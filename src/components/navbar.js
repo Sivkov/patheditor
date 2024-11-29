@@ -1,23 +1,28 @@
 import React from 'react';
+import ThemeSwitcher from './themeSwitcher';
+import Intro from './intro';
+
 
 const Navbar = () => {
 
 	const load = {}
-	const parser ={}
+	const parser = {}
 	const panels = {}
-	
-  return (
-    <nav className="navbar" id="navBar">
-      <div className="mx-4 d-flex flex-column">
-        <div className='navbar__regular_note'>Elliptical to circular arc converter</div>
-        <div className='navbar__small_note'>with counting deviation and showing deviation point</div>
-      </div>
-      <a href="https://github.com/Sivkov/arcConverter" className="github-button" target="_blank">
-			<img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Icon" className="github-icon" width="20" height="20"/>
-					<div id='github'>Code on GitHub</div>
-			</a>
-    </nav>
-  );
+
+	return (
+		<nav className="navbar conteiner-fluid p-0" id="navBar">
+			<div className="d-flex w-100 justify-content-between">
+				<div>
+					<Intro />
+				</div>
+				<div className='d-flex'>
+					<ThemeSwitcher />
+					<a href="https://github.com/Sivkov/arcConverter" className="github-button" target="_blank">
+						<img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Icon" className="github-icon" width="20" height="20" />
+					</a>
+				</div>
+			</div>
+		</nav>);
 };
 
 export default Navbar;

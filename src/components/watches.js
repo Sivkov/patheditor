@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import ThemeSwitcher from './themeSwitcher';
-
 
 const Watches= ()=> {
     const [time, setTime] = useState(false);
@@ -27,8 +25,7 @@ const Watches= ()=> {
 
   return (
   <div id="watches">
-    <ThemeSwitcher/>
-    <div className="d-none" >
+     <div >
         {time}      
     </div>
   </div>

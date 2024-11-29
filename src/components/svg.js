@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 
 
-const SvgComponent = ({ matrix, gmatrix, ell, arcs, deviation }) => {
+const SvgComponent = ({ matrix, gmatrix, ell, arcs, deviation, gridState }) => {
     const wrapperRef = useRef(null);
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${gmatrix.a} ${gmatrix.b} ${gmatrix.c} ${gmatrix.d} ${gmatrix.e} ${gmatrix.f}`;
@@ -48,19 +48,49 @@ const SvgComponent = ({ matrix, gmatrix, ell, arcs, deviation }) => {
             strokeWidth="0.2"
         >
             <defs>
-                <pattern id="xsGrid" width="1" height="1" fill="white" patternUnits="userSpaceOnUse">
-                    <path d="M 0 0 1 0 1 1 0 1 0 0" fill="none" stroke='var(--color)' strokeWidth="0.05"></path>
+                <pattern  
+                    id="xsGrid" 
+                    width="1" 
+                    height="1" 
+                    fill="var(--gridColorFill)" 
+                    patternUnits="userSpaceOnUse" 
+                    visibility={gridState.xsGrid.visibility}>
+                    <path  d="M 0 0 1 0 1 1 0 1 0 0" fill="var(--gridColorFill)" stroke="var(--gridColorStroke)" strokeWidth="0.05"/>
                 </pattern>
-                <pattern id="smallGrid" width="10" height="10" patternUnits="userSpaceOnUse">
-                    <rect width="100" height="100" fill="url(#xsGrid)"></rect>
-                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke='var(--color)' strokeWidth="0.2"></path>
+                <pattern 
+                    id="smallGrid" 
+                    width="10" 
+                    height="10" 
+                    patternUnits="userSpaceOnUse" >
+                    <rect  width="100" height="100" fill="url(#xsGrid)"/>
+                    <path  
+                    d="M 10 0 L 0 0 0 10 10 10 10 0" 
+                    fill={gridState.smallGrid.fill} 
+                    stroke="var(--gridColorStroke)" 
+                    strokeWidth="0.1" 
+                    visibility={gridState.smallGrid.visibility}/>
                 </pattern>
-                <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
-                    <rect width="100" height="100" fill="url(#smallGrid)"></rect>
-                    <path d="M 100 0 L 0 0 0 100" fill="none" stroke='var(--color)' strokeWidth="0.7"></path>
+                <pattern  
+                    id="grid" 
+                    width="100" 
+                    height="100" 
+                    patternUnits="userSpaceOnUse"
+                    visibility={gridState.grid.visibility}>
+                    <rect  
+                    width="100" height="100" 
+                    fill="url(#smallGrid)"/>
+                    <path  
+                    d="M 100 0 0 0 0 100 100 100 100 0" 
+                    fill={gridState.grid.fill} 
+                    stroke="var(--gridColorStroke)" 
+                    strokeWidth="0.2"/>
                 </pattern>
-                <marker id="dotRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
-                    <circle cx="5" cy="5" r="5" fill="red"></circle>
+                    <marker id="dotRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+                    <circle 
+                    cx="5" 
+                    cy="5" 
+                    r="5" 
+                    fill="red"></circle>
                 </marker>
             </defs>
             <g id="group2" fill="url(#grid)">

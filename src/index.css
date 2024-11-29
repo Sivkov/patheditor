@@ -19,10 +19,6 @@ code {
     background-color: red !important;
   }
 
-  #wrapper_svg_svg {
-    width:80%;
-    min-width: 50%;
-  } 
 
   .rightPanelItem {
     margin-top: 30px;
@@ -106,12 +102,6 @@ code {
     position: fixed
   }
 
-  #wrapper_svg_svg {
-    width: calc(100% - 10px);
-    flex-direction: column;
-    display: flex;
-  }
-
   .rightPanel__formCheck {
     min-height: 25px;
     padding-left: 0;
@@ -190,11 +180,7 @@ code {
     position: fixed
   }
 
-  #wrapper_svg_svg {
-    width: calc(100% - 10px);
-    flex-direction: column;
-    display: flex;
-  }
+ 
 
   .rightPanel__formCheck {
     min-height: 0;

@@ -3,7 +3,6 @@ import SvgComponent from './svg';
 import RightPanel from './rigthPanel.js';
 import Util from './../utils/util';
 import Arc from './../utils/arc.js';
-import Intro from './intro.js';
 
 
 const SvgWrapper = () => {
@@ -17,7 +16,6 @@ const SvgWrapper = () => {
 	const [segments, setSegments] = useState(14);
 	const [ell, setEllipse] = useState('M0 0');
     const [arcs, setArcs] = useState('M0 0');
-
     const ellepsisPath = (r1, r2) => {
         const widthSVG = 100;
         const heightSVG = 60;
@@ -30,6 +28,21 @@ const SvgWrapper = () => {
         }
     };
 
+	const [gridState, setGridState] = useState({
+		xsGrid: {
+			visibility: "visible",
+			fill: "var(--gridColorFill)",
+  		},
+		smallGrid: {
+			visibility: "visible",
+			fill: "none",
+ 		},
+		grid: {
+			visibility: "visible",
+			fill: "none",
+		},
+	  });
+
     useEffect(() => {
         const calculatedEllipse = ellepsisPath(radiusX, radiusY);
         setEllipse(calculatedEllipse);
@@ -38,6 +51,36 @@ const SvgWrapper = () => {
 		const calculatedDeviation = Arc.findMaxDeviationPoint(calculatedEllipse, calculatedArcs, 1000 )
 		setDeviation(calculatedDeviation)
     }, [radiusX, radiusY, segments]); 
+
+
+   	useEffect(() => {
+		const updatedState = { ...gridState };
+
+		if (matrix.a < 0.25) {
+		updatedState.xsGrid.visibility = "hidden";
+		updatedState.smallGrid.fill = "var(--gridColorFill)";
+		} else {
+		updatedState.xsGrid.visibility = "visible";
+		updatedState.smallGrid.fill = "none";
+		}
+
+		if (matrix.a < 0.125) {
+		updatedState.smallGrid.visibility = "hidden";
+		updatedState.grid.fill = "var(--gridColorFill)";
+		} else {
+		updatedState.smallGrid.visibility = "visible";
+		updatedState.grid.fill = "none";
+		}
+
+		if (matrix.a > 85) {
+		updatedState.grid.visibility = "hidden";
+		} else {
+		updatedState.grid.visibility = "visible";
+		}
+		setGridState(updatedState);
+	}, [matrix]);
+	
+
 
 	const handleMouseWheel = (event) => {
 		var svg = document.getElementById("svg")
@@ -51,6 +94,9 @@ const SvgWrapper = () => {
 		gTransform = gTransform.translate(-coords.x, -coords.y);
 
 		let comboMatrix = Util.multiplyMatrices(group, gTransform)
+		             
+		console.log (matrix)
+		
 		setMatrix({
 			a: comboMatrix.a,
 			b: comboMatrix.b,
@@ -102,10 +148,10 @@ const SvgWrapper = () => {
     }
 
 	return (
-		<main className="container-fluid h-100">
-			<div  id="wrapper_svg" className="w-100 h-100">
-				<div id='intro'><Intro /></div>
-				<div id="wrapper_svg_svg"
+		<main className="container-fluid h-100 overflow-hidden" id="parteditor">
+			<div className="row  align-items-center h-100">
+			<div className="w-100 h-100">
+			<div  id="wrapper_svg" 
 				onWheel={handleMouseWheel} 
 				onMouseDown={startDrag}
 				onMouseMove={drag} 
@@ -117,9 +163,10 @@ const SvgWrapper = () => {
 						ell={ell}
 						arcs={arcs}
 						deviation={deviation}
+						gridState={gridState}
 						/>
 				</div>
-				<div>
+				{/* <div>
 					<RightPanel 
 						setRadiusX={setRadiusX} 
 						setRadiusY={setRadiusY}
@@ -128,7 +175,8 @@ const SvgWrapper = () => {
 						arcs={arcs} 
 						deviation={deviation}
 						/>
-				</div>
+				</div> */}
+			</div>
 			</div>
 		</main>
 
