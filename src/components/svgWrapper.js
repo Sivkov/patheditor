@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useCoords } from './CoordsContext';
 import SvgComponent from './svg';
-import RightPanel from './rigthPanel.js';
+//import RightPanel from './rigthPanel.js';
 import Util from './../utils/util';
 import Arc from './../utils/arc.js';
 
@@ -9,7 +10,6 @@ const SvgWrapper = () => {
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [gmatrix, setGroupMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [offset, setOffset] = useState({});
-
 	const [deviation, setDeviation] = useState({deviation:0,maxDeviationPoint:{x:0,y:0}});
 	const [radiusX, setRadiusX] = useState(30);
 	const [radiusY, setRadiusY] = useState(20);
@@ -27,6 +27,7 @@ const SvgWrapper = () => {
             return pathElement ? pathElement.getAttribute('d') : 'M0 0';
         }
     };
+	const { setCoords } = useCoords(); // Получаем функцию для изменения координат
 
 	const [gridState, setGridState] = useState({
 		xsGrid: {
@@ -80,8 +81,6 @@ const SvgWrapper = () => {
 		setGridState(updatedState);
 	}, [matrix]);
 	
-
-
 	const handleMouseWheel = (event) => {
 		var svg = document.getElementById("svg")
 		var gTransform = svg.createSVGMatrix()
@@ -117,12 +116,13 @@ const SvgWrapper = () => {
         }
 	}
 
-	const endDrag =(e) =>{}
+	const endDrag =(e) =>{
+		setCoords({ x: '', y: ''})
+	}
 
 	const drag =(e) =>{
-		//console.log (e.buttons)
+		var coord = getMousePosition(e);
 		if (e.target && (e.buttons === 4 || e.buttons === 1)){
-			var coord = getMousePosition(e);
  			gmatrix.e = (coord.x - offset.x)
 			gmatrix.f = (coord.y - offset.y)
  
@@ -135,6 +135,8 @@ const SvgWrapper = () => {
 				f: gmatrix.f,
 			})
 		}
+		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
+		setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
 	}
 
     const getMousePosition = (evt) => {
