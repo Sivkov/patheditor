@@ -1,7 +1,8 @@
 import React from 'react';
 import ThemeSwitcher from './themeSwitcher';
 import Intro from './intro';
-
+import Panels from './panels'
+ 
 
 const Navbar = () => {
 
@@ -22,6 +23,7 @@ const Navbar = () => {
 					</a>
 				</div>
 			</div>
+			<Panels />
 		</nav>);
 };
 

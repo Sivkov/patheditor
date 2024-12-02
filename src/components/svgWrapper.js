@@ -94,7 +94,7 @@ const SvgWrapper = () => {
 
 		let comboMatrix = Util.multiplyMatrices(group, gTransform)
 		             
-		console.log (matrix)
+		//console.log (matrix)
 		
 		setMatrix({
 			a: comboMatrix.a,
