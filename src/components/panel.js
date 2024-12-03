@@ -5,50 +5,76 @@ const Panel = ({ element, index }) => {
 	const [zIndex, setZIndex] = useState(index+1);
 	const [position, setPosition] = useState({
 		top: element.style.top,
-		left: element.style.left,
+		left: element.style.left		
+	});
+	
+	const [size, setSize] = useState({
+		width: element.style.width,
+		height: element.style.height,
 	});
 
 	const panelRef = useRef(null);
 	const startPos = useRef({ x: 0, y: 0 });
+	const startWidth = useRef(0);
+	const startHeight = useRef(0);
+	const startY = useRef(0);
+	const startX = useRef(0);
+	const move = useRef(0);
 
-	// Toggle minimization
-	const toggleMinified = () => {
+ 	const toggleMinified = () => {
 		setIsMinified((prev) => !prev);
 	};
 
-	// Handle dragging
-	const handleMouseDown = (e) => {
+ 	const handleMouseDown = (e) => {
 		handleIncreaseZIndex()
 		e.preventDefault();
 		e.stopPropagation();
-		// Save the initial position of the mouse
 		startPos.current = {
 			x: e.clientX - panelRef.current.offsetLeft,
 			y: e.clientY - panelRef.current.offsetTop,
 		};
 
+		move.current = 'move'
+
 		document.addEventListener("mousemove", handleMouseMove);
 		document.addEventListener("mouseup", handleMouseUp);
-		//document.addEventListener("mouseleave", handleMouseUp);
 	};
 
-	const handleMouseMove = (e) => {
-		e.preventDefault();
-		e.stopPropagation();
-		// Calculate new position
-		const newLeft = e.clientX - startPos.current.x;
-		const newTop = e.clientY - startPos.current.y;
+	const initDrag =(e)=>{
+		startX.current = e.clientX;
+        startY.current = e.clientY;
 
-		// Update position
-		setPosition({
-			top: newTop,
-			left: newLeft,
-		});
+		startWidth.current = size.width
+		startHeight.current = size.height
+
+		move.current = 'resize'
+			
+		document.addEventListener("mousemove", handleMouseMove);
+		document.addEventListener("mouseup", handleMouseUp);
+	}
+	
+	const handleMouseMove = (e) => {
+		if (move.current === 'move') {
+			const newLeft = e.clientX - startPos.current.x;
+			const newTop = e.clientY - startPos.current.y;
+			setPosition({
+				top: newTop,
+				left: newLeft,
+			});
+		} else {
+			let w = startWidth.current + e.clientX - startX.current ;
+			let h = startHeight.current + e.clientY - startY.current;
+			setSize ({
+				width:w,
+				height:h
+			})
+		}
 	};
 
 	const handleMouseUp = () => {
 		document.removeEventListener("mousemove", handleMouseMove);
 		document.removeEventListener("mouseup", handleMouseUp);
+		move.current= ''
 	};
 
 	const findHighestZIndex = () => {
@@ -62,7 +88,6 @@ const Panel = ({ element, index }) => {
 				currentMaxZIndex = parsedZIndex;
 			}
 		});
-
 		return currentMaxZIndex;
 	};
 
@@ -81,18 +106,15 @@ const Panel = ({ element, index }) => {
 				zIndex: zIndex,
 				top: `${position.top}px`,
 				left: `${position.left}px`,
-				width: `${element.style.width}px`,
-				height: `${element.style.height}px`,
+				width: `${size.width}px`,
+				height: `${size.height}px`,
 			}}			
 		>
 			<div className="window-top popup-header" 
-				onMouseDown={handleMouseDown}
-				onMouseLeave={handleMouseUp}>
+				onMouseDown={handleMouseDown}>
 				<div className="d-flex align-items-center justify-content-between">
 					<div className="nav-link">{element.fa}</div>
-					<div
-						className="minify_wrapper d-flex align-items-center justify-content-center"
-					>
+					<div className="minify_wrapper d-flex align-items-center justify-content-center">
 						<div
 							className={`minify ${isMinified ? "minified" : ""}`}
 							onClick={(e) => {
@@ -106,9 +128,21 @@ const Panel = ({ element, index }) => {
 			<div className={`window-content ${isMinified ? "mini" : ""}`}>
 				{element.content}
 			</div>
-			<div className={`resizer-right ${isMinified ? "mini" : ""}`}></div>
-			<div className={`resizer-bottom ${isMinified ? "mini" : ""}`}></div>
-			<div className={`resizer-both ${isMinified ? "mini" : ""}`}></div>
+			<div 
+				className={`resizer-right ${isMinified ? "mini" : ""}`}
+				onMouseDown={initDrag}				
+				onMouseUp={handleMouseUp}
+			></div>
+			<div 
+				className={`resizer-bottom ${isMinified ? "mini" : ""}`}
+				onMouseDown={initDrag}
+				onMouseUp={handleMouseUp}
+			></div>
+			<div 
+				className={`resizer-both ${isMinified ? "mini" : ""}`}
+				onMouseDown={initDrag}
+				onMouseUp={handleMouseUp}
+			></div>
 		</div>
 	);
 };
