@@ -72,6 +72,16 @@ class Util {
 			return false
 		}
 	}
+	 
+	static getMousePosition = (evt) => {
+		var svg = document.getElementById("svg")
+    	let CTM = svg.getScreenCTM();
+        
+        return   {
+            x: (evt.clientX + CTM.f)/ CTM.a,
+            y: (evt.clientY + CTM.e)/ CTM.d
+        }; 
+    }
 }
 
 export default Util;

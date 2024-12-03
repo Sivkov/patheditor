@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCoords } from './CoordsContext';
 import SvgComponent from './svg';
-//import RightPanel from './rigthPanel.js';
-import Util from './../utils/util';
+ import Util from './../utils/util';
 import Arc from './../utils/arc.js';
 
 
@@ -27,8 +26,7 @@ const SvgWrapper = () => {
             return pathElement ? pathElement.getAttribute('d') : 'M0 0';
         }
     };
-	const { setCoords } = useCoords(); // Получаем функцию для изменения координат
-
+	const { setCoords } = useCoords();
 	const [gridState, setGridState] = useState({
 		xsGrid: {
 			visibility: "visible",
@@ -53,10 +51,8 @@ const SvgWrapper = () => {
 		setDeviation(calculatedDeviation)
     }, [radiusX, radiusY, segments]); 
 
-
    	useEffect(() => {
 		const updatedState = { ...gridState };
-
 		if (matrix.a < 0.25) {
 		updatedState.xsGrid.visibility = "hidden";
 		updatedState.smallGrid.fill = "var(--gridColorFill)";
@@ -80,7 +76,9 @@ const SvgWrapper = () => {
 		}
 		setGridState(updatedState);
 	}, [matrix]);
-	
+
+	const inMoveRef = useRef(0); 
+			
 	const handleMouseWheel = (event) => {
 		var svg = document.getElementById("svg")
 		var gTransform = svg.createSVGMatrix()
@@ -108,26 +106,31 @@ const SvgWrapper = () => {
 
 	const startDrag = (e) =>{
 		console.log ('startDrag')
+		inMoveRef.current = 1;		
 		if (e.target && (e.buttons === 4 || e.buttons === 1)) {            
-			let off = getMousePosition(e);
+			let off = Util.getMousePosition(e);
 			let transforms = document.getElementById("group1").transform.baseVal.consolidate().matrix
             off.x -= transforms.e;
             off.y -= transforms.f;
-			setOffset({x:off.x,y:off.y})			 
+			setOffset({x:off.x,y:off.y})
         }
 	}
 
 	const endDrag =(e) =>{
 		setCoords({ x: '', y: ''})
+		inMoveRef.current = 0;		
+		console.log ('endDrag ' + inMoveRef.current)
 	}
 
 	const drag =(e) =>{
-		console.log ('Drag ' + e.currentTarget.id )
-		var coord = getMousePosition(e);
+		console.log ('Drag ' + e.currentTarget.id +'  '+inMoveRef.current)
+		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
+		setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
+		if (!inMoveRef.current) return;
+		var coord = Util.getMousePosition(e);
 		if (e.target && (e.buttons === 4 || e.buttons === 1)){
  			gmatrix.e = (coord.x - offset.x)
-			gmatrix.f = (coord.y - offset.y)
- 
+			gmatrix.f = (coord.y - offset.y) 
 			setGroupMatrix({
 				a: gmatrix.a,
 				b: gmatrix.b,
@@ -137,30 +140,18 @@ const SvgWrapper = () => {
 				f: gmatrix.f,
 			})
 		}
-		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
-		setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
+		
 	}
-
-    const getMousePosition = (evt) => {
-		var svg = document.getElementById("svg")
-    	let CTM = svg.getScreenCTM();
-        
-        return   {
-            x: (evt.clientX + CTM.f)/ CTM.a,
-            y: (evt.clientY + CTM.e)/ CTM.d
-        }; 
-    }
 
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">
 			<div className="row  align-items-center h-100">
 			<div className="w-100 h-100">
-			<div  id="wrapper_svg" 
+			<div id="wrapper_svg" 
 				onWheel={handleMouseWheel} 
 				onMouseDown={startDrag}
 				onMouseMove={drag} 
- 				onMouseUp={endDrag}
-				onMouseLeave={endDrag}>		 
+ 				onMouseUp={endDrag}>		 
 					<SvgComponent 
 						matrix={matrix} 
 						gmatrix={gmatrix} 

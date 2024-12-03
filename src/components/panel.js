@@ -18,7 +18,9 @@ const Panel = ({ element, index }) => {
 
 	// Handle dragging
 	const handleMouseDown = (e) => {
+		handleIncreaseZIndex()
 		e.preventDefault();
+		e.stopPropagation();
 		// Save the initial position of the mouse
 		startPos.current = {
 			x: e.clientX - panelRef.current.offsetLeft,
@@ -27,10 +29,12 @@ const Panel = ({ element, index }) => {
 
 		document.addEventListener("mousemove", handleMouseMove);
 		document.addEventListener("mouseup", handleMouseUp);
+		//document.addEventListener("mouseleave", handleMouseUp);
 	};
 
 	const handleMouseMove = (e) => {
 		e.preventDefault();
+		e.stopPropagation();
 		// Calculate new position
 		const newLeft = e.clientX - startPos.current.x;
 		const newTop = e.clientY - startPos.current.y;
@@ -79,10 +83,11 @@ const Panel = ({ element, index }) => {
 				left: `${position.left}px`,
 				width: `${element.style.width}px`,
 				height: `${element.style.height}px`,
-			}}
-			onMouseDown={handleIncreaseZIndex}
+			}}			
 		>
-			<div className="window-top popup-header" onMouseDown={handleMouseDown}>
+			<div className="window-top popup-header" 
+				onMouseDown={handleMouseDown}
+				onMouseLeave={handleMouseUp}>
 				<div className="d-flex align-items-center justify-content-between">
 					<div className="nav-link">{element.fa}</div>
 					<div
