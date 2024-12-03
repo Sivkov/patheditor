@@ -18,11 +18,11 @@ const SvgComponent = ({ matrix, gmatrix, ell, arcs, deviation, gridState }) => {
         };
     };
 
-    const combinedMatrix = multiplyMatrices(gmatrix, matrix);
 
 
     const calculateRectAttributes = () => {
         // Ширина и высота исходя из scale
+        const combinedMatrix = multiplyMatrices(gmatrix, matrix);
         const scaleX = combinedMatrix.a;
         const scaleY = combinedMatrix.d;
 

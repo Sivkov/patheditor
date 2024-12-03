@@ -23,7 +23,7 @@ const Navbar = () => {
 					</a>
 				</div>
 			</div>
-			<Panels />
+			{/* <Panels /> */}
 		</nav>);
 };
 

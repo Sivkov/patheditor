@@ -32,7 +32,7 @@ class Util {
 
 		let aNumRows = matrixA.length;
 		let aNumCols = matrixA[0].length;
-		let bNumRows = matrixB.length;
+		//let bNumRows = matrixB.length;
 		let bNumCols = matrixB[0].length;
 		let newMatrix = new Array(aNumRows);
 

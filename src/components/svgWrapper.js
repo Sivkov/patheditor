@@ -9,7 +9,7 @@ import Arc from './../utils/arc.js';
 const SvgWrapper = () => {
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [gmatrix, setGroupMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
-	const [offset, setOffset] = useState({});
+	const [offset, setOffset] = useState({x:0,y:0});
 	const [deviation, setDeviation] = useState({deviation:0,maxDeviationPoint:{x:0,y:0}});
 	const [radiusX, setRadiusX] = useState(30);
 	const [radiusY, setRadiusY] = useState(20);
@@ -107,6 +107,7 @@ const SvgWrapper = () => {
 	};
 
 	const startDrag = (e) =>{
+		console.log ('startDrag')
 		if (e.target && (e.buttons === 4 || e.buttons === 1)) {            
 			let off = getMousePosition(e);
 			let transforms = document.getElementById("group1").transform.baseVal.consolidate().matrix
@@ -121,6 +122,7 @@ const SvgWrapper = () => {
 	}
 
 	const drag =(e) =>{
+		console.log ('Drag ' + e.currentTarget.id )
 		var coord = getMousePosition(e);
 		if (e.target && (e.buttons === 4 || e.buttons === 1)){
  			gmatrix.e = (coord.x - offset.x)
