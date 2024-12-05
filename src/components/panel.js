@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from "react";
 
 const Panel = ({ element, index }) => {
 
-
 	const  getPopupPosition = (id)=>{
 		console.log (id)
 		let pp = JSON.parse(localStorage.getItem('pp'))
@@ -13,13 +12,6 @@ const Panel = ({ element, index }) => {
 		return false
 	}
 
- 	let loadPanelPosition = getPopupPosition (element.id)
-	if (loadPanelPosition) {
-		if ( loadPanelPosition.hasOwnProperty('style'))	element.style = loadPanelPosition.style
-		if ( loadPanelPosition.hasOwnProperty('mini'))	element.mini = loadPanelPosition.mini
-	}
- 
-				
 	const [zIndex, setZIndex] = useState(index+1);
 	const [isMinified, setIsMinified] = useState( element.mini )
 	const [position, setPosition] = useState({
@@ -32,28 +24,33 @@ const Panel = ({ element, index }) => {
 		height: element.style.height
 	});
 
- 	/*useEffect(() => {
-		console.log ('Вызываем getPopupPosition только при первом рендере')
-		const loadPanelPosition = getPopupPosition(element.id);
-		if (loadPanelPosition) {
-		  if (loadPanelPosition.style) {
-			setPosition({
-			  top: loadPanelPosition.style.top,
-			  left: loadPanelPosition.style.left,
-			});
-			setSize({
-			  width: loadPanelPosition.style.width,
-			  height: loadPanelPosition.style.height,
-			});
-		  }
-		} 
-	},[]); */
+	const [isInitialized, setIsInitialized] = useState(false);
 
- 	useEffect(() => {
-		savePanelPosition(element.id)
-    }, [position, size, isMinified]);  
+	useEffect(() => {
+	  const loadPanelPosition = getPopupPosition(element.id);
+	  if (loadPanelPosition) {
+		if (loadPanelPosition.style) {
+		  setPosition({
+			top: loadPanelPosition.style.top,
+			left: loadPanelPosition.style.left,
+		  });
+		  setSize({
+			width: loadPanelPosition.style.width,
+			height: loadPanelPosition.style.height,
+		  });
+		}
+		if (loadPanelPosition.mini !== undefined) {
+		  setIsMinified(loadPanelPosition.mini);
+		}
+	  }
+	  setIsInitialized(true);
+	}, [element.id]);
 
-	
+	useEffect(() => {
+		if (!isInitialized) return; 
+		savePanelPosition(element.id);
+	}, [position, size, isMinified, isInitialized, element.id]);
+
 	const panelRef = useRef(null);
 	const startPos = useRef({ x: 0, y: 0 });
 	const startWidth = useRef(0);
