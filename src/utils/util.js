@@ -82,6 +82,10 @@ class Util {
             y: (evt.clientY + CTM.e)/ CTM.d
         }; 
     }
+
+	static mirror () {
+		return 'xui'
+	}
 }
 
 export default Util;

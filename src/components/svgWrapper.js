@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCoords } from './CoordsContext';
 import SvgComponent from './svg';
- import Util from './../utils/util';
+import Util from './../utils/util';
 import Arc from './../utils/arc.js';
 
 
