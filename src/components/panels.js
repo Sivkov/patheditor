@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
 import Panel from './panel';
-import Util from './../utils/util';
+//import Util from './../utils/util';
 import '@fortawesome/fontawesome-free/css/all.css'
 
 const Panels = () => {
@@ -20,10 +20,10 @@ const Panels = () => {
 			mini: false,
 			fa: (<Icon icon="heroicons:wrench-screwdriver-20-solid" />),
 			style: {
-			  top: 40,
+			  top: 0,
 			  left: 300,
 			  width: 150,
-			  height: "auto",
+			  height: 300,
 			},
 			content: (
 				<div className="d-flex align-items-center btn_block flex-wrap">
@@ -109,11 +109,10 @@ const Panels = () => {
 			mini: false,
 			fa: (<Icon icon="mynaui:square-dashed-solid" width="24" height="24"  style={{color: 'white'}} />),
 			style: {
-			  top: 121,
+			  top: 0,
 			  left: 12,
 			  width: 350,
-			  height: 'auto',
-			  zIndex: 122,
+			  height: 520,
 			},
 			content: (
 			  <div className="window-content">

@@ -1,18 +1,59 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+
 
 const Panel = ({ element, index }) => {
-	const [isMinified, setIsMinified] = useState(element.mini);
+
+
+	const  getPopupPosition = (id)=>{
+		console.log (id)
+		let pp = JSON.parse(localStorage.getItem('pp'))
+		if (pp && pp.hasOwnProperty(id)) {
+			return pp[id]
+		}
+		return false
+	}
+
+ 	let loadPanelPosition = getPopupPosition (element.id)
+	if (loadPanelPosition) {
+		if ( loadPanelPosition.hasOwnProperty('style'))	element.style = loadPanelPosition.style
+		if ( loadPanelPosition.hasOwnProperty('mini'))	element.mini = loadPanelPosition.mini
+	}
+ 
+				
 	const [zIndex, setZIndex] = useState(index+1);
+	const [isMinified, setIsMinified] = useState( element.mini )
 	const [position, setPosition] = useState({
-		top: element.style.top,
-		left: element.style.left		
+		top:  element.style.top,
+		left: element.style.left,
 	});
 	
 	const [size, setSize] = useState({
-		width: element.style.width,
-		height: element.style.height,
+		width:  element.style.width,
+		height: element.style.height
 	});
 
+ 	/*useEffect(() => {
+		console.log ('Вызываем getPopupPosition только при первом рендере')
+		const loadPanelPosition = getPopupPosition(element.id);
+		if (loadPanelPosition) {
+		  if (loadPanelPosition.style) {
+			setPosition({
+			  top: loadPanelPosition.style.top,
+			  left: loadPanelPosition.style.left,
+			});
+			setSize({
+			  width: loadPanelPosition.style.width,
+			  height: loadPanelPosition.style.height,
+			});
+		  }
+		} 
+	},[]); */
+
+ 	useEffect(() => {
+		savePanelPosition(element.id)
+    }, [position, size, isMinified]);  
+
+	
 	const panelRef = useRef(null);
 	const startPos = useRef({ x: 0, y: 0 });
 	const startWidth = useRef(0);
@@ -96,6 +137,40 @@ const Panel = ({ element, index }) => {
 		setZIndex(currentMaxZIndex + 1);
 		console.log ('Set Z')
 	};
+
+	const  savePanelPosition =(id)=>{
+		console.log("SavePositions")
+		let pp = localStorage.getItem('pp')
+		if (!pp) {
+            let positions = {}
+            positions[id] = {}
+            positions[id].mini = element.mini
+            positions[id].style = {
+				"top":position.top,
+				"left":position.left,
+				"width":size.width,
+				"height":size.height
+			}
+			positions[id].mini = isMinified
+            localStorage.setItem('pp', JSON.stringify(positions))
+        } else {
+
+            let positions = JSON.parse(localStorage.getItem('pp'))
+            if (!pp.hasOwnProperty(id)) {
+                positions[id] = {}
+            }
+            positions[id].mini = element.mini
+			positions[id].style = {
+				"top":position.top,
+				"left":position.left,
+				"width":size.width,
+				"height":size.height
+			}  
+			positions[id].mini = isMinified
+			localStorage.setItem('pp', JSON.stringify(positions))
+        }
+	}   
+
 
 	return (
 		<div
