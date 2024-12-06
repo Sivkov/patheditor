@@ -1,29 +1,19 @@
 import React, { useRef, useState } from 'react';
 import Part from './../scripts/part';
+import Util from './../utils/util';
 
 
-const SvgComponent = ({ matrix, gmatrix, simpleReturn,gridState }) => {
+const SvgComponent = ({ matrix, gmatrix, svgContent, gridState }) => {
     const wrapperRef = useRef(null);
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${gmatrix.a} ${gmatrix.b} ${gmatrix.c} ${gmatrix.d} ${gmatrix.e} ${gmatrix.f}`;
-	const widthSVG = 100
-	const heightSVG = 60
-    const multiplyMatrices = (m1, m2) => {
-        return {
-            a: m1.a * m2.a + m1.c * m2.b,
-            b: m1.b * m2.a + m1.d * m2.b,
-            c: m1.a * m2.c + m1.c * m2.d,
-            d: m1.b * m2.c + m1.d * m2.d,
-            e: m1.a * m2.e + m1.c * m2.f + m1.e,
-            f: m1.b * m2.e + m1.d * m2.f + m1.f,
-        };
-    };
-
+	const widthSVG = 189
+	const heightSVG = 200
 
 
     const calculateRectAttributes = () => {
         // Ширина и высота исходя из scale
-        const combinedMatrix = multiplyMatrices(gmatrix, matrix);
+        const combinedMatrix = Util.multiplyMatrices(gmatrix, matrix);
         const scaleX = combinedMatrix.a;
         const scaleY = combinedMatrix.d;
 
@@ -110,7 +100,7 @@ const SvgComponent = ({ matrix, gmatrix, simpleReturn,gridState }) => {
                                 strokeWidth="0"
                             ></rect>
                             <>
-                             { simpleReturn }
+                             { svgContent }
                             </>
                        </g>
                     </g>

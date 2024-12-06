@@ -24,7 +24,31 @@ class Part {
 
     }
 
+    static updateRect() {
+        var rect = document.querySelector('#wrapper_svg').getBoundingClientRect();   
+        var svg = document.querySelector('#svg')     
+        var point = svg.createSVGPoint();
+        point.y = rect.top;
+        point.x = rect.left;
+        let top = point.matrixTransform(document.querySelector('#group').getScreenCTM().inverse());
+
+        var point1 = svg.createSVGPoint();
+        point1.y = rect.bottom;
+        point1.x = rect.right;
+        let bottom = point1.matrixTransform(document.querySelector('#group').getScreenCTM().inverse());
+ 
+
+        let width =  bottom.x  - top.x
+        let height =  bottom.y - top.y
+        let rect1 = document.querySelector('#dimensionalGrid')
+        rect1.setAttribute('x', top.x)
+        rect1.setAttribute('y', top.y)
+        rect1.setAttribute('width', width)
+        rect1.setAttribute('height', height)
+    }
+
     static simpleReturn() {
+        console.log('simpleReturn__simpleReturn__simpleReturn')
         return (
           <>
             <g
@@ -139,31 +163,33 @@ class Part {
     static loadFileJson() {
         const url = new URL('http://127.0.0.1/parteditor.html?filename=700x700-10.0-DD11-N0.ncp&handle=0&part=part_6');
         const searchParams = url.searchParams;
-        this.file = searchParams.get('filename').replace(".ncp", "")
-        this.part = searchParams.get('part')
-        this.pNumber = Number(searchParams.get('part').replace('part_', ''))
-        this.handle = +searchParams.get('handle')
-        Part.getPartCode()
+        let file = searchParams.get('filename').replace(".ncp", "")
+        let part = searchParams.get('part')
+        let pNumber = Number(searchParams.get('part').replace('part_', ''))
+        let handle = +searchParams.get('handle')
+        Part.getPartCode(handle, pNumber)
         //if (this.handle >= 0) part.primaryPolling();
     }
 
-    /*static getPartCode(handle, number) {
-        if (this.pNumber){
-            axios({
-                method: "Get",
-                url: "http://127.0.0.1/editor/getpart?handle=" + this.handle + '&program_no=' + this.number,
-            }).done(function (code) {
-                Part.code = code.code
-                Part.ncpToSvg(part.code)
+    static getPartCode(handle=0, number=6) {        
+        axios({
+            method: "GET",
+            url: "http://127.0.0.1/editor/getpart?handle=0&program_no=6",
+          })
+            .then((response) => {
+              // Успешный ответ
+              debugger;
+              console.log(response.data);
+            })
+            .catch((error) => {
+              // Обработка ошибок
+              console.error(error);
             });
-        } /* else {
-            this.createModal('newPartDialog')
-        } 
-        
-    }*/
+          
+    }
 
     static add(create=false) {
-    /*     const svg = document.querySelector('#svg');
+    /*  const svg = document.querySelector('#svg');
         const lastContours = svg.querySelectorAll('g.contour');
         const lastContour = lastContours[lastContours.length - 1]
 

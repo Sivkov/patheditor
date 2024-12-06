@@ -118,7 +118,16 @@ const SvgWrapper = () => {
 		
 	}
 
-	const simpleReturn = Part.simpleReturn()
+	const [svgContent, setSvgContent] = useState(''); // Хранилище для SVG
+	const [svgIsLoad, setSvgIsLoad] = useState(false); // Флаг загрузки SVG
+  
+	useEffect(() => {
+	  if (!svgIsLoad) {
+		const loadedSvg = Part.simpleReturn();
+		setSvgContent(loadedSvg);
+		setSvgIsLoad(true); 
+	  }
+	}, [svgIsLoad]); 
 
 
 	return (
@@ -134,7 +143,7 @@ const SvgWrapper = () => {
 						matrix={matrix} 
 						gmatrix={gmatrix} 
 						gridState={gridState}
-						simpleReturn={simpleReturn}
+						svgContent={svgContent}
 						/>
 				</div>
 				</div>
