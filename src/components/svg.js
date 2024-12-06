@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
+import Part from './../scripts/part';
 
 
-const SvgComponent = ({ matrix, gmatrix, ell, arcs, deviation, gridState }) => {
+const SvgComponent = ({ matrix, gmatrix, simpleReturn,gridState }) => {
     const wrapperRef = useRef(null);
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${gmatrix.a} ${gmatrix.b} ${gmatrix.c} ${gmatrix.d} ${gmatrix.e} ${gmatrix.f}`;
@@ -108,24 +109,10 @@ const SvgComponent = ({ matrix, gmatrix, ell, arcs, deviation, gridState }) => {
                                 stroke='var(--color)'
                                 strokeWidth="0"
                             ></rect>
-                            <path 
-                                id="ellepsis" 
-                                d={ell}
-                            ></path>
-                            <path 
-                                markerEnd="url(#dotRed)" 
-                                markerMid="url(#dotRed)" 
-                                markerStart="url(#dotRed)"
-                                id="arcs" 
-                                d={arcs}
-                            ></path>
-                               <circle 
-                                cx={ deviation.maxDeviationPoint.x} 
-                                cy={ deviation.maxDeviationPoint.y} 
-                                r="1"
-                                stroke='qreen'
-                                strokeWidth={1}/>
-                        </g>
+                            <>
+                             { simpleReturn }
+                            </>
+                       </g>
                     </g>
                 </g>
             </g>

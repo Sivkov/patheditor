@@ -3,29 +3,13 @@ import { useCoords } from './CoordsContext';
 import SvgComponent from './svg';
 import Util from './../utils/util';
 import Arc from './../utils/arc.js';
+import Part from '../scripts/part.js';
 
 
 const SvgWrapper = () => {
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [gmatrix, setGroupMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [offset, setOffset] = useState({x:0,y:0});
-	const [deviation, setDeviation] = useState({deviation:0,maxDeviationPoint:{x:0,y:0}});
-	const [radiusX, setRadiusX] = useState(30);
-	const [radiusY, setRadiusY] = useState(20);
-	const [segments, setSegments] = useState(14);
-	const [ell, setEllipse] = useState('M0 0');
-    const [arcs, setArcs] = useState('M0 0');
-    const ellepsisPath = (r1, r2) => {
-        const widthSVG = 100;
-        const heightSVG = 60;
-
-        if (r1 && r2) {
-            return `M${widthSVG * 0.5 - r1} ${heightSVG * 0.5} A${r1} ${r2} 0 0 0 ${widthSVG * 0.5 + r1} ${heightSVG * 0.5} A ${r1} ${r2} 0 0 0 ${widthSVG * 0.5 - r1} ${heightSVG * 0.5}`;
-        } else {
-            const pathElement = document.querySelector('#ellepsis');
-            return pathElement ? pathElement.getAttribute('d') : 'M0 0';
-        }
-    };
 	const { setCoords } = useCoords();
 	const [gridState, setGridState] = useState({
 		xsGrid: {
@@ -41,15 +25,6 @@ const SvgWrapper = () => {
 			fill: "none",
 		},
 	  });
-
-    useEffect(() => {
-        const calculatedEllipse = ellepsisPath(radiusX, radiusY);
-        setEllipse(calculatedEllipse);
-        const calculatedArcs = Arc.converting(calculatedEllipse, segments); 
-        setArcs(calculatedArcs);
-		const calculatedDeviation = Arc.findMaxDeviationPoint(calculatedEllipse, calculatedArcs, 1000 )
-		setDeviation(calculatedDeviation)
-    }, [radiusX, radiusY, segments]); 
 
    	useEffect(() => {
 		const updatedState = { ...gridState };
@@ -143,6 +118,9 @@ const SvgWrapper = () => {
 		
 	}
 
+	const simpleReturn = Part.simpleReturn()
+
+
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">
 			<div className="row  align-items-center h-100">
@@ -155,23 +133,11 @@ const SvgWrapper = () => {
 					<SvgComponent 
 						matrix={matrix} 
 						gmatrix={gmatrix} 
-						ell={ell}
-						arcs={arcs}
-						deviation={deviation}
 						gridState={gridState}
+						simpleReturn={simpleReturn}
 						/>
 				</div>
-				{/* <div>
-					<RightPanel 
-						setRadiusX={setRadiusX} 
-						setRadiusY={setRadiusY}
-						setSegments={setSegments} 
-						ell={ell} 
-						arcs={arcs} 
-						deviation={deviation}
-						/>
-				</div> */}
-			</div>
+				</div>
 			</div>
 		</main>
 
