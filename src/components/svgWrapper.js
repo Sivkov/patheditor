@@ -25,6 +25,7 @@ const SvgWrapper = () => {
 			fill: "none",
 		},
 	  });
+	const [svgParams, setSvgParams]= useState({width:0, height:0}) 
 
    	useEffect(() => {
 		const updatedState = { ...gridState };
@@ -53,6 +54,8 @@ const SvgWrapper = () => {
 	}, [matrix]);
 
 	const inMoveRef = useRef(0); 
+	const group = useRef(null);
+    const wrapperSVG = useRef(null);
 			
 	const handleMouseWheel = (event) => {
 		var svg = document.getElementById("svg")
@@ -126,15 +129,49 @@ const SvgWrapper = () => {
 		const loadedSvg = Part.simpleReturn();
 		setSvgContent(loadedSvg);
 		setSvgIsLoad(true); 
+		setSvgParams(Part.getSvgParams())
+		fitToPAge()
 	  }
 	}, [svgIsLoad]); 
+
+	const fitToPAge =() => {
+		
+ 		setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
+		setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
+        //part.normalizeIntends()
+        //part.updateRect()
+        let box = document.querySelector('#group').getBoundingClientRect()
+		const wBox = wrapperSVG.current.getBoundingClientRect();
+		debugger
+        
+        let scaleW = wBox.width/ box.width
+        let scaleH = wBox.height / box.height
+        let scale = scaleW < scaleH ? scaleW : scaleH
+
+        let xd = (box.x + box.width * 0.5)
+        let yd = (box.y + box.height * 0.5)
+
+        let coords1 = Util.convertScreenCoordsToSvgCoords(xd, yd);
+        let center = Util.convertScreenCoordsToSvgCoords(wBox.x+wBox.width*0.5, wBox.y+wBox.height*0.5)
+       
+        let outerBox = document.querySelector('#contours').getBoundingClientRect()
+        let oxd = (outerBox.x + outerBox.width * 0.5)
+        let oyd = (outerBox.y + outerBox.height * 0.5)
+
+        let dif = Util.convertScreenCoordsToSvgCoords(oxd, oyd)
+        let ydif = dif.y - center.y
+        let xdif = dif.x - center.x
+		//setGroupMatrix({ a: scale, b: scale, c: 0, d: 1, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }) 
+		console.log ({ a: scale, b: scale, c: 0, d: 1, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif })
+		setGroupMatrix ({ a: 0.4908140727912276, b: 0, c: 0, d: 0.4908140727912276, e: 28.366972880205747, f: -0.19623375480269356 })
+     	}
 
 
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">
 			<div className="row  align-items-center h-100">
 			<div className="w-100 h-100">
-			<div id="wrapper_svg" 
+			<div id="wrapper_svg" ref={wrapperSVG}
 				onWheel={handleMouseWheel} 
 				onMouseDown={startDrag}
 				onMouseMove={drag} 
@@ -144,7 +181,8 @@ const SvgWrapper = () => {
 						gmatrix={gmatrix} 
 						gridState={gridState}
 						svgContent={svgContent}
-						/>
+						svgParams={svgParams}
+					/>
 				</div>
 				</div>
 			</div>

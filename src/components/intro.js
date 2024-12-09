@@ -5,10 +5,11 @@ function Intro() {
 	
 
 	return (
-		<div className="logo_wrapper part_editor_logo ms-2">
-			<Icon icon="fa6-solid:compass-drafting" />
+		<div className="m-1">
+			<div className="logo_wrapper part_editor_logo ms-2">
+				<Icon icon="fa6-solid:compass-drafting" />
+			</div>
 		</div>
-
 	);
 }
 

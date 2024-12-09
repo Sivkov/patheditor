@@ -3,12 +3,11 @@ import Part from './../scripts/part';
 import Util from './../utils/util';
 
 
-const SvgComponent = ({ matrix, gmatrix, svgContent, gridState }) => {
-    const wrapperRef = useRef(null);
+const SvgComponent = ({ matrix, gmatrix, svgContent, gridState, svgParams }) => {
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${gmatrix.a} ${gmatrix.b} ${gmatrix.c} ${gmatrix.d} ${gmatrix.e} ${gmatrix.f}`;
-	const widthSVG = 189
-	const heightSVG = 200
+	const widthSVG = svgParams.width
+	const heightSVG = svgParams.height
 
 
     const calculateRectAttributes = () => {

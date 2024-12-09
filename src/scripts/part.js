@@ -24,6 +24,20 @@ class Part {
 
     }
 
+    static #params = {
+        width: 150,
+        height:150
+    };
+
+    static setSvgParams(newParams) {
+        this.#params = { ...this.#params, ...newParams };
+    }
+
+    static getSvgParams(param=false) {
+        if (!param) return this.#params
+        return this.#params[param];
+    }
+
     static updateRect() {
         var rect = document.querySelector('#wrapper_svg').getBoundingClientRect();   
         var svg = document.querySelector('#svg')     
@@ -49,16 +63,18 @@ class Part {
 
     static simpleReturn() {
         console.log('simpleReturn__simpleReturn__simpleReturn')
+        Part.setSvgParams({width:189, height:200})
+        
         return (
           <>
             <g
-              data-cid="6"
+              data-cid="1"
               className="contour outer macro0 closed1 noOutlet"
             >
               <path d="M6,74.356 H0 V125.689 H12 V150.286 H0 V187.286 H12 V200 H177 V187.286 H189 V150.286 H177 V125.689 H189 V74.356 H177 V54.678 H189 V19.678 H177 V0 H12 V19.678 H0 V54.678 H12 V74.356 H6 "></path>
             </g>
             <g
-              data-cid="6"
+              data-cid="1"
               fill="none"
               className="inlet outer macro1"
               stroke="red"
@@ -70,7 +86,7 @@ class Part {
               ></path>
             </g>
             <g
-              data-cid="6"
+              data-cid="1"
               fill="none"
               className="outlet inner macro0 noOutlet"
               stroke="lime"
@@ -81,7 +97,8 @@ class Part {
             </g>
           </>
         );
-      }
+    }
+
       
     static normalizeIntends () {
  /*        let int = {x:Infinity,y:Infinity}
