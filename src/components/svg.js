@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import Part from './../scripts/part';
 import Util from './../utils/util';
+import SimpleReturnComponent from './simpleReturnComponent'
 
 
 const SvgComponent = ({ matrix, gmatrix, svgContent, gridState, svgParams }) => {
@@ -99,7 +100,7 @@ const SvgComponent = ({ matrix, gmatrix, svgContent, gridState, svgParams }) => 
                                 strokeWidth="0"
                             ></rect>
                             <>
-                             { svgContent }
+                             < SimpleReturnComponent />
                             </>
                        </g>
                     </g>

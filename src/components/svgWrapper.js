@@ -6,7 +6,7 @@ import Arc from './../utils/arc.js';
 import Part from '../scripts/part.js';
 
 
-const SvgWrapper = () => {
+const  SvgWrapper = () => {
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [gmatrix, setGroupMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [offset, setOffset] = useState({x:0,y:0});
@@ -123,11 +123,12 @@ const SvgWrapper = () => {
 
 	const [svgContent, setSvgContent] = useState(''); // Хранилище для SVG
 	const [svgIsLoad, setSvgIsLoad] = useState(false); // Флаг загрузки SVG
-  
+
+ 
 	useEffect(() => {
 	  if (!svgIsLoad) {
-		const loadedSvg = Part.simpleReturn();
-		setSvgContent(loadedSvg);
+		//const loadedSvg = Part.simpleReturn();
+		//setSvgContent(loadedSvg);
 		setSvgIsLoad(true); 
 		setSvgParams(Part.getSvgParams())
 		fitToPAge()
@@ -142,7 +143,6 @@ const SvgWrapper = () => {
         //part.updateRect()
         let box = document.querySelector('#group').getBoundingClientRect()
 		const wBox = wrapperSVG.current.getBoundingClientRect();
-		debugger
         
         let scaleW = wBox.width/ box.width
         let scaleH = wBox.height / box.height
