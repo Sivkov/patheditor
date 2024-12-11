@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useCoords } from './CoordsContext';
+import coordsStore from './coordsStore.js'; 
 import SvgComponent from './svg';
 import Util from './../utils/util';
-import Arc from './../utils/arc.js';
+//import Arc from './../utils/arc.js';
 import Part from '../scripts/part.js';
 
 
@@ -10,7 +10,6 @@ const  SvgWrapper = () => {
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [gmatrix, setGroupMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [offset, setOffset] = useState({x:0,y:0});
-	const { setCoords } = useCoords();
 	const [gridState, setGridState] = useState({
 		xsGrid: {
 			visibility: "visible",
@@ -51,10 +50,10 @@ const  SvgWrapper = () => {
 		updatedState.grid.visibility = "visible";
 		}
 		setGridState(updatedState);
-	}, [matrix]);
+	}, [matrix, gridState]);
 
 	const inMoveRef = useRef(0); 
-	const group = useRef(null);
+	//const group = useRef(null);
     const wrapperSVG = useRef(null);
 			
 	const handleMouseWheel = (event) => {
@@ -95,15 +94,18 @@ const  SvgWrapper = () => {
 	}
 
 	const endDrag =(e) =>{
-		setCoords({ x: '', y: ''})
 		inMoveRef.current = 0;		
 		console.log ('endDrag ' + inMoveRef.current)
+	}
+
+	const leave =(e)=>{	
+		coordsStore.setCoords({ x:0,y:0});
 	}
 
 	const drag =(e) =>{
 		console.log ('Drag ' + e.currentTarget.id +'  '+inMoveRef.current)
 		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
-		setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
+		coordsStore.setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
 		if (!inMoveRef.current) return;
 		var coord = Util.getMousePosition(e);
 		if (e.target && (e.buttons === 4 || e.buttons === 1)){
@@ -121,14 +123,12 @@ const  SvgWrapper = () => {
 		
 	}
 
-	const [svgContent, setSvgContent] = useState(''); // Хранилище для SVG
 	const [svgIsLoad, setSvgIsLoad] = useState(false); // Флаг загрузки SVG
 
  
 	useEffect(() => {
 	  if (!svgIsLoad) {
 		//const loadedSvg = Part.simpleReturn();
-		//setSvgContent(loadedSvg);
 		setSvgIsLoad(true); 
 		setSvgParams(Part.getSvgParams())
 		fitToPAge()
@@ -175,13 +175,13 @@ const  SvgWrapper = () => {
 				onWheel={handleMouseWheel} 
 				onMouseDown={startDrag}
 				onMouseMove={drag} 
- 				onMouseUp={endDrag}>		 
+ 				onMouseUp={endDrag}
+				onMouseLeave={leave}>		 
 					<SvgComponent 
 						matrix={matrix} 
 						gmatrix={gmatrix} 
 						gridState={gridState}
-						svgContent={svgContent}
-						svgParams={svgParams}
+ 						svgParams={svgParams}
 					/>
 				</div>
 				</div>

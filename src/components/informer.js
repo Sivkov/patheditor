@@ -1,8 +1,9 @@
 import React from 'react';
-import { useCoords } from './CoordsContext';
+import { observer } from 'mobx-react-lite';  // Импортируем observer для оборачивания компонента
+import coordsStore from './coordsStore.js';  // Импортируем store
 
-const Informer = () => {
-  const { coords } = useCoords();
+const Informer = observer(() => {
+  const { coords } = coordsStore;  // Получаем данные из store
 
   return (
     <div className="nav-item unselectable">
@@ -12,6 +13,6 @@ const Informer = () => {
       </a>
     </div>
   );
-};
+});
 
 export default Informer;

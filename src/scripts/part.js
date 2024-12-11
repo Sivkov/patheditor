@@ -96,191 +96,6 @@ class Part {
     static add(create=false) {
     }
     
-/*     static ncpToSvg(ncpCode) {
-
-        let svg = ''
-        const ncpLines = ncpCode.code
-        let currentX, currentY
-        let path = 'closed'
-        let mode = ''
-        let cid;
-        let jointContainerOpen = false;
-        for (const line of ncpLines) {
-            if (line.includes('(<Part id="')) {
-                Part.width = +Util.getAttributeValue(line, 'originx')
-                Part.height = +Util.getAttributeValue(line, 'originy')
-				Part.setSvgParams({width: Part.width, height: Part.height})
-                svg += `<svg id="svg" baseProfile="full" viewBox="0.00 0.00 ${Part.width} ${Part.height}" style="overflow:visible;" part-code="114___10__2" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink">`;
-            } else if (line.includes('(<Inlet')) {
-                let x = Util.getValueFromString(line, 'x')
-                let y = Util.getValueFromString(line, 'y')
-                cid = Util.getAttributeValue(line, 'contour_id')
-                let innerOuter = Util.getAttributeValue(line, 'mode')
-                let macroValue = +Util.getAttributeValue(line, 'macro')
-                let pulseValue = +Util.getAttributeValue(line, 'pulse')
-                let piercingMode = 'dotRed'
-                if (pulseValue === 0) {
-                    piercingMode = 'dotRed'
-                } else if (pulseValue === 1) {
-                    piercingMode = 'dotPink'
-                } else if (pulseValue === -1) {
-                    piercingMode = 'dotYellow'
-                }
-
-                svg += `<g data-cid="${cid}" fill="none" class="inlet ${innerOuter} ${'macro' + macroValue}" stroke="red" stroke-width="0.2">
-                <path   marker-start="url(#${piercingMode})" d="`;
-                currentX = x
-                currentY = y
-                mode = 'inlet'
-                path = 'open'
-
-            } else if (line.includes('(<Outlet')) {
-                svg += `"></path></g>`;
-                let x = +Util.getValueFromString(line, 'x')
-                let y = +Util.getValueFromString(line, 'y')
-                let innerOuter = Util.getAttributeValue(line, 'mode')
-                let macroValue = +Util.getAttributeValue(line, 'macro')
-                svg += `<g data-cid="${this.lastContourId}" fill="none" class="outlet ${innerOuter} ${'macro' + macroValue}" stroke="lime" stroke-width="0.2">
-                <path d="`;
-                currentX = x
-                currentY = y
-                mode = 'outlet'
-                path = 'open'
-            } else if (line.includes('(<Contour')) {
-                if (mode === 'inlet') {
-                    svg += `"></path></g>`;
-                    mode = 'contour'
-                }
-                Part.joints=''
-
-                //path === "closed"
-                let eng = line.includes('mode="engraving"')
-                cid = Util.getAttributeValue(line, 'contour_id')
-                let macroValue = +Util.getAttributeValue(line, 'macro')
-                let innerOuter = Util.getAttributeValue(line, 'mode')
-                let openClosed = +Util.getAttributeValue(line, 'closed')
-                this.lastContourId = +cid
-                svg += `<g data-cid="${cid}" 
-                            class="contour ${innerOuter} ${'macro' + macroValue} ${'closed' + openClosed}" 
-                            >
-                    <path  d="`;
-                path = 'open'
-            } else if (line.includes('(<laser_on>)')) {
-                // Включите лазер, если необходимо
-            } else if (line.includes('(<laser_off>)')) {
-                // Выключите лазер, если необходимо
-            } else if (line.includes('G0 ')) {
-                // Обработайте команды G0 (быстрое перемещение)
-                if (true) {
-                    let x = Util.getValueFromString(line, 'x')
-                    let y = Util.getValueFromString(line, 'y')
-                    if (x == null) x = currentX;
-                    if (y == null) y = currentY;
-                    svg += `M${Util.round(x)},${Util.round(Part.height - y)} `;
-                    currentX = x
-                    currentY = y
-                    path = 'continued'
-                }
-            } else if (line.includes('G1 ')) {
-                // Обработайте команды G1 (линейное перемещение)
-                const xMatch = line.match(/x(\S+)/);
-                const yMatch = line.match(/y(\S+)/);
-                if (xMatch && yMatch) {
-                    // If both x and y are matched, add an SVG 'L' command
-                    let x = Util.getValueFromString(line, 'x')
-                    let y = Util.getValueFromString(line, 'y')
-                    if (x == null) x = currentX;
-                    if (y == null) y = currentY;
-
-                    if (path !== 'continued') {
-                        svg += `M${Util.round(x)},${Util.round(Part.height - y)} `;
-                    } else {
-                        svg += `L${Util.round(x)},${Util.round(Part.height - y)} `;
-                    }
-                    currentX = x
-                    currentY = y
-
-                } else if (xMatch) {
-                    // If only x is matched, add an SVG 'H' command
-                    let x = Util.getValueFromString(line, 'x');
-                    svg += `H${Util.round(x)} `;
-                    currentX = x
-                } else if (yMatch) {
-                    // If only y is matched, add an SVG 'V' command
-                    let y = Util.getValueFromString(line, 'y');
-                    svg += `V${Util.round(Part.height - y)} `;
-                    currentY = y
-                }
-                path = 'continued'
-
-            } else if (line.includes('G2 ')) {
-                // Process G2 commands
-                if (true) {
-                    let x = Util.getValueFromString(line, 'x')
-                    let y = Util.getValueFromString(line, 'y')
-                    let i = Util.getValueFromString(line, 'i');
-                    let j = Util.getValueFromString(line, 'j');
-
-                    if (i == null) i = 0;
-                    if (j == null) j = 0;
-                    if (x == null) x = currentX;
-                    if (y == null) y = currentY;
-
-                    let r = Util.round(Math.sqrt(i ** 2 + j ** 2))
-                    let largeArcFlag = Util.getLargeArcFlag(currentX, currentY, x, y, i, j, false);
-
-                    svg += `A${r},${r} 0 ${largeArcFlag} 1 ${Util.round(x)},${Util.round(Part.height - y)} `;
-                    currentX = x;
-                    currentY = y;
-                }
-            } else if (line.includes('G3 ')) {
-                // Process G3 commands
-                if (true) {
-                    let x = Util.getValueFromString(line, 'x')
-                    let y = Util.getValueFromString(line, 'y')
-                    let i = Util.getValueFromString(line, 'i');
-                    let j = Util.getValueFromString(line, 'j');
-                    if (i == null) i = 0;
-                    if (j == null) j = 0;
-                    if (x == null) x = currentX;
-                    if (y == null) y = currentY;
-
-                    let r = Util.round(Math.sqrt(i ** 2 + j ** 2))
-                    let largeArcFlag = Util.getLargeArcFlag(currentX, currentY, x, y, i, j, true);
-                    svg += `A${r},${r} 0 ${largeArcFlag} 0 ${Util.round(x)},${Util.round(Part.height - y)} `;
-                    currentX = x;
-                    currentY = y;
-                }
-            } else if (line.includes('</Contour')) {
-                svg += `"></path></g>`;
-                svg+=this.joints
-                path = 'closed'
-                jointContainerOpen = false
-
-            } else if (line.includes('(<Joint')){
-                let x = +Util.getAttributeValue(line, 'x')
-                let y = +Util.getAttributeValue(line, 'y')
-                let dp = +Util.getAttributeValue(line, 'dp');
-                let length = +Util.getAttributeValue(line, 'length');
-                let path =  Util.getJoint(x,y)
-                let uuid = Util.uuid()
-                let jointClass = 'manual'
-                if (!jointContainerOpen){
-                    jointContainerOpen = true
-                    document.querySelector('#jointSize').value = length
-                    this.joints+=`<g data-cid="${cid}" fill="none" class="joint" stroke="white" stroke-width="0.5">`
-                }
-                this.joints=this.joints.replace(/<\/g>$/g,'')
-                this.joints+=`<path d="${path}" fill="none" id="${uuid}" class="joint ${jointClass}" data-dist="${dp}" data-length='${length}'></path>`
-                this.joints+=`</g>`;
-
-            } 
-        }
-        // Закройте SVG элемент
-        svg += '</svg>';
-		return svg        
-    } */
-
     static ncpToSvg(ncpCode) {
         let svg = []
         const ncpLines = ncpCode.code
@@ -464,7 +279,7 @@ class Part {
                 jointContainerOpen = false
 
             } else if (line.includes('(<Joint')){
-/*                let x = +Util.getAttributeValue(line, 'x')
+                /*let x = +Util.getAttributeValue(line, 'x')
                 let y = +Util.getAttributeValue(line, 'y')
                 let dp = +Util.getAttributeValue(line, 'dp');
                 let length = +Util.getAttributeValue(line, 'length');
@@ -488,7 +303,6 @@ class Part {
              let  bc = b.class.split(' ').map(a => que.indexOf(a)).sort((a,b)=> b-a)[0]
              return bc-ac
         })
-        debugger
 		return svg        
     }
 } 

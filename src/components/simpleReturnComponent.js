@@ -8,7 +8,7 @@ const SimpleReturnComponent = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const svg = await Part.getPartCode(3,6)
+            const svg = await Part.getPartCode(handle, partNumber)
             setSvgData(svg); 
         }
         fetchData();
@@ -25,10 +25,7 @@ const SimpleReturnComponent = () => {
             </g>
           ))}
         </>
-      );
-
-        
-  
+      );      
 };
 
 export default SimpleReturnComponent;
