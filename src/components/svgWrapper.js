@@ -95,7 +95,7 @@ const  SvgWrapper = () => {
 
 	const endDrag =(e) =>{
 		inMoveRef.current = 0;		
-		console.log ('endDrag ' + inMoveRef.current)
+		// ('endDrag ' + inMoveRef.current)
 	}
 
 	const leave =(e)=>{	
@@ -103,7 +103,7 @@ const  SvgWrapper = () => {
 	}
 
 	const drag =(e) =>{
-		console.log ('Drag ' + e.currentTarget.id +'  '+inMoveRef.current)
+		//console.log ('Drag ' + e.currentTarget.id +'  '+inMoveRef.current)
 		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
 		coordsStore.setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
 		if (!inMoveRef.current) return;
@@ -162,7 +162,7 @@ const  SvgWrapper = () => {
         let ydif = dif.y - center.y
         let xdif = dif.x - center.x
 		//setGroupMatrix({ a: scale, b: scale, c: 0, d: 1, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }) 
-		console.log ({ a: scale, b: scale, c: 0, d: 1, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif })
+		//console.log ({ a: scale, b: scale, c: 0, d: 1, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif })
 		setGroupMatrix ({ a: 0.4908140727912276, b: 0, c: 0, d: 0.4908140727912276, e: 28.366972880205747, f: -0.19623375480269356 })
      	}
 

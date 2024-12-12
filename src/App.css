@@ -1631,3 +1631,8 @@ g.macro5.closed0 {
 /*     fill:transparent;
  */    stroke-width: var(--widthThin);;
 }
+
+
+#logger_wrapper {
+  height: 50px;
+}

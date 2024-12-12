@@ -9,7 +9,7 @@ class CoordsStore {
   }
 
   setCoords(newCoords) {
-    console.log ('setCoords' + newCoords)
+    //console.log ('setCoords' + newCoords)
     this.coords = newCoords;
   }
 }

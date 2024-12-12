@@ -3,6 +3,8 @@ import { Icon } from '@iconify/react';
 import Panel from './panel';
 //import Util from './../utils/util';
 import '@fortawesome/fontawesome-free/css/all.css'
+import { observer } from "mobx-react-lite";
+import svgStore from "./svgStore.js";
 
 const Panels = () => {
 
@@ -13,6 +15,11 @@ const Panels = () => {
 	};
 
 	function __(w) { return w }
+
+	const handleRemoveLast = () => {
+		console.log ('handleRemoveLast')
+		svgStore.removeLastCodeElement(); // Удаляем последний элемент из массива code
+	  };
 
 	const panelInfo = [
 		{
@@ -225,7 +232,7 @@ const Panels = () => {
 				height:100,
 			  },
 			content: 
-			(<div id="logger_wrapper">
+			(<div id="logger_wrapper" onClick={handleRemoveLast}>
 				<div id="logger"></div>
 			</div>)
 		},    
