@@ -214,6 +214,21 @@ const Panels = () => {
 			  </div>
 			),
 		  },
+		  {
+			id: 'logPopup',
+			fa: (<Icon icon="vaadin:time-backward" width="24" height="24"  style={{color: 'white'}} />),
+			mini: false,
+			style: {
+				top: 40,
+				left: 12,
+				width: 350,
+				height:100,
+			  },
+			content: 
+			(<div id="logger_wrapper">
+				<div id="logger"></div>
+			</div>)
+		},    
 	]
 return (
 	<>

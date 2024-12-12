@@ -303,7 +303,7 @@ class Part {
              let  bc = b.class.split(' ').map(a => que.indexOf(a)).sort((a,b)=> b-a)[0]
              return bc-ac
         })
-		return svg        
+		return svg//{width: Part.width, height: Part.height,code:svg}        
     }
 } 
 export default Part;

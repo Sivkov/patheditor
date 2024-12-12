@@ -50,7 +50,7 @@ const  SvgWrapper = () => {
 		updatedState.grid.visibility = "visible";
 		}
 		setGridState(updatedState);
-	}, [matrix, gridState]);
+	}, [matrix]);
 
 	const inMoveRef = useRef(0); 
 	//const group = useRef(null);
