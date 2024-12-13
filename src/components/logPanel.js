@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';  
 import logStore from './logStore.js'; 
 import svgStore from "./svgStore.js";
+import { useEffect } from 'react';
 
 
 const LogPanel = observer(() => {
@@ -13,6 +14,21 @@ const LogPanel = observer(() => {
 		svgStore.removeLastCodeElement(); 
 		logStore.add ({time: new Date().getTime() ,action:'Contour deleted'})
 	};
+
+	useEffect(()=>{
+		const interval = setInterval(() => {
+			if (logStore.log.length > 0) {
+ 				const lastLog = logStore.log[logStore.log.length - 1];
+				const currentTime = new Date().getTime();
+	  
+ 				if (currentTime - lastLog.time > 30000) {
+					logStore.add({ time: currentTime, action: "autosave" });
+					console.log("Autosave added to logStore!");
+				}
+			} 
+		  }, 10000);	  
+		  return () => clearInterval(interval); // О
+	},[logStore.log])
 
 	const time = (t) => {
 		const date = new Date(t); // Преобразуем t в объект Date

@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 import svgStore from "./svgStore.js";
+import logStore from "./logStore.js";
 import Part from "./../scripts/part";
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
   const SimpleReturnComponent = observer(() => {
 
-    const [svgData, setSvgData] = useState(null); // Состояние для хранения данных SVG
     const handle = 0;
     const partNumber = 6;
 
@@ -17,10 +17,11 @@ import React, { useState, useEffect } from 'react';
           height: svg.height,
           code: svg.code,
         };
-        svgStore.setSvgData(newSvgData); // Сохраняем данные в store
+        svgStore.setSvgData(newSvgData); 
       };
       fetchData();
-    }, [handle, partNumber]);
+      logStore.add({time: new Date().getTime(), action:'Ready to work'})
+    }, []);
 
     return (
       <>

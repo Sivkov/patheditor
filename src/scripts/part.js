@@ -42,28 +42,6 @@ class Part {
  
     }
 
-    static async  simpleReturn() {
-        Part.setSvgParams({width:189, height:200})
-		const url = new URL('http://127.0.0.1/parteditor.html?filename=700x700-10.0-DD11-N0.ncp&handle=0&part=part_6');
-        const searchParams = url.searchParams;
-        //let file = searchParams.get('filename').replace(".ncp", "")
-        //let part = searchParams.get('part')
-        let pNumber = Number(searchParams.get('part').replace('part_', ''))
-        let handle = +searchParams.get('handle')
-		const assvg = await Part.getPartCode(0, 6);
-		
-       
-        return (
-          <>
-            <g
-              data-cid="1"
-              className="contour outer macro0 closed1 noOutlet"
-            >
-              <path d="M6,74.356 H0 V125.689 H12 V150.286 H0 V187.286 H12 V200 H177 V187.286 H189 V150.286 H177 V125.689 H189 V74.356 H177 V54.678 H189 V19.678 H177 V0 H12 V19.678 H0 V54.678 H12 V74.356 H6 "></path>
-            </g>
-          </>
-        );
-    }
 
       
     static normalizeIntends () {
