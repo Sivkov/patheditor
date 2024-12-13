@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
 import Panel from './panel';
-//import Util from './../utils/util';
 import '@fortawesome/fontawesome-free/css/all.css'
-import { observer } from "mobx-react-lite";
-import svgStore from "./svgStore.js";
+import LogPanel from './logPanel';
 
 const Panels = () => {
 
@@ -14,12 +12,7 @@ const Panels = () => {
 		setInputValue(event.target.value);
 	};
 
-	function __(w) { return w }
-
-	const handleRemoveLast = () => {
-		console.log ('handleRemoveLast')
-		svgStore.removeLastCodeElement(); // Удаляем последний элемент из массива code
-	  };
+//	function __(w) { return w }
 
 	const panelInfo = [
 		{
@@ -221,7 +214,7 @@ const Panels = () => {
 			  </div>
 			),
 		  },
-		  {
+		/*   {
 			id: 'logPopup',
 			fa: (<Icon icon="vaadin:time-backward" width="24" height="24"  style={{color: 'white'}} />),
 			mini: false,
@@ -235,13 +228,14 @@ const Panels = () => {
 			(<div id="logger_wrapper" onClick={handleRemoveLast}>
 				<div id="logger"></div>
 			</div>)
-		},    
+		},     */
 	]
 return (
 	<>
 		{panelInfo.map((element, index) => (
 			<Panel key={'panel' + index} element={element} index={index} />
 		))}
+		<LogPanel />
 	</>
 );
 };

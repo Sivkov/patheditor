@@ -1634,5 +1634,25 @@ g.macro5.closed0 {
 
 
 #logger_wrapper {
-  height: 50px;
+  border: #9b9da2 1px solid;
+  height: 550px !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+#logger {
+  width:100%;
+  margin: 0.5em;
+} 
+
+#logPopup .window-top {
+  position: sticky;
+  top: 0px;
+}
+
+.custom_devide {
+  height: 1px;
+  width: 100%;
+  border-top: 1px solid #9b9da2;
 }
