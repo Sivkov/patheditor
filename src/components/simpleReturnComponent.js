@@ -3,6 +3,7 @@ import svgStore from "./svgStore.js";
 import logStore from "./logStore.js";
 import Part from "./../scripts/part";
 import React, { useEffect } from 'react';
+import log from "../scripts/log.js";
 
   const SimpleReturnComponent = observer(() => {
 
@@ -20,7 +21,14 @@ import React, { useEffect } from 'react';
         svgStore.setSvgData(newSvgData); 
       };
       fetchData();
-      logStore.add({time: new Date().getTime(), action:'Ready to work'})
+      let now = new Date().getTime()
+      logStore.add({time: now, action:'Ready to work'})
+      let data = {
+        id: now,
+        svg: JSON.stringify(svgStore.svgData)
+      }
+      //log.save (data)
+
     }, []);
 
     return (

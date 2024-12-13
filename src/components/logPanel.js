@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite';
 import logStore from './logStore.js'; 
 import svgStore from "./svgStore.js";
 import { useEffect } from 'react';
+import log from './../scripts/log.js'
 
 
 const LogPanel = observer(() => {
@@ -12,10 +13,20 @@ const LogPanel = observer(() => {
 	const handleRemoveLast = () => {
 		console.log ('handleRemoveLast')
 		svgStore.removeLastCodeElement(); 
-		logStore.add ({time: new Date().getTime() ,action:'Contour deleted'})
+		let now = new Date().getTime()
+		logStore.add ({time: now ,action:'Contour deleted'})
+		let data = {
+			id: now,
+			svg: JSON.stringify(svgStore.svgData)
+		}
+		log.save(data)
 	};
 
-	useEffect(()=>{
+	useEffect(() =>{
+		log.initDatabase()
+	}, [])
+
+/* 	useEffect(()=>{
 		const interval = setInterval(() => {
 			if (logStore.log.length > 0) {
  				const lastLog = logStore.log[logStore.log.length - 1];
@@ -28,20 +39,36 @@ const LogPanel = observer(() => {
 			} 
 		  }, 10000);	  
 		  return () => clearInterval(interval); // О
-	},[logStore.log])
+	},[logStore.log]) */
 
 	const time = (t) => {
-		const date = new Date(t); // Преобразуем t в объект Date
-		const hours = date.getHours().toString().padStart(2, "0"); // Часы с ведущим нулем
-		const minutes = date.getMinutes().toString().padStart(2, "0"); // Минуты с ведущим нулем
-		const seconds = date.getSeconds().toString().padStart(2, "0"); // Секунды с ведущим нулем
-	  
-		return `${hours}:${minutes}:${seconds}`; // Возвращаем отформатированное время
+		const date = new Date(t);
+		const hours = date.getHours().toString().padStart(2, "0"); 
+		const minutes = date.getMinutes().toString().padStart(2, "0");
+		const seconds = date.getSeconds().toString().padStart(2, "0");
+	  	return `${hours}:${minutes}:${seconds}`;
 	};
 
-	const restore =()=>{
-		console.log ('restore')
-	}
+	const restore = async (e) => {
+		try {
+			const tpoint = Number(e.currentTarget.getAttribute('data-stamp'));
+			console.log('Restore from', tpoint);
+			const data = await log.load(tpoint);	
+ 			console.log('Loaded data:', data);
+			let parsed = JSON.parse(data.svg)
+			if (parsed ) {
+				const newSvgData = {
+					width: parsed.width,
+					height: parsed.height,
+					code: parsed.code,
+				  };
+				svgStore.setSvgData(newSvgData)
+			}
+			
+		} catch (error) {
+			console.error('Error during restore:', error);
+		}
+	};
 
 	const panelInfo = [
 		  {
@@ -55,7 +82,8 @@ const LogPanel = observer(() => {
 				height:100,
 			  },
 			  content: (
-				<div id="logger_wrapper" onClick={handleRemoveLast}>
+				<div id="logger_wrapper">
+				<button onMouseDown={handleRemoveLast}>Button</button>
 				  <div id="logger">
 					{logStore.log.map((element, index) => (					  
 
@@ -70,7 +98,7 @@ const LogPanel = observer(() => {
 									</div>
 								</div>
 								<div className="me-4">
-									<button type="button" className="btn btn-sm btn-primary mt-1 ms-2" onMouseDown={restore}>
+									<button type="button" className="btn btn-sm btn-primary mt-1 ms-2"  data-stamp={ element.time } onMouseDown={restore}>
 									Restore
 								</button>
 								</div>                
