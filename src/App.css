@@ -1656,3 +1656,7 @@ g.macro5.closed0 {
   width: 100%;
   border-top: 1px solid #9b9da2;
 }
+
+.btn-log-restore.active {
+  background-color: #02feff !important;
+}

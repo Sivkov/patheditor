@@ -4,7 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';  
 import logStore from './logStore.js'; 
 import svgStore from "./svgStore.js";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import log from './../scripts/log.js'
 
 
@@ -22,25 +22,27 @@ const LogPanel = observer(() => {
 		log.save(data)
 	};
 
-	useEffect(() =>{
+	useEffect(() => {
 		log.initDatabase()
-	}, [])
-
-/* 	useEffect(()=>{
-		const interval = setInterval(() => {
-			if (logStore.log.length > 0) {
- 				const lastLog = logStore.log[logStore.log.length - 1];
-				const currentTime = new Date().getTime();
-	  
- 				if (currentTime - lastLog.time > 30000) {
-					logStore.add({ time: currentTime, action: "autosave" });
-					console.log("Autosave added to logStore!");
-				}
-			} 
-		  }, 10000);	  
-		  return () => clearInterval(interval); // О
-	},[logStore.log]) */
-
+			.then(() => {
+				console.log('Database initialized.');
+	
+				let now = new Date().getTime();
+				logStore.add({ time: now, action: 'Ready to work' });
+	
+				let data = {
+					id: now,
+					svg: JSON.stringify(svgStore.svgData),
+				};
+	
+				log.save(data);
+				console.log('Data saved to IndexedDB.');
+			})
+			.catch((error) => {
+				console.error('Error initializing database or saving data:', error);
+			});
+	}, []);
+	
 	const time = (t) => {
 		const date = new Date(t);
 		const hours = date.getHours().toString().padStart(2, "0"); 
@@ -63,7 +65,8 @@ const LogPanel = observer(() => {
 					code: parsed.code,
 				  };
 				svgStore.setSvgData(newSvgData)
-			}
+			}		
+			logStore.makeNoteActive(tpoint)	
 			
 		} catch (error) {
 			console.error('Error during restore:', error);
@@ -85,7 +88,7 @@ const LogPanel = observer(() => {
 				<div id="logger_wrapper">
 				<button onMouseDown={handleRemoveLast}>Button</button>
 				  <div id="logger">
-					{logStore.log.map((element, index) => (					  
+					{logStore.log.map((element, index, arr) => (					  
 
 						<div key={index+'logger'} className="log_mess"  data-stamp={ element.time } >
 							<div className="d-flex justify-content-between pt-2">
@@ -98,7 +101,11 @@ const LogPanel = observer(() => {
 									</div>
 								</div>
 								<div className="me-4">
-									<button type="button" className="btn btn-sm btn-primary mt-1 ms-2"  data-stamp={ element.time } onMouseDown={restore}>
+									<button type="button" className={ element.active ? 
+									'btn btn-sm mt-1 ms-2 btn-secondary btn-log-restore active' : 
+									'btn btn-sm mt-1 ms-2 btn-secondary btn-log-restore'} 
+									data-stamp={ element.time } 
+									onMouseDown={restore}>
 									Restore
 								</button>
 								</div>                

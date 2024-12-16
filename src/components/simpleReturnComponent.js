@@ -21,13 +21,6 @@ import log from "../scripts/log.js";
         svgStore.setSvgData(newSvgData); 
       };
       fetchData();
-      let now = new Date().getTime()
-      logStore.add({time: now, action:'Ready to work'})
-      let data = {
-        id: now,
-        svg: JSON.stringify(svgStore.svgData)
-      }
-      //log.save (data)
 
     }, []);
 
