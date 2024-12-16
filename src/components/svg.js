@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import Part from './../scripts/part';
 import Util from './../utils/util';
 import SimpleReturnComponent from './simpleReturnComponent'
+import Selector from './selector.js'
 
 
 const SvgComponent = ({ matrix, gmatrix, gridState, svgParams }) => {
@@ -103,6 +104,7 @@ const SvgComponent = ({ matrix, gmatrix, gridState, svgParams }) => {
                              < SimpleReturnComponent />
                             </>
                        </g>
+                       <Selector />
                     </g>
                 </g>
             </g>

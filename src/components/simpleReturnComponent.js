@@ -1,9 +1,9 @@
 import { observer } from "mobx-react-lite";
 import svgStore from "./svgStore.js";
-import logStore from "./logStore.js";
 import Part from "./../scripts/part";
 import React, { useEffect } from 'react';
-import log from "../scripts/log.js";
+//import logStore from "./logStore.js";
+//import log from "../scripts/log.js";
 
   const SimpleReturnComponent = observer(() => {
 
@@ -24,6 +24,14 @@ import log from "../scripts/log.js";
 
     }, []);
 
+    const setSelected = (e) =>{
+      let cid = Number(e.currentTarget.getAttribute('data-cid'));
+      console.log ('Selected: '+cid)
+      if(typeof cid  === 'number') {
+        svgStore.setContourSelected(cid)
+      }
+    }
+
     return (
       <>
         {svgStore.svgData['code'].map((element, i) => (
@@ -31,6 +39,7 @@ import log from "../scripts/log.js";
             key={i}
             data-cid={element.cid}
             className={element.class}
+            onMouseDown={element.class.includes('contour') ? setSelected : ()=>{}}
             fill={element.class.includes("inner") ? "url(#grid)" : ""}
           >
             <path d={element.path}></path>

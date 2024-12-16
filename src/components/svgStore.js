@@ -1,5 +1,6 @@
 // SvgStore.js
 import { makeAutoObservable } from "mobx";
+import { toJS } from "mobx";
 
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [] }; // Хранилище объекта SVG
@@ -39,6 +40,31 @@ class SvgStore {
 		if (element && val in element) {
 			element[val] = newVal; // Обновляем значение указанного ключа
 		}
+	}
+
+	setContourSelected(cid) {
+		console.log('setContourSelected ' + cid)
+ 		this.svgData.code.forEach((el, i, arr)=>{
+			if(el.hasOwnProperty('selected')) {
+				this.updateElementValue (el.cid, 'contour', 'selected', false)		
+			}
+		}) 
+		this.updateElementValue (cid, 'contour', 'selected', true)
+	}
+
+	getSelectedElement(val = '') {
+		const selectedElement = this.svgData.code.find(element => element.selected);
+		if (!selectedElement) {
+			return null;
+		}
+		return val ? selectedElement[val] || null : selectedElement;
+	}
+	
+
+	printStore() {
+		this.svgData['code'].forEach(element => {
+                 console.log("printStore:", toJS(element));
+        });
 	}
 }
 

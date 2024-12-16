@@ -25,8 +25,7 @@ const LogPanel = observer(() => {
 	useEffect(() => {
 		log.initDatabase()
 			.then(() => {
-				console.log('Database initialized.');
-	
+				console.log('Database initialized.');	
 				let now = new Date().getTime();
 				logStore.add({ time: now, action: 'Ready to work' });
 	
