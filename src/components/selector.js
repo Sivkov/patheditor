@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { observer } from "mobx-react-lite";
 import svgStore from "./svgStore.js";
 import { toJS } from "mobx";
+import SVGPathCommander from 'svg-path-commander';
 
 
 
@@ -9,12 +10,11 @@ const Selector = observer(() => {
 
     const { svgData } = svgStore;
     const visibility = svgData.code.some(element => element.selected);
+    let  path = svgStore.getSelectedElement('path') 
+    const box =  SVGPathCommander.getPathBBox(path);
     const selectorCoords = visibility
-      ? { x: 0, y: 0, width: 189, height: 200 }
+      ? { x: box.x, y: box.y, width: box.width, height:  box.height }
       : { x: 0, y: 0, width: 0, height: 0 };
-
-    let selected = svgStore.getSelectedElement('path') 
-    console.log("Selector:", toJS(selected));
 
     return (
         <>
