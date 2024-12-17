@@ -185,7 +185,11 @@ const Panel = ({ element, index }) => {
 			<div className="window-top popup-header" 
 				onMouseDown={handleMouseDown}>
 				<div className="d-flex align-items-center justify-content-between">
-					<div className="nav-link">{element.fa}</div>
+					<div className="nav-link">
+						<div className="d-flex align-items-center">
+							{element.fa}
+						</div>
+					</div>
 					<div className="minify_wrapper d-flex align-items-center justify-content-center">
 						<div
 							className={`minify ${isMinified ? "minified" : ""}`}

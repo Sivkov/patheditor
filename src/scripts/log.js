@@ -52,7 +52,7 @@ class Log {
         const request = objectStore.add(data);
 
         request.onsuccess = () => {
-            console.log('Data saved to IndexedDB:', data);
+            console.log('Data saved to IndexedDB!');
         };
 
         request.onerror = (event) => {

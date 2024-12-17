@@ -59,6 +59,15 @@ class SvgStore {
 		}
 		return val ? selectedElement[val] || null : selectedElement;
 	}
+
+	deleteSelected () {
+		let cidSelected = this.getSelectedElement('cid')
+		if (typeof cidSelected) {
+			['inlet', 'outlet', 'contour', 'joint'].map(a =>{
+				this.removeElementByCidAndClass(cidSelected, a)
+			})
+		}
+	}
 	
 
 	printStore() {

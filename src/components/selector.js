@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react';
 import { observer } from "mobx-react-lite";
 import svgStore from "./svgStore.js";
-import { toJS } from "mobx";
 import SVGPathCommander from 'svg-path-commander';
-
 
 
 const Selector = observer(() => {

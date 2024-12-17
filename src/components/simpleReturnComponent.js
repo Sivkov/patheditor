@@ -2,8 +2,6 @@ import { observer } from "mobx-react-lite";
 import svgStore from "./svgStore.js";
 import Part from "./../scripts/part";
 import React, { useEffect } from 'react';
-//import logStore from "./logStore.js";
-//import log from "../scripts/log.js";
 
   const SimpleReturnComponent = observer(() => {
 
