@@ -76,13 +76,27 @@ const SvgComponent = ({ matrix, gmatrix, gridState, svgParams }) => {
                     stroke="var(--gridColorStroke)" 
                     strokeWidth="0.2"/>
                 </pattern>
-                    <marker id="dotRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+                <marker id="dotRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
                     <circle 
                     cx="5" 
                     cy="5" 
                     r="5" 
                     fill="red"></circle>
                 </marker>
+                <marker id="dotPink" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+                    <circle 
+                    cx="5" 
+                    cy="5" 
+                    r="5" 
+                    fill="pink"></circle>
+                </marker>
+                <marker id="dotYellow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+                    <circle 
+                    cx="5" 
+                    cy="5" 
+                    r="5" 
+                    fill="yellow"></circle>
+                </marker>                
             </defs>
             <g id="group2" fill="url(#grid)">
                 <g id="group1" transform={`matrix(${matrixG})`}>

@@ -1604,6 +1604,24 @@ g.inlet {
     stroke-width: var(--widthInlet);
 }
 
+g.inlet.pulse-1 {
+  marker-start: none;
+}
+
+g.inlet.pulse0 {
+  marker-start: url(#dotRed);
+
+}
+
+g.inlet.pulse1 {
+  marker-start: url(#dotPink);
+ 
+}
+
+g.inlet.pulse2 {
+  marker-start: url(#dotYellow);
+}
+
 g.macro2 {
     fill:transparent;
   /*   stroke-width:0.4; */

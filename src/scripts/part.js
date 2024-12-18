@@ -226,23 +226,18 @@ class Part {
                 let innerOuter = Util.getAttributeValue(line, 'mode')
                 let macroValue = +Util.getAttributeValue(line, 'macro')
                 let pulseValue = +Util.getAttributeValue(line, 'pulse')
-                let piercingMode = 'dotRed'
-                if (pulseValue === 0) {
-                    piercingMode = 'dotRed'
-                } else if (pulseValue === 1) {
-                    piercingMode = 'dotPink'
-                } else if (pulseValue === -1) {
-                    piercingMode = 'dotYellow'
-                }
+                
+                /// !!!TODO при сохрание еслм два тов пирсинге -1 todo
+                if (pulseValue === -1) pulseValue = 2
 
                 let inlet=  
                     {
                         cid:+cid,
-                        class:`inlet ${innerOuter} ${'macro' + macroValue}`,
+                        class:`inlet ${innerOuter} ${'macro' + macroValue} ${'pulse'+pulseValue}`,
                         path:'',
                         stroke:'red',
                         strokeWidth:0.2,
-                        piercingMode:piercingMode
+                       // piercingMode:piercingMode
                     }
                 svg.push(inlet)                
                 
@@ -266,7 +261,7 @@ class Part {
                     path:'',
                     stroke:'lime',
                     strokeWidth:0.2,
-                    piercingMode: null
+                    //piercingMode: null
                 }
                 svg.push(outlet)                
                
@@ -294,7 +289,7 @@ class Part {
                     path:'',
                     stroke:'red',
                     strokeWidth:0.2,
-                    piercingMode: null,
+                    //piercingMode: null,
                     selected:false
                 }
                 svg.push(contour)
@@ -427,12 +422,12 @@ class Part {
     }
     
     static detectPiercingType (classes) {
-        
+        if (!classes) return -1
+        if ( classes.includes('pulse0')) return 0
+        if ( classes.includes('pulse1')) return 1
+        if ( classes.includes('pulse2')) return 2
+        return -1
     }   
-
-    static detectInletModeType (classes) {
-        
-    }  
     
     static detectContourModeType (classes) {
         console.log ('detectContourModeType' + classes)

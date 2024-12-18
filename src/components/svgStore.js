@@ -15,25 +15,28 @@ class SvgStore {
         });
     }
 
-
 	get selectedPiercingType () {
-		const selected = this.getSelectedElement('class');
+		const selected = this.getSelectedElement();
 		if (selected) {
-			return Part.detectPiercingType(selected);
+			const inletClass = this.getElementByCidAndClass (selected.cid, 'inlet', 'class')
+			if (inletClass){
+				return Part.detectPiercingType(inletClass);
+			}
 		}
 		return '';
-
-
 	}
+
 	get selectedInletModeType () {
-		const selected = this.getSelectedElement('class');
+		const selected = this.getSelectedElement();
 		if (selected) {
-			return Part.detectInletModeType(selected);
+			const inletClass = this.getElementByCidAndClass (selected.cid, 'inlet', 'class')
+			if (inletClass) {
+				return Part.detectContourModeType(inletClass);
+			}	
 		}
 		return '';
-
-
 	}
+
 	get selectedContourModeType () {
 		const selected = this.getSelectedElement('class');
 		if (selected) {
@@ -41,9 +44,6 @@ class SvgStore {
 		}
 		return '';
 	}
-
-         
-
 	get selectedType() {
 		const selected = this.getSelectedElement('class');
 		if (selected) {
@@ -69,6 +69,19 @@ class SvgStore {
 			console.log('LLL: '+ this.svgData.code.length)
 		}
 	}
+
+	getElementByCidAndClass(cid, className, val = '') {
+		const element = this.svgData.code.find(
+			(el) => el.cid === cid && el.class.includes(className)
+		);
+	
+		if (!element) {
+			return null; 
+		}
+	
+		return val ? element[val] || null : element;
+	}
+	
 
 	removeElementByCidAndClass(cid, className) {
 		this.svgData.code = this.svgData.code.filter(

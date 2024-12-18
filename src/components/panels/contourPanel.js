@@ -12,8 +12,11 @@ import svgStore from "../svgStore.js";
 
 const ContourPanel = observer(() => {
 
-	const { selectedType } = svgStore;
-	const { selectedContourModeType } = svgStore;
+	const { selectedType,
+			selectedContourModeType, 
+		   	selectedInletModeType,
+			selectedPiercingType } = svgStore;
+
 	const setSelectedContourModeType =(e)=> {
 		let n = (Number(e.target.value))
 		let newMode = 'macro'+n
@@ -22,6 +25,29 @@ const ContourPanel = observer(() => {
 			let newClass =  selected.class.replace(/macro\d/gm, '')+' '+newMode
 			svgStore.updateElementValue(selected.cid, 'contour', 'class', newClass)
 		}		
+	}
+
+	const setSelectedInletModeType =(e)=> {
+		let n = (Number(e.target.value))
+		let newMode = 'macro'+n
+		let selected = svgStore.getSelectedElement()
+		if (selected) {
+			let inlet = svgStore.getElementByCidAndClass(selected.cid, 'inlet')
+			let newClass =  inlet.class.replace(/macro\d/gm, '')+' '+newMode
+			svgStore.updateElementValue(selected.cid, 'inlet', 'class', newClass)
+		}
+	}
+
+	const setSelectedPiercingType =(e)=>{
+		let n = (Number(e.target.value))
+		let newMode = 'pulse'+n
+		let selected = svgStore.getSelectedElement()
+		if (selected) {
+			let inlet = svgStore.getElementByCidAndClass(selected.cid, 'inlet')
+			let newClass =  inlet.class.replace(/pulse-1/gm, '').replace(/pulse\d/gm, '')+' '+newMode
+			svgStore.updateElementValue(selected.cid, 'inlet', 'class', newClass)
+		}
+
 	}
 
 	const panelInfo = [
@@ -53,11 +79,15 @@ const ContourPanel = observer(() => {
 						className="form-select"
 						id="piercingSelect"
 						aria-label="Default select example"
+						onChange={ setSelectedPiercingType }
+						value={selectedPiercingType}
 						>
-							<option value={-1} />
+ 							<option value={-1} disabled={typeof selectedPiercingType  === 'number'}>
+								-- Select Piercing Type --
+							</option>	
 							<option value={0}>normal</option>
-							<option value={-1}>without_time</option>
 							<option value={1}>pulse</option>
+							<option value={2}>without_time</option>
 						</select>
 				  </td>
 				</tr>
@@ -70,9 +100,24 @@ const ContourPanel = observer(() => {
 					style={{ padding: "0 0.2rem" }}
 					id="info_inlet_operating_mode"
 				  >
-					 
-					<div>{selectedContourModeType}</div>
-				  </td>
+					 <select
+                        id="operatingInletSelect"
+                        className="form-select"
+                        aria-label="Default select example"
+						value={selectedInletModeType}
+						onChange={ setSelectedInletModeType }
+                        >
+							<option value={-1} disabled={selectedInletModeType}>
+								-- Select Inlet Mode --
+							</option>							
+							<option value={0} >cutting</option>
+							<option value={1} >pulse</option>
+							<option value={2} >engraving</option>
+							<option value={3} >macro3</option>
+							<option value={4} >macro4</option>
+							<option value={5} >cutless</option>
+                        </select> 				  
+					</td>
 				</tr>
 				<tr style={{ height: "1.5rem" }}>
 				  <td colSpan={2} className="text-start ps-2">
@@ -91,7 +136,9 @@ const ContourPanel = observer(() => {
 						value={selectedContourModeType} // Привязка состояния
 						onChange={ setSelectedContourModeType }
                         >
-                        	<option value={-1} />
+							<option value={-1} disabled={selectedContourModeType}>
+								-- Select Contour Mode --
+							</option>								
 							<option value={0} >cutting</option>
 							<option value={1} >pulse</option>
 							<option value={2} >engraving</option>
