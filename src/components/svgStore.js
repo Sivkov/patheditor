@@ -12,8 +12,21 @@ class SvgStore {
 			selectedPiercingType: computed,
 			selectedInletModeType: computed,
 			selectedContourModeType: computed,
+			tecnology: computed,
         });
     }
+
+	get tecnology () {
+		let allClasses =''
+		this.svgData['code'].forEach(element => {
+			allClasses+=' '
+			allClasses+=element.class
+			allClasses+=' '
+   		});
+		let allTec = [...new Set (allClasses.split(/\s{1,}/gm))]
+		console.log("printStore:", toJS(allTec));
+	    return allTec
+	}
 
 	get selectedPiercingType () {
 		const selected = this.getSelectedElement();
@@ -44,6 +57,7 @@ class SvgStore {
 		}
 		return '';
 	}
+
 	get selectedType() {
 		const selected = this.getSelectedElement('class');
 		if (selected) {
@@ -61,15 +75,6 @@ class SvgStore {
 		this.svgData = { width: 0, height: 0, code: [] }; // Очищаем данные SVG
 	}
 
-	removeLastCodeElement() {
-		console.log ('removeLastCodeElement')
-		if (this.svgData.code.length > 0) {
-			//this.svgData.code.pop();
-			this.svgData.code = this.svgData.code.slice(0, -1);
-			console.log('LLL: '+ this.svgData.code.length)
-		}
-	}
-
 	getElementByCidAndClass(cid, className, val = '') {
 		const element = this.svgData.code.find(
 			(el) => el.cid === cid && el.class.includes(className)
@@ -82,8 +87,8 @@ class SvgStore {
 		return val ? element[val] || null : element;
 	}
 	
-
 	removeElementByCidAndClass(cid, className) {
+		console.log ('removeElementByCidAndClass', className, cid)
 		this.svgData.code = this.svgData.code.filter(
 			(element) => element.cid !== cid || !element.class.includes(className)
 		);
@@ -108,7 +113,7 @@ class SvgStore {
 		this.updateElementValue (cid, 'contour', 'selected', true)
 	}
 
-	getSelectedElement(val = '') {		
+	getSelectedElement(val = '') {	
 		const selectedElement = this.svgData.code.find(element => element.selected);
 		if (!selectedElement) {
 			return null;
@@ -117,14 +122,15 @@ class SvgStore {
 	}
 
 	deleteSelected () {
-		let cidSelected = this.getSelectedElement('cid')
-		if (typeof cidSelected) {
+		let selected = this.getSelectedElement()	
+		let cidSelected = selected.cid		
+
+		if (typeof cidSelected === 'number') {
 			['inlet', 'outlet', 'contour', 'joint'].map(a =>{
 				this.removeElementByCidAndClass(cidSelected, a)
 			})
 		}
 	}
-	
 
 	printStore() {
 		this.svgData['code'].forEach(element => {

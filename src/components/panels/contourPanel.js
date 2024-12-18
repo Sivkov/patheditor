@@ -2,9 +2,9 @@ import { Icon } from '@iconify/react';
 import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
-//import logStore from '../logStore.js';
+import logStore from '../logStore.js';
 import svgStore from "../svgStore.js";
-//import log from '../../scripts/log.js'
+import log from '../../scripts/log.js'
 //import Part from '../../scripts/part.js'
 //import { toJS } from "mobx";
 //import { useState } from 'react';
@@ -24,6 +24,8 @@ const ContourPanel = observer(() => {
 		if (selected) {
 			let newClass =  selected.class.replace(/macro\d/gm, '')+' '+newMode
 			svgStore.updateElementValue(selected.cid, 'contour', 'class', newClass)
+			addToLog ('Contour type changed')
+
 		}		
 	}
 
@@ -35,6 +37,8 @@ const ContourPanel = observer(() => {
 			let inlet = svgStore.getElementByCidAndClass(selected.cid, 'inlet')
 			let newClass =  inlet.class.replace(/macro\d/gm, '')+' '+newMode
 			svgStore.updateElementValue(selected.cid, 'inlet', 'class', newClass)
+			addToLog ('Inlet type changed')
+
 		}
 	}
 
@@ -46,8 +50,19 @@ const ContourPanel = observer(() => {
 			let inlet = svgStore.getElementByCidAndClass(selected.cid, 'inlet')
 			let newClass =  inlet.class.replace(/pulse-1/gm, '').replace(/pulse\d/gm, '')+' '+newMode
 			svgStore.updateElementValue(selected.cid, 'inlet', 'class', newClass)
+			addToLog ('Piercing type changed')
 		}
 
+	}
+
+	const addToLog =(mess)=> {
+		let now = new Date().getTime()
+		logStore.add ({time: now ,action: mess})
+		let data = {
+			id: now,
+			svg: JSON.stringify(svgStore.svgData)
+		}
+		log.save(data)	
 	}
 
 	const panelInfo = [
