@@ -1,5 +1,7 @@
 import axios from 'axios';
 import Util from '../utils/util';
+import CONSTANTS from '../constants/constants.js';
+
 
 class Part {
     constructor() {
@@ -415,14 +417,32 @@ class Part {
 		return {width: Part.width, height: Part.height,code:svg}        
     }
 
-    static detectElementType (classes) {
-        let  contourTypes = ['engraving', 'inner', 'outer']
-        for (let t in contourTypes) {
-            if (classes.includes(contourTypes[t])){
-                return contourTypes[t]
+    static detectContourType (classes) {
+        for (let t in CONSTANTS.contourTypes) {
+            if (classes.includes(CONSTANTS.contourTypes[t])){
+                return CONSTANTS.contourTypes[t]
             } 
         }
         return ''
-    }    
+    }
+    
+    static detectPiercingType (classes) {
+        
+    }   
+
+    static detectInletModeType (classes) {
+        
+    }  
+    
+    static detectContourModeType (classes) {
+        console.log ('detectContourModeType' + classes)
+        for (let t in CONSTANTS.operatingModes) {
+            if (classes.includes(CONSTANTS.operatingModes[t])){
+                return t
+            } 
+        }
+        return -1
+        
+    }   
 } 
 export default Part;

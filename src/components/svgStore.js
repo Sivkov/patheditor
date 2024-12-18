@@ -8,15 +8,46 @@ class SvgStore {
 
 	constructor() {
         makeAutoObservable(this, {
-            selectedType: computed // Отмечаем вычисляемое свойство
+            selectedType: computed,
+			selectedPiercingType: computed,
+			selectedInletModeType: computed,
+			selectedContourModeType: computed,
         });
     }
 
+
+	get selectedPiercingType () {
+		const selected = this.getSelectedElement('class');
+		if (selected) {
+			return Part.detectPiercingType(selected);
+		}
+		return '';
+
+
+	}
+	get selectedInletModeType () {
+		const selected = this.getSelectedElement('class');
+		if (selected) {
+			return Part.detectInletModeType(selected);
+		}
+		return '';
+
+
+	}
+	get selectedContourModeType () {
+		const selected = this.getSelectedElement('class');
+		if (selected) {
+			return Part.detectContourModeType(selected);
+		}
+		return '';
+	}
+
+         
+
 	get selectedType() {
 		const selected = this.getSelectedElement('class');
-		console.log('selectedType', selected)
 		if (selected) {
-			return Part.detectElementType(selected);
+			return Part.detectContourType(selected);
 		}
 		return '';
 	}

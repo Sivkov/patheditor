@@ -4,7 +4,6 @@ import Util from './../utils/util';
 import SimpleReturnComponent from './simpleReturnComponent'
 import Selector from './selector.js'
 
-
 const SvgComponent = ({ matrix, gmatrix, gridState, svgParams }) => {
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${gmatrix.a} ${gmatrix.b} ${gmatrix.c} ${gmatrix.d} ${gmatrix.e} ${gmatrix.f}`;

@@ -13,6 +13,17 @@ import svgStore from "../svgStore.js";
 const ContourPanel = observer(() => {
 
 	const { selectedType } = svgStore;
+	const { selectedContourModeType } = svgStore;
+	const setSelectedContourModeType =(e)=> {
+		let n = (Number(e.target.value))
+		let newMode = 'macro'+n
+		let selected = svgStore.getSelectedElement()
+		if (selected) {
+			let newClass =  selected.class.replace(/macro\d/gm, '')+' '+newMode
+			svgStore.updateElementValue(selected.cid, 'contour', 'class', newClass)
+		}		
+	}
+
 	const panelInfo = [
 		{
 			id: "contourPopup",
@@ -52,7 +63,7 @@ const ContourPanel = observer(() => {
 				</tr>
 				<tr style={{ height: "1.5rem" }}>
 				  <td colSpan={2} className="text-start ps-2">
-					Inlet:part.createOperatingPanel()
+					Inlet:
 				  </td>
 				  <td
 					colSpan={2}
@@ -60,19 +71,7 @@ const ContourPanel = observer(() => {
 					id="info_inlet_operating_mode"
 				  >
 					 
-					 <select
-                        id="operatingInletSelect"
-                        className="form-select"
-                        aria-label="Default select example"
-                    >
-                    <option value={-1} />
-                    <option value={0}>cutting</option>
-                    <option value={1}>pulse</option>
-                    <option value={2}>engraving</option>
-                    <option value={3}>macro3</option>
-                    <option value={4}>macro4</option>
-                    <option value={5}>cutless</option>
-                    </select>
+					<div>{selectedContourModeType}</div>
 				  </td>
 				</tr>
 				<tr style={{ height: "1.5rem" }}>
@@ -83,21 +82,23 @@ const ContourPanel = observer(() => {
 					colSpan={2}
 					style={{ padding: "0 0.2rem" }}
 					id="info_contour_operating_mode"
-				  >
+				  ><div></div>
 					 
-					 <select
+					  <select
                         id="operatingInletSelect"
                         className="form-select"
                         aria-label="Default select example"
+						value={selectedContourModeType} // Привязка состояния
+						onChange={ setSelectedContourModeType }
                         >
-                        <option value={-1} />
-                        <option value={0}>cutting</option>
-                        <option value={1}>pulse</option>
-                        <option value={2}>engraving</option>
-                        <option value={3}>macro3</option>
-                        <option value={4}>macro4</option>
-                        <option value={5}>cutless</option>
-                        </select>
+                        	<option value={-1} />
+							<option value={0} >cutting</option>
+							<option value={1} >pulse</option>
+							<option value={2} >engraving</option>
+							<option value={3} >macro3</option>
+							<option value={4} >macro4</option>
+							<option value={5} >cutless</option>
+                        </select> 
 				  </td>
 				</tr>
 			  </tbody>
