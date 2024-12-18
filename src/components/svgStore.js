@@ -1,12 +1,24 @@
 // SvgStore.js
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, computed } from "mobx";
 import { toJS } from "mobx";
+import Part from "../scripts/part";
 
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [] }; // Хранилище объекта SVG
 
 	constructor() {
-		makeAutoObservable(this); // Делаем свойства наблюдаемыми
+        makeAutoObservable(this, {
+            selectedType: computed // Отмечаем вычисляемое свойство
+        });
+    }
+
+	get selectedType() {
+		const selected = this.getSelectedElement('class');
+		console.log('selectedType', selected)
+		if (selected) {
+			return Part.detectElementType(selected);
+		}
+		return '';
 	}
 
 	setSvgData(newData) {
@@ -52,7 +64,7 @@ class SvgStore {
 		this.updateElementValue (cid, 'contour', 'selected', true)
 	}
 
-	getSelectedElement(val = '') {
+	getSelectedElement(val = '') {		
 		const selectedElement = this.svgData.code.find(element => element.selected);
 		if (!selectedElement) {
 			return null;

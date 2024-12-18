@@ -4,6 +4,7 @@ import Panel from './panel';
 import '@fortawesome/fontawesome-free/css/all.css'
 import LogPanel from './logPanel';
 import ToolsPanel from './toolsPanel';
+import ContourPanel from './contourPanel';
 
 const Panels = () => {
 
@@ -129,6 +130,7 @@ return (
 		))}
 		<LogPanel />
 		<ToolsPanel />
+		<ContourPanel />
 
 	</>
 );

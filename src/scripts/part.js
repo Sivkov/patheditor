@@ -41,8 +41,6 @@ class Part {
     static updateRect() {
  
     }
-
-
       
     static normalizeIntends () {
     }
@@ -416,5 +414,15 @@ class Part {
         })
 		return {width: Part.width, height: Part.height,code:svg}        
     }
+
+    static detectElementType (classes) {
+        let  contourTypes = ['engraving', 'inner', 'outer']
+        for (let t in contourTypes) {
+            if (classes.includes(contourTypes[t])){
+                return contourTypes[t]
+            } 
+        }
+        return ''
+    }    
 } 
 export default Part;

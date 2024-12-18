@@ -7,6 +7,18 @@
   src: url('./fonts/agencyfbcyrillic.ttf');
 }
 
+:root {
+  --edge:32px;
+  --pEdge:8px;
+  --hEdge: 10px;
+  --tEdge: -6px;
+  --bEdge: 26px;
+  --sizeSortedPlanItemY:50px;    
+  --sizeSortedPlanItemX:100px;    
+  --sizePlanX:50;   
+  --sizePlanY:50;  
+}
+
 
  .theme_light {
   --color: #02feff;        
@@ -1659,4 +1671,55 @@ g.macro5.closed0 {
 
 .btn-log-restore.active {
   background-color: #02feff !important;
+}
+
+/*       **          */
+.containerPoint {
+  position: relative;
+  width: var(--edge);
+  height: var(--edge);
+  border: 2px solid var(--color);
+}
+
+.contourPoint {
+  position: absolute;
+  width: var(--pEdge);
+  height: var(--pEdge);
+  background-color: var(--color);
+}  
+
+.topX {
+  left: var(--tEdge);
+}    
+
+.topY {
+top: var(--tEdge);
+}
+
+.botX {
+ left: var(--bEdge);
+
+}
+
+.botY{
+top:var(--bEdge);
+} 
+
+.midX {
+left:var(--hEdge);
+}
+ 
+.midY{
+top:var(--hEdge);
+}
+
+.contourPoint.active{
+  background-color: orangered ;
+}
+/*         конец          */
+
+.table .editable {
+  background: rgba(69, 208, 226, .5) !important;
+  width: 50px;
+ /*  height: 2rem; */
 }

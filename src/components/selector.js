@@ -13,6 +13,9 @@ const Selector = observer(() => {
       ? { x: box.x, y: box.y, width: box.width, height:  box.height }
       : { x: 0, y: 0, width: 0, height: 0 };
 
+      let circleSize = (box.width + box.height) / 40;
+      circleSize = circleSize > 2 ? 2 : circleSize
+
     return (
         <>
             <g id="selectorPart" className={visibility ? '' : 'd-none'}> 
@@ -23,94 +26,94 @@ const Selector = observer(() => {
                     height={selectorCoords.height}
                     fill="none" 
                     stroke="black" 
-                    strokeWidth="0.25">
+                    strokeWidth={circleSize/10}>
                 </rect>         
                 <circle 
                     id="selectorGrip_resize_nw"
-                    fill="black"
-                    r="2"
+                    fill="black" stroke="white"
+                    r={circleSize}
                     style={{cursor: "nwResize"}}
-                    strokeWidth="0.25"
+                    strokeWidth={circleSize/10}
                     pointerEvents="all"
                     cx={selectorCoords.x}
                     cy={selectorCoords.y}>
                 </circle>
                 <circle 
                     id="selectorGrip_resize_ne"
-                    fill="black"
-                    r="2"
+                    fill="black" stroke="white"
+                    r={circleSize}
                     style={{cursor: "neResize"}}
-                    strokeWidth="0.25"
+                    strokeWidth={circleSize/10}
                     pointerEvents="all"
                     cx={selectorCoords.x+selectorCoords.width}
                     cy={selectorCoords.y}>
                 </circle>
                 <circle 
                     id="selectorGrip_resize_sw"
-                    fill="black"
-                    r="2"
+                    fill="black" stroke="white"
+                    r={circleSize}
                     style={{cursor: "swResize"}}
-                    strokeWidth="0.25"
+                    strokeWidth={circleSize/10}
                     pointerEvents="all"
                     cx={selectorCoords.x}
                     cy={selectorCoords.y+selectorCoords.height}>
                 </circle>
                 <circle 
                     id="selectorGrip_resize_se"
-                    fill="black"
-                    r="2"
+                    fill="black" stroke="white"
+                    r={circleSize}
                     style={{cursor: "seResize"}}
-                    strokeWidth="0.25"
+                    strokeWidth={circleSize/10}
                     pointerEvents="all"
                     cx={selectorCoords.x+selectorCoords.width}
                     cy={selectorCoords.y+selectorCoords.height}>
                 </circle>
                 <circle 
                     id="selectorGrip_resize_n"
-                    fill="black"
-                    r="2"
+                    fill="black" stroke="white"
+                    r={circleSize}
                     style={{cursor: "nResize"}}
-                    strokeWidth="0.25"
+                    strokeWidth={circleSize/10}
                     pointerEvents="all"
                     cx={selectorCoords.x+selectorCoords.width*0.5}
                     cy={selectorCoords.y}>
                 </circle>
                 <circle 
                     id="selectorGrip_resize_w"
-                    fill="black"
-                    r="2"
+                    fill="black" stroke="white"
+                    r={circleSize}
                     style={{cursor: "wResize"}}
-                    strokeWidth="0.25"
+                    strokeWidth={circleSize/10}
                     pointerEvents="all"
                     cx={selectorCoords.x}
                     cy={selectorCoords.y+selectorCoords.height*0.5}>
                 </circle>
                 <circle 
                     id="selectorGrip_resize_s"
-                    fill="black"
-                    r="2"
+                    fill="black" stroke="white"
+                    r={circleSize}
                     style={{cursor: "sResize"}}
-                    strokeWidth="0.25"
+                    strokeWidth={circleSize/10}
                     pointerEvents="all"
                     cx={selectorCoords.x+selectorCoords.width*0.5}
                     cy={selectorCoords.y+selectorCoords.height}>
                 </circle>
                 <circle 
                     id="selectorGrip_resize_e"
-                    fill="black"
-                    r="2"
+                    fill="black" stroke="white"
+                    r={circleSize}
                      style={{cursor: "eResize"}}
-                    strokeWidth="0.25"
+                    strokeWidth={circleSize/10}
                     pointerEvents="all"
                     cx={selectorCoords.x+selectorCoords.width}
                     cy={selectorCoords.y+selectorCoords.height*0.5}>
                 </circle>
                 <circle 
                     id="selectorGrip_central"
-                    fill="black"
-                    r="2"
+                    fill="white" stroke="black"
+                    r={circleSize}
                     style={{cursor: "move"}}
-                    strokeWidth="0.25"
+                    strokeWidth={circleSize/10}
                     pointerEvents="all"
                     cx={selectorCoords.x+selectorCoords.width*0.5}
                     cy={selectorCoords.y+selectorCoords.height*0.5}>
