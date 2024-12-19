@@ -61,14 +61,7 @@ const LogPanel = observer(() => {
 		  {
 			id: 'logPopup',
 			fa: (<><Icon icon="vaadin:time-backward" width="24" height="24"  style={{color: 'white'}} className='me-2' /><div>History</div></>),
-			mini: true,
-			style: {
-				top: 160,
-				left: 12,
-				width: 350,
-				height:100,
-			  },
-			  content: (
+			content: (
 				<div id="logger_wrapper">
 				  <div id="logger">
 					{logStore.log.map((element, index, arr) => (					  

@@ -8,7 +8,6 @@ import log from './../../scripts/log.js'
  
 
 const ToolsPanel = observer(() => {
-
 	const deleteContour =()=>{
 		if  (svgStore.getSelectedElement()){
 			svgStore.deleteSelected()
@@ -25,15 +24,8 @@ const ToolsPanel = observer(() => {
 	const panelInfo = [
 		{
 			id: "toolsPopup",
-			mini: true,
 			fa: (<Icon icon="heroicons:wrench-screwdriver-20-solid" />),
-			style: {
-			  top: 80,
-			  left: 300,
-			  width: 150,
-			  height: 300,
-			},
-			content: (
+ 			content: (
 				<div className="d-flex align-items-center btn_block flex-wrap">
 				  <button
 					type="button"

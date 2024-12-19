@@ -12,15 +12,8 @@ const TecnologyPanel =  observer(() => {
 	const panelInfo = [
 		  {
 			id: 'contourModesPopup',
-			mini: true,
 			fa: (<><Icon icon="mynaui:square-dashed-solid" width="24" height="24"  style={{color: 'white'}} className='me-2'/><div>Operating modes</div></>),
-			style: {
-			  top: 80,
-			  left: 12,
-			  width: 350,
-			  height: 520,
-			},
-			content: (
+	 		content: (
 			  <div className="window-content">
 				<div className="d-flex">
 				  <table className="table">

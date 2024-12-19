@@ -1,56 +1,18 @@
+import { observer } from "mobx-react-lite";
 import React, { useState, useRef, useEffect } from "react";
+import panelStore from "../stores/panelStore";
+//import { toJS } from "mobx";
 
 
-const Panel = ({ element, index }) => {
+const Panel = observer (({ element, index }) => {
+	const id =element.id
 
-	const  getPopupPosition = (id)=>{
-		console.log (id)
-		let pp = JSON.parse(localStorage.getItem('pp'))
-		if (pp && pp.hasOwnProperty(id)) {
-			return pp[id]
-		}
-		return false
-	}
-
-	const [zIndex, setZIndex] = useState(index+1);
-	const [isMinified, setIsMinified] = useState( element.mini )
-	const [position, setPosition] = useState({
-		top:  element.style.top,
-		left: element.style.left,
-	});
+	useEffect(()=>{
+		panelStore.getInitialPositions()
+	},[])
 	
-	const [size, setSize] = useState({
-		width:  element.style.width,
-		height: element.style.height
-	});
-
-	const [isInitialized, setIsInitialized] = useState(false);
-
-	useEffect(() => {
-	  const loadPanelPosition = getPopupPosition(element.id);
-	  if (loadPanelPosition) {
-		if (loadPanelPosition.style) {
-		  setPosition({
-			top: loadPanelPosition.style.top,
-			left: loadPanelPosition.style.left,
-		  });
-		  setSize({
-			width: loadPanelPosition.style.width,
-			height: loadPanelPosition.style.height,
-		  });
-		}
-		if (loadPanelPosition.mini !== undefined) {
-		  setIsMinified(loadPanelPosition.mini);
-		}
-	  }
-	  setIsInitialized(true);
-	}, [element.id]);
-
-	useEffect(() => {
-		if (!isInitialized) return; 
-		savePanelPosition(element.id);
-	}, [position, size, isMinified, isInitialized, element.id]);
-
+	
+	const [zIndex, setZIndex] = useState(index+1);
 	const panelRef = useRef(null);
 	const startPos = useRef({ x: 0, y: 0 });
 	const startWidth = useRef(0);
@@ -60,7 +22,17 @@ const Panel = ({ element, index }) => {
 	const move = useRef(0);
 
  	const toggleMinified = () => {
-		setIsMinified((prev) => !prev);
+		let positions = {
+			style:{
+				width: panelStore.positions[id].style.width,
+				height:panelStore.positions[id].style.height,
+				top:   panelStore.positions[id].style.top,
+				left:  panelStore.positions[id].style.left				
+			}
+		}
+		positions.mini = Boolean(!Number( panelStore.positions[id].mini ))
+		panelStore.setPosition(id, positions)
+		savePanelPosition()
 	};
 
  	const handleMouseDown = (e) => {
@@ -82,8 +54,8 @@ const Panel = ({ element, index }) => {
 		startX.current = e.clientX;
         startY.current = e.clientY;
 
-		startWidth.current = size.width
-		startHeight.current = size.height
+		startWidth.current = panelStore.positions[id].style.width
+		startHeight.current = panelStore.positions[id].style.height
 
 		move.current = 'resize'
 			
@@ -95,17 +67,41 @@ const Panel = ({ element, index }) => {
 		if (move.current === 'move') {
 			const newLeft = e.clientX - startPos.current.x;
 			const newTop = e.clientY - startPos.current.y;
-			setPosition({
+			/* setPosition({
 				top: newTop,
 				left: newLeft,
-			});
+			}); */
+			let positions = {
+				style:{
+					top:newTop,
+					left:newLeft,
+					width:panelStore.positions[id].style.width,
+					height:panelStore.positions[id].style.height,
+				}
+			}
+			positions.mini = panelStore.positions[id].mini
+			panelStore.setPosition(id, positions)
+
+
 		} else {
 			let w = startWidth.current + e.clientX - startX.current ;
 			let h = startHeight.current + e.clientY - startY.current;
-			setSize ({
+			/* setSize ({
 				width:w,
 				height:h
-			})
+			}) */
+			
+            let positions = {
+				style:{
+					top:panelStore.positions[id].style.top,
+					left:panelStore.positions[id].style.left,
+					width:w,
+					height:h,
+				}
+			}
+			positions.mini = panelStore.positions[id].mini
+			panelStore.setPosition(id, positions)
+
 		}
 	};
 
@@ -113,6 +109,7 @@ const Panel = ({ element, index }) => {
 		document.removeEventListener("mousemove", handleMouseMove);
 		document.removeEventListener("mouseup", handleMouseUp);
 		move.current= ''
+		savePanelPosition()
 	};
 
 	const findHighestZIndex = () => {
@@ -139,32 +136,11 @@ const Panel = ({ element, index }) => {
 		console.log("SavePositions")
 		let pp = localStorage.getItem('pp')
 		if (!pp) {
-            let positions = {}
-            positions[id] = {}
-            positions[id].mini = element.mini
-            positions[id].style = {
-				"top":position.top,
-				"left":position.left,
-				"width":size.width,
-				"height":size.height
-			}
-			positions[id].mini = isMinified
-            localStorage.setItem('pp', JSON.stringify(positions))
+            let pp = {}
+            pp.positions = panelStore.positions
+            localStorage.setItem('pp', JSON.stringify(panelStore.positions))
         } else {
-
-            let positions = JSON.parse(localStorage.getItem('pp'))
-            if (!pp.hasOwnProperty(id)) {
-                positions[id] = {}
-            }
-            positions[id].mini = element.mini
-			positions[id].style = {
-				"top":position.top,
-				"left":position.left,
-				"width":size.width,
-				"height":size.height
-			}  
-			positions[id].mini = isMinified
-			localStorage.setItem('pp', JSON.stringify(positions))
+ 			localStorage.setItem('pp', JSON.stringify(panelStore.positions))
         }
 	}   
 
@@ -173,13 +149,13 @@ const Panel = ({ element, index }) => {
 		<div
 			ref={panelRef}
 			id={element.id}
-			className={`window popup ${isMinified ? " mini h45" : ""}`}
+			className={`window popup ${panelStore.positions[id].mini ? " mini h45" : ""}`}
 			style={{
 				zIndex: zIndex,
-				top: `${position.top}px`,
-				left: `${position.left}px`,
-				width: `${size.width}px`,
-				height: `${isMinified ? 45 : size.height}px`,
+				top: `${panelStore.positions[id].style.top}px`,
+				left: `${panelStore.positions[id].style.left}px`,
+				width: `${panelStore.positions[id].style.width}px`,
+				height: `${panelStore.positions[id].mini ? 45 : panelStore.positions[id].style.height}px`,
 			}}			
 		>
 			<div className="window-top popup-header" 
@@ -192,7 +168,7 @@ const Panel = ({ element, index }) => {
 					</div>
 					<div className="minify_wrapper d-flex align-items-center justify-content-center">
 						<div
-							className={`minify ${isMinified ? "minified" : ""}`}
+							className={`minify ${panelStore.positions[id].mini ? "minified" : ""}`}
 							onClick={(e) => {
 								e.stopPropagation();
 								toggleMinified();
@@ -201,26 +177,26 @@ const Panel = ({ element, index }) => {
 					</div>
 				</div>
 			</div>
-			<div className={`window-content ${isMinified ? "mini" : ""}`}>
+			<div className={`window-content ${panelStore.positions[id].mini ? "mini" : ""}`}>
 				{element.content}
 			</div>
 			<div 
-				className={`resizer-right ${isMinified ? "mini" : ""}`}
+				className={`resizer-right ${panelStore.positions[id].mini ? "mini" : ""}`}
 				onMouseDown={initDrag}				
 				onMouseUp={handleMouseUp}
 			></div>
 			<div 
-				className={`resizer-bottom ${isMinified ? "mini" : ""}`}
+				className={`resizer-bottom ${panelStore.positions[id].mini ? "mini" : ""}`}
 				onMouseDown={initDrag}
 				onMouseUp={handleMouseUp}
 			></div>
 			<div 
-				className={`resizer-both ${isMinified ? "mini" : ""}`}
+				className={`resizer-both ${panelStore.positions[id].mini ? "mini" : ""}`}
 				onMouseDown={initDrag}
 				onMouseUp={handleMouseUp}
 			></div>
 		</div>
 	);
-};
+});
 
 export default Panel;

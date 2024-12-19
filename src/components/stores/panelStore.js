@@ -1,19 +1,29 @@
 import { makeAutoObservable } from "mobx";
+import CONSTANTS from "../../constants/constants";
+
 
 class PanelStore {
-  coords = { x: 0, y: 0 };
 
-  constructor() {
-    makeAutoObservable(this);
-  }
+	positions = CONSTANTS.panelPostions
+	constructor() {
+		makeAutoObservable(this);
+	}
 
-  minimize_all_panels () {
+	getInitialPositions() {
+		const pp = JSON.parse(localStorage.getItem('pp'));
+		if (pp) {
+			for (let key in pp) {
+				if (pp.hasOwnProperty(key)) {
+					this.positions[key] = pp[key];
+				}
+			}
+		}
+	}
 
-  }
+	setPosition(id, positions) {
+		this.positions[id]=positions
+	}
 
-  setCoords(newCoords) {
-    this.coords = newCoords;
-  }
 }
 
 const panelStore = new PanelStore();

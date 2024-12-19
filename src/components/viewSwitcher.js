@@ -1,15 +1,16 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite'; 
-import PanelStore from './stores/panelStore';
 import panelStore from './stores/panelStore';
+import CONSTANTS from '../constants/constants';
    
 
 const viewSwitcher = observer(() => {
 
 	const minimize_all_panels = () => {
-		console.log('minimize_all_panels')
-		panelStore.minimize_all_panels()
-
+		for (let key in CONSTANTS.panelPostions) {
+			panelStore.setPosition(key, CONSTANTS.panelPostions[key])
+		}	 
+		localStorage.removeItem("pp");
 	}
 
 	return (
@@ -36,7 +37,7 @@ const viewSwitcher = observer(() => {
 				<a
 					className="dropdown-item"
 					href="#"
-					onclick={ minimize_all_panels }
+					onClick={ minimize_all_panels }
 				>
 					<i className="fa-solid fa-align-justify me-2" />
 					Minimize all panels

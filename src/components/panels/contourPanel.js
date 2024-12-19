@@ -68,14 +68,7 @@ const ContourPanel = observer(() => {
 	const panelInfo = [
 		{
 			id: "contourPopup",
-			mini: true,
 			fa: (<><Icon icon="oui:polygon" width="24" height="24" style={{ color: 'white' }} className='me-2' /><div>Contour</div></>),
-			style: {
-				top: 120,
-				left: 12,
-				width: 350,
-				height: 340,
-			},
 			content: (<div className="d-flex flex-column">
 			<table className="table mb-0">
 			  <tbody>
@@ -357,7 +350,7 @@ const ContourPanel = observer(() => {
 					<div className="d-flex align-items-center justify-content-around">
 					  <div className="d-flex align-items-center">
 					  	<Icon icon="ant-design:radius-upright-outlined" width="24" height="24" />
-						<div class="ms-2">Rounding radius</div>
+						<div className="ms-2">Rounding radius</div>
 						<input
 						  className="mx-2"
 						  id="rounding_radius"
