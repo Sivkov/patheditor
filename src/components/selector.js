@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import svgStore from "./svgStore.js";
+import svgStore from "./stores/svgStore.js";
 import SVGPathCommander from 'svg-path-commander';
 
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';  // Импортируем observer для оборачивания компонента
-import coordsStore from './coordsStore.js';  // Импортируем store
+import coordsStore from './stores/coordsStore.js';  // Импортируем store
 
 const Informer = observer(() => {
   const { coords } = coordsStore;  // Получаем данные из store

@@ -173,13 +173,13 @@ const Panel = ({ element, index }) => {
 		<div
 			ref={panelRef}
 			id={element.id}
-			className={`window popup${isMinified ? " mini h45" : ""}`}
+			className={`window popup ${isMinified ? " mini h45" : ""}`}
 			style={{
 				zIndex: zIndex,
 				top: `${position.top}px`,
 				left: `${position.left}px`,
 				width: `${size.width}px`,
-				height: `${size.height}px`,
+				height: `${isMinified ? 45 : size.height}px`,
 			}}			
 		>
 			<div className="window-top popup-header" 

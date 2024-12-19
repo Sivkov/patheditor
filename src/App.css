@@ -1741,3 +1741,12 @@ top:var(--hEdge);
   width: 50px;
  /*  height: 2rem; */
 }
+
+
+.dropdown-menu {
+  background-color:var(--mainBg1) !important;
+}
+
+.dropdown-menu .dropdown-item {
+  color: var(--paleColor) !important;
+}

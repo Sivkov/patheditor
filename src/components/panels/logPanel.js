@@ -2,8 +2,8 @@ import { Icon } from '@iconify/react';
 import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';  
-import logStore from '../logStore.js'; 
-import svgStore from "../svgStore.js";
+import logStore from '../stores/logStore.js'; 
+import svgStore from "../stores/svgStore.js";
 import { useEffect, useState } from 'react';
 import log from './../../scripts/log.js'
 
@@ -61,9 +61,9 @@ const LogPanel = observer(() => {
 		  {
 			id: 'logPopup',
 			fa: (<><Icon icon="vaadin:time-backward" width="24" height="24"  style={{color: 'white'}} className='me-2' /><div>History</div></>),
-			mini: false,
+			mini: true,
 			style: {
-				top: 40,
+				top: 160,
 				left: 12,
 				width: 350,
 				height:100,

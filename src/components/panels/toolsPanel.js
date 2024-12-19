@@ -2,8 +2,8 @@ import { Icon } from '@iconify/react';
 import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';  
-import logStore from '../logStore.js'; 
-import svgStore from "../svgStore.js";
+import logStore from '../stores/logStore.js'; 
+import svgStore from "../stores/svgStore.js";
 import log from './../../scripts/log.js'
  
 
@@ -25,10 +25,10 @@ const ToolsPanel = observer(() => {
 	const panelInfo = [
 		{
 			id: "toolsPopup",
-			mini: false,
+			mini: true,
 			fa: (<Icon icon="heroicons:wrench-screwdriver-20-solid" />),
 			style: {
-			  top: 0,
+			  top: 80,
 			  left: 300,
 			  width: 150,
 			  height: 300,

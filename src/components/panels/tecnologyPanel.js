@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from '@iconify/react';
 import Panel from './panel';
 import '@fortawesome/fontawesome-free/css/all.css'
-import svgStore from '../svgStore';
+import svgStore from '../stores/svgStore';
 import { observer } from 'mobx-react-lite';
 
 
@@ -12,10 +12,10 @@ const TecnologyPanel =  observer(() => {
 	const panelInfo = [
 		  {
 			id: 'contourModesPopup',
-			mini: false,
+			mini: true,
 			fa: (<><Icon icon="mynaui:square-dashed-solid" width="24" height="24"  style={{color: 'white'}} className='me-2'/><div>Operating modes</div></>),
 			style: {
-			  top: 0,
+			  top: 80,
 			  left: 12,
 			  width: 350,
 			  height: 520,

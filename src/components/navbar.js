@@ -1,7 +1,7 @@
 import React from 'react';
 import ThemeSwitcher from './themeSwitcher';
 import Intro from './intro';
- 
+ import ViewSwitcher from './viewSwitcher';
 
 const Navbar = () => {
 
@@ -12,9 +12,11 @@ const Navbar = () => {
 	return (
 		<nav className="navbar conteiner-fluid p-0" id="navBar">
 			<div className="d-flex w-100 justify-content-between">
-				<div>
+				<div className="d-flex">
 					<Intro />
+					<ViewSwitcher />
 				</div>
+
 				<div className='d-flex align-items-center'>
 					<ThemeSwitcher />
 					<a href="https://github.com/Sivkov/arcConverter" className="github-button" target="_blank">
@@ -22,7 +24,6 @@ const Navbar = () => {
 					</a>
 				</div>
 			</div>
-			{/* <Panels /> */}
 		</nav>);
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import coordsStore from './coordsStore.js'; 
+import coordsStore from './stores/coordsStore.js'; 
 import SvgComponent from './svg';
 import Util from './../utils/util';
 //import Arc from './../utils/arc.js';

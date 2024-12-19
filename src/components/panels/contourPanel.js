@@ -2,8 +2,8 @@ import { Icon } from '@iconify/react';
 import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
-import logStore from '../logStore.js';
-import svgStore from "../svgStore.js";
+import logStore from '../stores/logStore.js';
+import svgStore from "../stores/svgStore.js";
 import log from '../../scripts/log.js'
 //import Part from '../../scripts/part.js'
 //import { toJS } from "mobx";
@@ -68,12 +68,12 @@ const ContourPanel = observer(() => {
 	const panelInfo = [
 		{
 			id: "contourPopup",
-			mini: false,
+			mini: true,
 			fa: (<><Icon icon="oui:polygon" width="24" height="24" style={{ color: 'white' }} className='me-2' /><div>Contour</div></>),
 			style: {
-				top: 0,
-				left: 300,
-				width: 200,
+				top: 120,
+				left: 12,
+				width: 350,
 				height: 340,
 			},
 			content: (<div className="d-flex flex-column">
@@ -270,8 +270,7 @@ const ContourPanel = observer(() => {
 				  <td className="w-25" rowSpan={3}></td>
 				  <td>
 					<div className="d-flex flex-row align-items-top justify-content-center">
-					  <i className="fa-solid fa-angle-90" />
-					  <div
+					<Icon icon="tabler:angle" width="24" height="24" />					  <div
 						style={{ fontFamily: '"Font Awesome 6 Pro"', marginTop: "-7px" }}
 					  >
 						°
@@ -309,37 +308,37 @@ const ContourPanel = observer(() => {
 						type="button"
 						className="btn text-white mt-1 btn_align btn_align-left"
 					  >
-						<i className="fa-solid fa-objects-align-left" />
+						<Icon icon="solar:align-left-linear" width="28" height="28" />
 					  </button>
 					  <button
 						type="button"
 						className="btn text-white mt-1 btn_align btn_align-center-vertical"
 					  >
-						<i className="fa-solid fa-objects-align-center-horizontal" />
+						<Icon icon="solar:align-horizontal-center-linear" width="28" height="28" />
 					  </button>
 					  <button
 						type="button"
 						className="btn text-white mt-1 btn_align btn_align-right"
 					  >
-						<i className="fa-solid fa-objects-align-right" />
+						<Icon icon="solar:align-right-linear" width="28" height="28" />
 					  </button>
 					  <button
 						type="button"
 						className="btn text-white mt-1 btn_align btn_align-top"
 					  >
-						<i className="fa-solid fa-objects-align-left fa-rotate-90" />
+						<Icon icon="solar:align-top-linear" width="28" height="28" />
 					  </button>
 					  <button
 						type="button"
 						className="btn text-white mt-1 btn_align btn_align-center-horizontal"
 					  >
-						<i className="fa-solid fa-objects-align-center-vertical" />
+						<Icon icon="solar:align-vertical-center-linear" width="28" height="28" />
 					  </button>
 					  <button
 						type="button"
 						className="btn text-white mt-1 btn_align btn_align-bottom"
 					  >
-						<i className="fa-solid fa-objects-align-right fa-rotate-90" />
+						<Icon icon="solar:align-bottom-linear" width="28" height="28" />
 					  </button>
 					</div>
 				  </td>
@@ -357,7 +356,8 @@ const ContourPanel = observer(() => {
 				  <td className="text-start ps-2">
 					<div className="d-flex align-items-center justify-content-around">
 					  <div className="d-flex align-items-center">
-						<div>Rounding radius</div>
+					  	<Icon icon="ant-design:radius-upright-outlined" width="24" height="24" />
+						<div class="ms-2">Rounding radius</div>
 						<input
 						  className="mx-2"
 						  id="rounding_radius"

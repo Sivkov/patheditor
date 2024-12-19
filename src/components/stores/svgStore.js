@@ -1,7 +1,7 @@
 // SvgStore.js
 import { makeAutoObservable, computed } from "mobx";
 import { toJS } from "mobx";
-import Part from "../scripts/part";
+import Part from "../../scripts/part";
 
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [] }; // Хранилище объекта SVG
