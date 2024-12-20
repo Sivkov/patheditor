@@ -124,24 +124,25 @@ const  SvgWrapper = () => {
 	}
 
 	const [svgIsLoad, setSvgIsLoad] = useState(false); // Флаг загрузки SVG
-
  
 	useEffect(() => {
-	  if (!svgIsLoad) {
+	  if (true) {
 		//const loadedSvg = Part.simpleReturn();
-		setSvgIsLoad(true); 
+		//setSvgIsLoad(true); 
 		setSvgParams(Part.getSvgParams())
-		fitToPAge()
-	  }
+
+ 		const timeoutId = setTimeout(() => {
+			console.log ('Delayed message after 2 seconds!');
+			fitToPAge()
+			}, 500);
+	  		return () => clearTimeout(timeoutId); 
+		}
 	}, [svgIsLoad]); 
 
 	const fitToPAge =() => {
 		
  		setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
-		setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
-        //part.normalizeIntends()
-        //part.updateRect()
-        let box = document.querySelector('#group').getBoundingClientRect()
+	    let box = document.querySelector('#group').getBoundingClientRect()
 		const wBox = wrapperSVG.current.getBoundingClientRect();
         
         let scaleW = wBox.width/ box.width
@@ -161,30 +162,33 @@ const  SvgWrapper = () => {
         let dif = Util.convertScreenCoordsToSvgCoords(oxd, oyd)
         let ydif = dif.y - center.y
         let xdif = dif.x - center.x
-		//setGroupMatrix({ a: scale, b: scale, c: 0, d: 1, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }) 
-		//console.log ({ a: scale, b: scale, c: 0, d: 1, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif })
-		setGroupMatrix ({ a: 0.4908140727912276, b: 0, c: 0, d: 0.4908140727912276, e: 28.366972880205747, f: -0.19623375480269356 })
+
+		setGroupMatrix({ a: scale, b: 0, c: 0, d: scale, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }) 
+		console.log ({ a: scale, b: scale, c: 0, d: 1, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif })
+
      	}
 
 
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">
 			<div className="row  align-items-center h-100">
-			<div className="w-100 h-100">
-			<div id="wrapper_svg" ref={wrapperSVG}
-				onWheel={handleMouseWheel} 
-				onMouseDown={startDrag}
-				onMouseMove={drag} 
- 				onMouseUp={endDrag}
-				onMouseLeave={leave}>		 
-					<SvgComponent 
-						matrix={matrix} 
-						gmatrix={gmatrix} 
-						gridState={gridState}
- 						svgParams={svgParams}
-					/>
-				</div>
-				</div>
+				<div className="w-100 h-100">
+					<div className="d-flex" id="editor_main_wrapper">
+						<div id="wrapper_svg" ref={wrapperSVG}
+							onWheel={handleMouseWheel} 
+							onMouseDown={startDrag}
+							onMouseMove={drag} 
+							onMouseUp={endDrag}
+							onMouseLeave={leave}>		 
+								<SvgComponent 
+									matrix={matrix} 
+									gmatrix={gmatrix} 
+									gridState={gridState}
+									svgParams={svgParams}
+								/>
+						</div>
+					</div>
+				</div>	
 			</div>
 		</main>
 
