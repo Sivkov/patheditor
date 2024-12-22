@@ -1,33 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 //import Part from './../scripts/part';
 import Util from './../utils/util';
 import SimpleReturnComponent from './simpleReturnComponent'
 import Selector from './selector.js'
 
-const SvgComponent = ({ matrix, gmatrix, gridState, svgParams }) => {
+const SvgComponent = ({ matrix, gmatrix, gridState, svgParams, rectParams}) => {
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
     const matrixG = `${gmatrix.a} ${gmatrix.b} ${gmatrix.c} ${gmatrix.d} ${gmatrix.e} ${gmatrix.f}`;
 	const widthSVG = svgParams.width
 	const heightSVG = svgParams.height
 
-
-    const calculateRectAttributes = () => {
-        // Ширина и высота исходя из scale
-        const combinedMatrix = Util.multiplyMatrices(gmatrix, matrix);
-        const scaleX = combinedMatrix.a;
-        const scaleY = combinedMatrix.d;
-
-        const width = widthSVG/ scaleX;
-        const height = heightSVG / scaleY;
-
-        // Координаты x и y исходя из translate
-        const x = -combinedMatrix.e / scaleX;
-        const y = -combinedMatrix.f / scaleY;
-
-        return { x, y, width, height };
-    };
-    const { x, y, width, height } = calculateRectAttributes();
-
+    console.log  (rectParams)
     return (
         <svg
             id="svg"
@@ -104,10 +87,10 @@ const SvgComponent = ({ matrix, gmatrix, gridState, svgParams }) => {
                         <g id="contours">
                             <rect
                                 id="dimensionalGrid"
-                                height={height}
-                                width={width}
-                                x={x}
-                                y={y}
+                                height={rectParams.height}
+                                width={rectParams.width}
+                                x={rectParams.x}
+                                y={rectParams.y}
                                 fill="url(#grid)"
                                 transform-origin="50% 50%"
                                 stroke='var(--color)'

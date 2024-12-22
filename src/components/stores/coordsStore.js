@@ -3,6 +3,7 @@ import { makeAutoObservable } from "mobx";
 
 class CoordsStore {
   coords = { x: 0, y: 0 };
+  needeToFit = false
 
   constructor() {
     makeAutoObservable(this);
@@ -12,6 +13,11 @@ class CoordsStore {
     //console.log ('setCoords' + newCoords)
     this.coords = newCoords;
   }
+
+  setFitted (val) {
+    this.needeToFit = val
+  }
+
 }
 
 const coordsStore = new CoordsStore();
