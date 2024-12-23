@@ -5,14 +5,14 @@ import { observer } from 'mobx-react-lite';
 import logStore from '../stores/logStore.js';
 import svgStore from "../stores/svgStore.js";
 import log from '../../scripts/log.js'
-//import Part from '../../scripts/part.js'
-//import { toJS } from "mobx";
-//import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
+import SVGPathCommander from 'svg-path-commander';
+import Util from '../../utils/util.js';
 
 const ContourPanel = observer(() => {
 
-	const { selectedType,
+	const { selected,
+			selectedType,
 			selectedContourModeType, 
 		   	selectedInletModeType,
 			selectedPiercingType } = svgStore;
@@ -64,6 +64,64 @@ const ContourPanel = observer(() => {
 		}
 		log.save(data)	
 	}
+
+	const [activePoint, setActive] = useState('topYtopX')
+	const [activeCooord, setActiveCoord ] = useState({x:0,y:0})
+	const [wh, setWH ] = useState({w:0,h:0})
+
+
+	const contourPoint =(e) =>{
+		let id  = e.currentTarget.getAttribute('id')
+		setActive(id)
+	}
+
+	useEffect(()=>{
+		let x = 0
+		let y = 0
+		let  path = svgStore.getSelectedElement('path') 
+		console.log (path)
+		if (!path) {
+			setActiveCoord({x,y})
+			return	
+		}
+		const box = SVGPathCommander.getPathBBox(path);
+		console.log (box)
+		if (activePoint.match(/topX/gm)) {
+			x=box.x
+		} else if (activePoint.match(/midX/gm)) {
+			x=box.x + box.width*0.5
+		} else if (activePoint.match(/botX/gm)) {
+			x=box.x2
+		}
+
+		if (activePoint.match(/topY/gm)) {
+			y=box.y
+		} else if (activePoint.match(/midY/gm)) {
+			y=box.y + box.height*0.5
+		} else if (activePoint.match(/botY/gm)) {
+			y=box.y2
+		}
+
+		if(activeCooord)
+		setActiveCoord({x:Util.round(x, 3),y:Util.round(y, 3)})
+	},[activePoint, selected ])
+
+	useEffect(()=>{
+		let x = 0
+		let y = 0
+		let  path = svgStore.getSelectedElement('path') 
+		console.log (path)
+		if (!path) {
+			setActiveCoord({x,y})
+			return	
+		}
+		const box = SVGPathCommander.getPathBBox(path);
+		if (box) {
+			x = Util.round(box.width, 3)
+			y = Util.round(box.height, 3)
+		}
+		setWH({w:x,h:y})
+	},[selected ])
 
 	const panelInfo = [
 		{
@@ -184,37 +242,73 @@ const ContourPanel = observer(() => {
 						  height: "2.5rem"
 						}}
 					  >
-						<div className="containerPoint">
-						  <div className="contourPoint active topY topX" />
-						  <div className="contourPoint topY botX" />
-						  <div className="contourPoint botY topX" />
-						  <div className="contourPoint botY botX" />
-						  <div className="contourPoint midX topY" />
-						  <div className="contourPoint midX botY" />
-						  <div className="contourPoint midY topX" />
-						  <div className="contourPoint midY botX" />
-						  <div className="contourPoint midX midY" />
-						</div>
+					<div className="containerPoint">
+						<div
+							id="topYtopX"
+							onMouseDown={contourPoint}
+							className={`contourPoint topY topX ${activePoint === 'topYtopX' ? 'active' : ''}`}
+						/>
+						<div
+							id="topYbotX"
+							onMouseDown={contourPoint}
+							className={`contourPoint topY botX ${activePoint === 'topYbotX' ? 'active' : ''}`}
+						/>
+												<div
+							id="botYtopX"
+							onMouseDown={contourPoint}
+							className={`contourPoint botY topX ${activePoint === 'botYtopX' ? 'active' : ''}`}
+						/>
+						<div
+							id="botYbotX"
+							onMouseDown={contourPoint}
+							className={`contourPoint botY botX ${activePoint === 'botYbotX' ? 'active' : ''}`}
+						/>
+						<div
+							id="midXtopY"
+							onMouseDown={contourPoint}
+							className={`contourPoint midX topY ${activePoint === 'midXtopY' ? 'active' : ''}`}
+						/>
+						<div
+							id="midXbotY"
+							onMouseDown={contourPoint}
+							className={`contourPoint midX botY ${activePoint === 'midXbotY' ? 'active' : ''}`}
+						/>
+												<div
+							id="midYtopX"
+							onMouseDown={contourPoint}
+							className={`contourPoint midY topX ${activePoint === 'midYtopX' ? 'active' : ''}`}
+						/>
+						<div
+							id="midYbotX"
+							onMouseDown={contourPoint}
+							className={`contourPoint midY botX ${activePoint === 'midYbotX' ? 'active' : ''}`}
+						/>
+												<div
+							id="midXmidY"
+							onMouseDown={contourPoint}
+							className={`contourPoint midX midY ${activePoint === 'midXmidY' ? 'active' : ''}`}
+						/>
+ 					  </div>
 					  </div>
 					</div>
 				  </td>
 				  <td>X:</td>
 				  <td id="contourPointXvalue" className="editable" contentEditable="">
-					0
+					{activeCooord.x}
 				  </td>
 				  <td>Y:</td>
 				  <td id="contourPointYvalue" className="editable" contentEditable="">
-					0
+				  {activeCooord.y}
 				  </td>
 				</tr>
 				<tr>
 				  <td>__:</td>
 				  <td id="contourWidthValue" className="editable" contentEditable="">
-					0
+					{wh.w}
 				  </td>
 				  <td>|:</td>
 				  <td id="contourHeightValue" className="editable" contentEditable="">
-					0
+					{wh.h}
 				  </td>
 				</tr>
 				<tr>

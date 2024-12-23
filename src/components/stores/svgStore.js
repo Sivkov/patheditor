@@ -5,9 +5,9 @@ import Part from "../../scripts/part";
 
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [] }; // Хранилище объекта SVG
-
 	constructor() {
-        makeAutoObservable(this, {
+		makeAutoObservable(this, {
+			selected: computed,
             selectedType: computed,
 			selectedPiercingType: computed,
 			selectedInletModeType: computed,
@@ -15,6 +15,14 @@ class SvgStore {
 			tecnology: computed,
         });
     }
+
+	get selected () {
+		const selected = this.getSelectedElement();
+		if (selected) {
+			return selected;		 
+		}
+		return '';
+	}
 
 	get tecnology () {
 		let allClasses =''
