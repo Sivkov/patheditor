@@ -10,7 +10,7 @@ const SvgComponent = ({ matrix, gmatrix, gridState, svgParams, rectParams}) => {
 	const widthSVG = svgParams.width
 	const heightSVG = svgParams.height
 
-    console.log  (rectParams)
+    //console.log  (rectParams)
     return (
         <svg
             id="svg"

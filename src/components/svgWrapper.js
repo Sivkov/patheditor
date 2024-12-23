@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite'; 
+import { toJS } from 'mobx'; 
 import coordsStore from './stores/coordsStore.js'; 
 import SvgComponent from './svg';
 import Util from './../utils/util';
 //import Arc from './../utils/arc.js';
 import Part from '../scripts/part.js';
-import svgStore from './stores/svgStore.js';
-import { use } from 'react';
-
+  
 
 const  SvgWrapper = observer (() => {
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
@@ -28,39 +27,9 @@ const  SvgWrapper = observer (() => {
 			visibility: "visible",
 			fill: "none",
 		},
-	  });
+	});
+
 	const [svgParams, setSvgParams]= useState({width:0, height:0}) 
-
-   	useEffect(() => {
-		const updatedState = { ...gridState };
-		if (matrix.a < 0.25) {
-		updatedState.xsGrid.visibility = "hidden";
-		updatedState.smallGrid.fill = "var(--gridColorFill)";
-		} else {
-		updatedState.xsGrid.visibility = "visible";
-		updatedState.smallGrid.fill = "none";
-		}
-
-		if (matrix.a < 0.125) {
-		updatedState.smallGrid.visibility = "hidden";
-		updatedState.grid.fill = "var(--gridColorFill)";
-		} else {
-		updatedState.smallGrid.visibility = "visible";
-		updatedState.grid.fill = "none";
-		}
-
-		if (matrix.a > 85) {
-		updatedState.grid.visibility = "hidden";
-		} else {
-		updatedState.grid.visibility = "visible";
-		}
-		setGridState(updatedState);
-	}, [matrix]);
-
-
-	useEffect(()=>{
-		calculateRectAttributes()
-	},[matrix, gmatrix, offset])
 
 	const inMoveRef = useRef(0); 
 	//const group = useRef(null);
@@ -128,62 +97,113 @@ const  SvgWrapper = observer (() => {
 			})
 		}
 	}
-
  
 	useEffect(() => {
 	  if (true) {
 		setSvgParams(Part.getSvgParams())
  		const timeoutId = setTimeout(() => {
 			console.log ('Delayed message after 2 seconds!');
-			fitToPage()
-
-			}, 1000);
+ 			fitToPage()
+		}, 50);
 	  		return () => clearTimeout(timeoutId); 
 		}
 	}, []); 
 
 	useEffect(() => { 
 		if (coordsStore.needeToFit) {
-			setRectParams({x:0, y:0, width: 0, height: 0})
-			fitToPage()			 
+ 			fitToPage()		 
 		}		
 	}, [coordsStore.needeToFit]); 
 
 	const fitToPage =() => {
+		console.log (coordsStore.fittedPosition)
+
+		if (!coordsStore.fittedPosition) {
+			console.log('calculate without store')
+
+			setRectParams({x:0, y:0, width: 0, height: 0})
+			setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
+			setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
+
+			let box = document.querySelector('#group').getBoundingClientRect()
+			const wBox = wrapperSVG.current.getBoundingClientRect();
+			
+			let scaleW = wBox.width/ box.width
+			let scaleH = wBox.height / box.height
+			let scale = scaleW < scaleH ? scaleW : scaleH
+
+			let xd = (box.x + box.width * 0.5)
+			let yd = (box.y + box.height * 0.5)
+
+			let coords1 = Util.convertScreenCoordsToSvgCoords(xd, yd);
+			let center = Util.convertScreenCoordsToSvgCoords(wBox.x+wBox.width*0.5, wBox.y+wBox.height*0.5)
 		
- 		setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
-		setGroupMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
-	    let box = document.querySelector('#group').getBoundingClientRect()
-		const wBox = wrapperSVG.current.getBoundingClientRect();
-        
-        let scaleW = wBox.width/ box.width
-        let scaleH = wBox.height / box.height
-        let scale = scaleW < scaleH ? scaleW : scaleH
+			let outerBox = document.querySelector('#contours').getBoundingClientRect()
+			let oxd = (outerBox.x + outerBox.width * 0.5)
+			let oyd = (outerBox.y + outerBox.height * 0.5)
 
-        let xd = (box.x + box.width * 0.5)
-        let yd = (box.y + box.height * 0.5)
+			let dif = Util.convertScreenCoordsToSvgCoords(oxd, oyd)
+			let ydif = dif.y - center.y
+			let xdif = dif.x - center.x
 
-        let coords1 = Util.convertScreenCoordsToSvgCoords(xd, yd);
-        let center = Util.convertScreenCoordsToSvgCoords(wBox.x+wBox.width*0.5, wBox.y+wBox.height*0.5)
-       
-        let outerBox = document.querySelector('#contours').getBoundingClientRect()
-        let oxd = (outerBox.x + outerBox.width * 0.5)
-        let oyd = (outerBox.y + outerBox.height * 0.5)
+			let matrix = { a: scale, b: 0, c: 0, d: scale, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }
+			setGroupMatrix (matrix)
+ 			coordsStore.setFitted(false)
+			coordsStore.setFittedPosition ({matrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }, gmatrix: matrix , rectParams:rectParams})
 
-        let dif = Util.convertScreenCoordsToSvgCoords(oxd, oyd)
-        let ydif = dif.y - center.y
-        let xdif = dif.x - center.x
+		} else {
+			console.log('from store')
+	 		setMatrix(coordsStore.fittedPosition.matrix)
+			setGroupMatrix(coordsStore.fittedPosition.gmatrix)
+			setRectParams(coordsStore.fittedPosition.rectParams)
+			coordsStore.setFitted(false)
+ 
+		/*	TODO: доделть смещение e f.
+			масштаб поучаем из мм1
+			а вот смещение надо рпассчитать как отклонение центра swgWrapper от центра outer при том что это  постоянное 
+			соотношение... от соотношение рахмеров окна и svg
+			console.log ("matrix  " + JSON.stringify(toJS(coordsStore.fittedPosition.matrix)))
+			console.log ( "gmatrix  " + JSON.stringify(toJS(coordsStore.fittedPosition.gmatrix)))
 
-		//setGroupMatrix({ a: scale, b: 0, c: 0, d: scale, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }) 
-		let matrix = { a: scale, b: 0, c: 0, d: scale, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }
-		setGroupMatrix (matrix)
-		//let transitions = generateTransitionMatrices(matrixA, matrixB, 50)
-		//smoothTransition (transitions, 0.001)
-		coordsStore.setFitted(false)
-
+			
+			let mm1 = document.querySelector('#group1').transform.baseVal.consolidate().matrix
+			console.log(mm1)
+			setMatrix( { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
+			setGroupMatrix(mm1)
+			coordsStore.setFitted(false)		
+  			*/
+		}	
     }
 
+	useEffect(() => {
+		const updatedState = { ...gridState };
+		if (matrix.a < 0.25) {
+		updatedState.xsGrid.visibility = "hidden";
+		updatedState.smallGrid.fill = "var(--gridColorFill)";
+		} else {
+		updatedState.xsGrid.visibility = "visible";
+		updatedState.smallGrid.fill = "none";
+		}
 
+		if (matrix.a < 0.125) {
+		updatedState.smallGrid.visibility = "hidden";
+		updatedState.grid.fill = "var(--gridColorFill)";
+		} else {
+		updatedState.smallGrid.visibility = "visible";
+		updatedState.grid.fill = "none";
+		}
+
+		if (matrix.a > 85) {
+		updatedState.grid.visibility = "hidden";
+		} else {
+		updatedState.grid.visibility = "visible";
+		}
+		setGridState(updatedState);
+	}, [matrix]);
+
+  	useEffect(()=>{
+			setRectParams( calculateRectAttributes())
+	},[matrix, gmatrix, offset])  
 
     const updateRect =()=> {
 		var svg = document.getElementById("svg")
@@ -204,41 +224,6 @@ const  SvgWrapper = observer (() => {
 
     } 
 
-/* 	const generateTransitionMatrices = (matrixA, matrixB, steps, interval)=> {
-			const transitionMatrices = [];
-			
-			const keys = Object.keys(matrixA);			
-			const delta = {};
-			for (let key of keys) {
-				delta[key] = (matrixB[key] - matrixA[key]) / steps;
-			}
-			
-			for (let step = 0; step <= steps; step++) {
-				const currentMatrix = {};
-				
-				for (let key of keys) {
-					currentMatrix[key] = matrixA[key] + delta[key] * step;
-				}
-				
-				transitionMatrices.push(currentMatrix);
-			}			
-			return transitionMatrices;
-	}
-/*  */
-	/*const smoothTransition = (transitions, delay)=> {
-			function updateMatrix(index) {
-				if (index < transitions.length) {
-					let m = transitions[index];
-					setGroupMatrix(m);
-					setTimeout(() => {
-						updateMatrix(index + 1);
-					}, delay);
-				}
-			}
-		
-			updateMatrix(0);
-	} */
-
 	const calculateRectAttributes = () => {
 		const widthSVG = svgParams.width
 		const heightSVG = svgParams.height
@@ -255,9 +240,9 @@ const  SvgWrapper = observer (() => {
         const x = -combinedMatrix.e / scaleX;
         const y = -combinedMatrix.f / scaleY;
 
-        setRectParams ({ x:x, y:y, width:width, height:height })
+        return { x:x, y:y, width:width, height:height }
     };
-		
+
 
 	return (
 		<main className="container-fluid h-100 overflow-hidden" id="parteditor">
@@ -276,7 +261,6 @@ const  SvgWrapper = observer (() => {
 									gridState={gridState}
 									svgParams={svgParams}
 									rectParams={rectParams}
-
 								/>
 						</div>
 					</div>
