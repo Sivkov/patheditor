@@ -8,6 +8,7 @@ import log from '../../scripts/log.js'
 import { useEffect, useState } from 'react';
 import SVGPathCommander from 'svg-path-commander';
 import Util from '../../utils/util.js';
+import { toJS } from "mobx";
 
 const ContourPanel = observer(() => {
 
@@ -68,7 +69,7 @@ const ContourPanel = observer(() => {
 	const [activePoint, setActive] = useState('topYtopX')
 	const [activeCooord, setActiveCoord ] = useState({x:0,y:0})
 	const [wh, setWH ] = useState({w:0,h:0})
-
+	const [angle, setAngle ] = useState('0')
 
 	const contourPoint =(e) =>{
 		let id  = e.currentTarget.getAttribute('id')
@@ -82,7 +83,7 @@ const ContourPanel = observer(() => {
 		console.log (path)
 		if (!path) {
 			setActiveCoord({x,y})
-			return	
+ 			return	
 		}
 		const box = SVGPathCommander.getPathBBox(path);
 		console.log (box)
@@ -104,16 +105,16 @@ const ContourPanel = observer(() => {
 
 		if(activeCooord)
 		setActiveCoord({x:Util.round(x, 3),y:Util.round(y, 3)})
-	},[activePoint, selected ])
+ 	},[activePoint, selected ])
 
 	useEffect(()=>{
+		console.log ('useEffect in here')
 		let x = 0
 		let y = 0
 		let  path = svgStore.getSelectedElement('path') 
-		console.log (path)
 		if (!path) {
 			setActiveCoord({x,y})
-			return	
+ 			return	
 		}
 		const box = SVGPathCommander.getPathBBox(path);
 		if (box) {
@@ -121,7 +122,36 @@ const ContourPanel = observer(() => {
 			y = Util.round(box.height, 3)
 		}
 		setWH({w:x,h:y})
-	},[selected ])
+ 	},[ selected, activePoint ])
+
+	const handleKeyPress =(e)=> {
+		let id = e.currentTarget.getAttribute('id')
+		let val = Number(e.currentTarget.textContent)
+		console.log (toJS (selected))
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			let path = svgStore.getSelectedElement('path') 
+			let cid =  svgStore.getSelectedElement('cid') 
+			let newPath =''
+			if( !path ) return;
+			let box = SVGPathCommander.getPathBBox(path)
+			newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)
+/* 			if (id === 'contourWidthValue') {
+				newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)
+			} else if (id  === 'contourHeightValue') {			
+				newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)	
+			} else if (id  === 'contourPointXvalue') {
+				newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)
+			} else if (id  === 'contourPointYvalue') {
+				newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)
+			} */	
+
+			svgStore.updateElementValue (cid, 'contour', 'path', newPath )
+			addToLog ('Contour changed ' + val )
+			setAngle('')
+			setAngle(0)
+		}
+	}
 
 	const panelInfo = [
 		{
@@ -293,21 +323,37 @@ const ContourPanel = observer(() => {
 					</div>
 				  </td>
 				  <td>X:</td>
-				  <td id="contourPointXvalue" className="editable" contentEditable="">
+				  <td id="contourPointXvalue" 
+				  className="editable" 
+				  contentEditable=""
+				  onKeyPress={handleKeyPress}		
+				  >
 					{activeCooord.x}
 				  </td>
 				  <td>Y:</td>
-				  <td id="contourPointYvalue" className="editable" contentEditable="">
+				  <td id="contourPointYvalue" 
+				  className="editable" 
+				  contentEditable=""
+				  onKeyPress={handleKeyPress}		
+				  >
 				  {activeCooord.y}
 				  </td>
 				</tr>
 				<tr>
 				  <td>__:</td>
-				  <td id="contourWidthValue" className="editable" contentEditable="">
+				  <td id="contourWidthValue" 
+				  className="editable" 
+				  contentEditable=""
+				  onKeyPress={handleKeyPress}		
+				  >
 					{wh.w}
 				  </td>
 				  <td>|:</td>
-				  <td id="contourHeightValue" className="editable" contentEditable="">
+				  <td id="contourHeightValue" 
+				  	className="editable" 
+					contentEditable=""
+					onKeyPress={handleKeyPress}		
+					>
 					{wh.h}
 				  </td>
 				</tr>
@@ -364,8 +410,13 @@ const ContourPanel = observer(() => {
 					  </div>
 					</div>
 				  </td>
-				  <td id="contourRotateValue" className="editable" contentEditable="">
-					0
+				  <td 
+					id="contourRotateValue" 
+					className="editable" 
+					contentEditable=""
+					onKeyPress={handleKeyPress}	
+					>
+					{angle}
 				  </td>
 				  <td />
 				  <td />

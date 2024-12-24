@@ -104,7 +104,7 @@ const  SvgWrapper = observer (() => {
  		const timeoutId = setTimeout(() => {
 			console.log ('Delayed message after 2 seconds!');
  			fitToPage()
-		}, 50);
+		}, 100);
 	  		return () => clearTimeout(timeoutId); 
 		}
 	}, []); 

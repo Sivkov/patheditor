@@ -1,3 +1,6 @@
+import svgPath from "svgpath";
+import SVGPathCommander from "svg-path-commander";
+
 class Util {
 	static radian(ux, uy, vx, vy) {
 		var dot = ux * vx + uy * vy;
@@ -151,6 +154,75 @@ class Util {
 		return (eang * 180) / Math.PI - (sang * 180) / Math.PI <= 180 ? 0 : 1;
 	}
 
+	static transformContour (path, id, val, contourPointXvalue ,contourPointYvalue, contourIntendsWidth, contourIntendsHeight, t=false) {
+        if (!t) {
+            t = {
+                scaleX: 1,
+                scaleY: 1,
+                translateX: 0,
+                translateY: 0,
+                rotate:{angle:0, x:0, y:0},
+                update: false,
+                element:false
+            }      
+            
+            const isProportionChecked = document.getElementById('proportion').checked;
+            const proportionX = +document.getElementById('proportionX').value / 100
+            const proportionY = +document.getElementById('proportionY').value / 100
+            if (id === "contourPointXvalue") {
+                t.translateX = val - contourPointXvalue;
+            } else if (id === "contourPointYvalue") {
+                t.translateY = val - contourPointYvalue;
+            } else if (id === "contourWidthValue") {
+                t.scaleX = val / contourIntendsWidth
+                t.translateX = contourPointXvalue - contourPointXvalue * t.scaleX
+                if (isProportionChecked) {
+                    t.scaleY = t.scaleX * (proportionY / proportionX)
+                    t.translateY = contourPointYvalue - contourPointYvalue * t.scaleY
+                }
+            } else if (id === "contourHeightValue") {
+                t.scaleY = val / contourIntendsHeight
+                t.translateY = contourPointYvalue - contourPointYvalue * t.scaleY;
+                if (isProportionChecked) {
+                    t.scaleX = t.scaleY * (proportionX / proportionY)
+                    t.translateX = contourPointXvalue - contourPointXvalue * t.scaleX
+                }
+            } else if (id === "contourRotateValue") {
+                let angle = +(document.getElementById(id).innerHTML)
+                if (angle) t.rotate={angle: angle, x:contourPointXvalue, y:contourPointYvalue}     
+            }
+        }
+      /*   if (!t.element) {
+            t.element = document.querySelector('.selectedContour');
+        } */
+
+/*         if (document.querySelector('#transformAll').checked  && $(t.element).hasClass('outer') ) {
+            document.querySelectorAll(".contour[data-cid]").forEach((element)=>{
+                this.applyTransform(t.scaleX, t.scaleY, t.translateX, t.translateY, t.rotate, t.update, element)
+            })
+        } else {
+            this.applyTransform(t.scaleX, t.scaleY, t.translateX, t.translateY, t.rotate, t.update, t.element)
+        } */
+
+		let newPath = this.applyTransform(path,t.scaleX, t.scaleY, t.translateX, t.translateY, t.rotate, t.update, t.element)
+		return newPath
+        
+    }
+
+    static applyTransform(path, scaleX, scaleY, translateX, translateY, rotate={angle: 0, x:0, y:0}, update = true, element =false, updatePanels=true) {
+        //console.log(arguments)
+        //const mybigPathBBox = SVGPathCommander.getPathBBox(path);
+        //const mybigPathBBox = text.fakeBox(path);
+        //$('#inletModeSet').trigger('click')
+        var transformed = svgPath(path)
+            .scale(scaleX, scaleY)
+            .translate(translateX, translateY)
+            .rotate(rotate.angle, rotate.x /*+ mybigPathBBox.width * 0.5*/, rotate.y /*+ mybigPathBBox.height * 0.5*/)
+            .toString();
+        
+		return transformed
+     
+    }
 }
 
 export default Util;
