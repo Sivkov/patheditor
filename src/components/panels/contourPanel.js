@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import logStore from '../stores/logStore.js';
 import svgStore from "../stores/svgStore.js";
 import log from '../../scripts/log.js'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import SVGPathCommander from 'svg-path-commander';
 import Util from '../../utils/util.js';
 import { toJS } from "mobx";
@@ -13,6 +13,7 @@ import { toJS } from "mobx";
 const ContourPanel = observer(() => {
 
 	const { selected,
+			selectedPath,
 			selectedType,
 			selectedContourModeType, 
 		   	selectedInletModeType,
@@ -69,24 +70,48 @@ const ContourPanel = observer(() => {
 	const [activePoint, setActive] = useState('topYtopX')
 	const [activeCooord, setActiveCoord ] = useState({x:0,y:0})
 	const [wh, setWH ] = useState({w:0,h:0})
-	const [angle, setAngle ] = useState('0')
+	const [angle, setAngle ] = useState(0)
+	const cellRef = useRef(null); // Ссылка на ячейку таблицы
+
 
 	const contourPoint =(e) =>{
 		let id  = e.currentTarget.getAttribute('id')
 		setActive(id)
 	}
 
+
 	useEffect(()=>{
+		console.log ('USING EFFECT')
+		updateState()
+ 	},[ selected, selectedPath, activePoint])
+
+	const updateState = () => {
+
 		let x = 0
 		let y = 0
+
+		if (angle === 0) {
+			setAngle('')
+		} else {
+			setAngle(0)
+		}
+
+		
 		let  path = svgStore.getSelectedElement('path') 
-		console.log (path)
 		if (!path) {
 			setActiveCoord({x,y})
+			setWH({w:x,h:y})
  			return	
 		}
+
 		const box = SVGPathCommander.getPathBBox(path);
-		console.log (box)
+		if (box) {
+			let w = Util.round(box.width, 3)
+			let h= Util.round(box.height, 3)
+			setWH({w,h})
+
+		}
+
 		if (activePoint.match(/topX/gm)) {
 			x=box.x
 		} else if (activePoint.match(/midX/gm)) {
@@ -103,63 +128,79 @@ const ContourPanel = observer(() => {
 			y=box.y2
 		}
 
-		if(activeCooord)
-		setActiveCoord({x:Util.round(x, 3),y:Util.round(y, 3)})
- 	},[activePoint, selected ])
+		if(activeCooord) setActiveCoord({x:Util.round(x, 3),y:Util.round(y, 3)})	
+	}
 
-	useEffect(()=>{
-		console.log ('useEffect in here')
-		let x = 0
-		let y = 0
-		let  path = svgStore.getSelectedElement('path') 
-		if (!path) {
-			setActiveCoord({x,y})
- 			return	
+	const captureInput = (event) => {
+	 	// Get the current value from the event
+		const newValue = event.currentTarget.textContent.trim();
+		// Update the angle state, assuming the input should be a number
+		if (!isNaN(newValue) && newValue !== '') {
+		  setAngle(Number(newValue)); // Convert string to number
+		} else {
+		  // Handle invalid input if necessary
+		  console.warn('Invalid input, please enter a number');	
+		  if (angle === 0) {
+			setAngle('')
+		  } else {
+			setAngle(0)
+		  }
 		}
-		const box = SVGPathCommander.getPathBBox(path);
-		if (box) {
-			x = Util.round(box.width, 3)
-			y = Util.round(box.height, 3)
-		}
-		setWH({w:x,h:y})
- 	},[ selected, activePoint ])
+		const range = document.createRange();
+		const selection = window.getSelection();
+		
+		// Устанавливаем диапазон в конец ячейки
+		range.selectNodeContents(cellRef.current);
+		range.collapse(false); // Сжимаем диапазон к концу
+		selection.removeAllRanges(); // Убираем все выделения
+		selection.addRange(range); // Добавляем новый диапазон 
+	  };
 
-	const handleKeyPress =(e)=> {
+	const onKeyDown =(e)=> {
 		let id = e.currentTarget.getAttribute('id')
 		let val = Number(e.currentTarget.textContent)
-		console.log (toJS (selected))
-		if (e.key === 'Enter') {
-			e.preventDefault()
-			let path = svgStore.getSelectedElement('path') 
-			let cid =  svgStore.getSelectedElement('cid') 
+		let path = svgStore.getSelectedElement('path') 
+		let cid =  svgStore.getSelectedElement('cid') 
+		//TODO нижнюю строку убрать и далее при вращении относительно любой точке
+		// кроме центра необходимо учитывать смещение относительно высоты ширины
+		 
+		if(id === 'contourRotateValue') setActive('midXmidY');
+
+		if( !path ) return;
+		let params = {
+			x:activeCooord.x,
+			y:activeCooord.y,
+			width:wh.w,
+			height:wh.h,
+			angle: angle,
+			proportion: false//proportion
+		}
+		if (e.key === 'Enter' || e.key === 'Return' || e.key === 'Tab') {
+			
+			if (e.key === 'Enter') e.preventDefault();			
 			let newPath =''
-			if( !path ) return;
-			let box = SVGPathCommander.getPathBBox(path)
-			let params = {
-				x:activeCooord.x,
-				y:activeCooord.y,
-				width:wh.w,
-				height:wh.h,
-				angle: angle,
-				proportion: false//proportion
+			newPath = Util.transformContour(path, id, val, params)
+			svgStore.updateElementValue (cid, 'contour', 'path', newPath )
+
+			let start =  SVGPathCommander.normalizePath(newPath)[0]
+			let contourStart =  {x: start[start.length-2], y: start[start.length-1]}
+			let inlet = svgStore.getElementByCidAndClass (cid, 'inlet')
+			let outlet = svgStore.getElementByCidAndClass (cid, 'outlet')
+
+			if (inlet) {
+				let inletPath = SVGPathCommander.normalizePath(inlet.path)
+				let inletLastSeg = inletPath[inletPath.length-1]
+				let inletEnd = {x: inletLastSeg[inletLastSeg.length-2], y:inletLastSeg[inletLastSeg.length-1]}
+				let xDif = contourStart.x- inletEnd.x
+				let yDif = contourStart.y- inletEnd.y
+
+				let newInletPath = Util.applyTransform(inlet.path, 1, 1, xDif, yDif, {angle: angle, x:0, y:0})
+				svgStore.updateElementValue (cid, 'inlet', 'path', newInletPath )
 			}
 
-			newPath = Util.transformContour(path, id, val, params)
-/* 			if (id === 'contourWidthValue') {
-				newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)
-			} else if (id  === 'contourHeightValue') {			
-				newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)	
-			} else if (id  === 'contourPointXvalue') {
-				newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)
-			} else if (id  === 'contourPointYvalue') {
-				newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)
-			} */	
-
-			svgStore.updateElementValue (cid, 'contour', 'path', newPath )
 			addToLog ('Contour changed ' + val )
-			setAngle('')
-			setAngle(0)
-		} 
+		}	
+	
 	}
 
 	const panelInfo = [
@@ -335,7 +376,7 @@ const ContourPanel = observer(() => {
 				  <td id="contourPointXvalue" 
 				  className="editable" 
 				  contentEditable=""
-				  onKeyPress={handleKeyPress}		
+				  onKeyDown={onKeyDown}		
 				  >
 					{activeCooord.x}
 				  </td>
@@ -343,7 +384,7 @@ const ContourPanel = observer(() => {
 				  <td id="contourPointYvalue" 
 				  className="editable" 
 				  contentEditable=""
-				  onKeyPress={handleKeyPress}		
+				  onKeyDown={onKeyDown}		
 				  >
 				  {activeCooord.y}
 				  </td>
@@ -353,7 +394,7 @@ const ContourPanel = observer(() => {
 				  <td id="contourWidthValue" 
 				  className="editable" 
 				  contentEditable=""
-				  onKeyPress={handleKeyPress}		
+				  onKeyDown={onKeyDown}		
 				  >
 					{wh.w}
 				  </td>
@@ -361,7 +402,7 @@ const ContourPanel = observer(() => {
 				  <td id="contourHeightValue" 
 				  	className="editable" 
 					contentEditable=""
-					onKeyPress={handleKeyPress}		
+					onKeyDown={onKeyDown}		
 					>
 					{wh.h}
 				  </td>
@@ -420,12 +461,14 @@ const ContourPanel = observer(() => {
 					</div>
 				  </td>
 				  <td 
+				  	ref={cellRef}
 					id="contourRotateValue" 
 					className="editable" 
 					contentEditable=""
-					onKeyPress={handleKeyPress}	
+					onKeyDown={onKeyDown}	
+					onInput={captureInput} 
 					>
-					{angle}
+					{ angle }
 				  </td>
 				  <td />
 				  <td />

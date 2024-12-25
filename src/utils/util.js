@@ -155,7 +155,7 @@ class Util {
 	}
 
 	static transformContour (path, id, val, params, t=false) {
-        let {x, y, width, height, angle, propotion} = params
+        let {x, y, width, height, angle, proportion} = params
 		if (!t) {
             t = {
                 scaleX: 1,
@@ -177,14 +177,14 @@ class Util {
             } else if (id === "contourWidthValue") {
                 t.scaleX = val / width
                 t.translateX = x - x * t.scaleX
-                if (propotion) {
+                if (proportion) {
                     t.scaleY = t.scaleX * 1//(proportionY / proportionX)
                     t.translateY = y - y * t.scaleY
                 }
             } else if (id === "contourHeightValue") {
                 t.scaleY = val / height
                 t.translateY = y - y * t.scaleY;
-                if (propotion) {
+                if (proportion) {
                     t.scaleX = t.scaleY * 1//(proportionX / proportionY)
                     t.translateX = x - x * t.scaleX
                 }

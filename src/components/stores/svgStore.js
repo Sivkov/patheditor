@@ -8,6 +8,7 @@ class SvgStore {
 	constructor() {
 		makeAutoObservable(this, {
 			selected: computed,
+			selectedPath: computed,
             selectedType: computed,
 			selectedPiercingType: computed,
 			selectedInletModeType: computed,
@@ -15,6 +16,16 @@ class SvgStore {
 			tecnology: computed,
         });
     }
+
+	get selectedPath () {
+		const selected = this.getSelectedElement();
+		if (selected) {
+			if (selected.hasOwnProperty('path')){
+				return selected.path
+			}
+		}
+		return '';
+	}
 
 	get selected () {
 		const selected = this.getSelectedElement();
