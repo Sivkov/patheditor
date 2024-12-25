@@ -154,8 +154,9 @@ class Util {
 		return (eang * 180) / Math.PI - (sang * 180) / Math.PI <= 180 ? 0 : 1;
 	}
 
-	static transformContour (path, id, val, contourPointXvalue ,contourPointYvalue, contourIntendsWidth, contourIntendsHeight, t=false) {
-        if (!t) {
+	static transformContour (path, id, val, params, t=false) {
+        let {x, y, width, height, angle, propotion} = params
+		if (!t) {
             t = {
                 scaleX: 1,
                 scaleY: 1,
@@ -166,30 +167,29 @@ class Util {
                 element:false
             }      
             
-            const isProportionChecked = document.getElementById('proportion').checked;
-            const proportionX = +document.getElementById('proportionX').value / 100
-            const proportionY = +document.getElementById('proportionY').value / 100
+            //const isProportionChecked = document.getElementById('proportion').checked;
+            //const proportionX = +document.getElementById('proportionX').value / 100
+            //const proportionY = +document.getElementById('proportionY').value / 100
             if (id === "contourPointXvalue") {
-                t.translateX = val - contourPointXvalue;
+                t.translateX = val - x;
             } else if (id === "contourPointYvalue") {
-                t.translateY = val - contourPointYvalue;
+                t.translateY = val - y;
             } else if (id === "contourWidthValue") {
-                t.scaleX = val / contourIntendsWidth
-                t.translateX = contourPointXvalue - contourPointXvalue * t.scaleX
-                if (isProportionChecked) {
-                    t.scaleY = t.scaleX * (proportionY / proportionX)
-                    t.translateY = contourPointYvalue - contourPointYvalue * t.scaleY
+                t.scaleX = val / width
+                t.translateX = x - x * t.scaleX
+                if (propotion) {
+                    t.scaleY = t.scaleX * 1//(proportionY / proportionX)
+                    t.translateY = y - y * t.scaleY
                 }
             } else if (id === "contourHeightValue") {
-                t.scaleY = val / contourIntendsHeight
-                t.translateY = contourPointYvalue - contourPointYvalue * t.scaleY;
-                if (isProportionChecked) {
-                    t.scaleX = t.scaleY * (proportionX / proportionY)
-                    t.translateX = contourPointXvalue - contourPointXvalue * t.scaleX
+                t.scaleY = val / height
+                t.translateY = y - y * t.scaleY;
+                if (propotion) {
+                    t.scaleX = t.scaleY * 1//(proportionX / proportionY)
+                    t.translateX = x - x * t.scaleX
                 }
             } else if (id === "contourRotateValue") {
-                let angle = +(document.getElementById(id).innerHTML)
-                if (angle) t.rotate={angle: angle, x:contourPointXvalue, y:contourPointYvalue}     
+                if (angle) t.rotate={angle: angle, x:x, y:y}     
             }
         }
       /*   if (!t.element) {

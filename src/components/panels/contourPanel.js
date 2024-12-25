@@ -135,7 +135,16 @@ const ContourPanel = observer(() => {
 			let newPath =''
 			if( !path ) return;
 			let box = SVGPathCommander.getPathBBox(path)
-			newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)
+			let params = {
+				x:activeCooord.x,
+				y:activeCooord.y,
+				width:wh.w,
+				height:wh.h,
+				angle: angle,
+				proportion: false//proportion
+			}
+
+			newPath = Util.transformContour(path, id, val, params)
 /* 			if (id === 'contourWidthValue') {
 				newPath = Util.transformContour(path, id, val, activeCooord.x, activeCooord.y, wh.w, wh.h)
 			} else if (id  === 'contourHeightValue') {			
@@ -150,7 +159,7 @@ const ContourPanel = observer(() => {
 			addToLog ('Contour changed ' + val )
 			setAngle('')
 			setAngle(0)
-		}
+		} 
 	}
 
 	const panelInfo = [
