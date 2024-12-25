@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';  
 import logStore from '../stores/logStore.js'; 
 import svgStore from "../stores/svgStore.js";
+import editorStore from "../stores/editorStore.js";
 import log from './../../scripts/log.js'
  
 
@@ -21,6 +22,14 @@ const ToolsPanel = observer(() => {
 		}
 	}
 
+	const setResize =()=>{
+		editorStore.setMode('resize')
+	}
+
+	const setDrag =()=>{
+		editorStore.setMode('drag')
+	}
+
 	const panelInfo = [
 		{
 			id: "toolsPopup",
@@ -30,12 +39,14 @@ const ToolsPanel = observer(() => {
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
+					onMouseDown={setResize}
 				  >
 					<i className="fa-solid fa-arrow-pointer"></i>
 				  </button>
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_tool btn_drag_mode"
+					onMouseDown={setDrag}
 				  >
 					<i className="fa-solid fa-hand"></i>
 				  </button>

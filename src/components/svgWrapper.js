@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite'; 
-import { toJS } from 'mobx'; 
+//import { toJS } from 'mobx'; 
 import coordsStore from './stores/coordsStore.js'; 
+import editorStore from './stores/editorStore.js'; 
 import SvgComponent from './svg';
 import Util from './../utils/util';
 //import Arc from './../utils/arc.js';
@@ -58,9 +59,9 @@ const  SvgWrapper = observer (() => {
 	};
 
 	const startDrag = (e) =>{
-		console.log ('startDrag')
-		inMoveRef.current = 1;		
-		if (e.target && (e.buttons === 4 || e.buttons === 1)) {            
+		//console.log ('startDrag')
+		inMoveRef.current = 1;	
+		if (e.target && ((e.buttons === 4 ) || editorStore.mode== 'drag')) {            
 			let off = Util.getMousePosition(e);
 			let transforms = document.getElementById("group1").transform.baseVal.consolidate().matrix
             off.x -= transforms.e;
@@ -80,22 +81,26 @@ const  SvgWrapper = observer (() => {
 
 	const drag =(e) =>{
 		//console.log ('Drag ' + e.currentTarget.id +'  '+inMoveRef.current)
-		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
-		coordsStore.setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
-		if (!inMoveRef.current) return;
-		var coord = Util.getMousePosition(e);
-		if (e.target && (e.buttons === 4 || e.buttons === 1)){
- 			gmatrix.e = (coord.x - offset.x)
-			gmatrix.f = (coord.y - offset.y) 
-			setGroupMatrix({
-				a: gmatrix.a,
-				b: gmatrix.b,
-				c: gmatrix.c,
-				d: gmatrix.d,
-				e: gmatrix.e,
-				f: gmatrix.f,
-			})
+		//console.log (e.buttons)	
+		if (e.target && ((e.buttons === 4 ) || editorStore.mode== 'drag')) {
+			let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
+			coordsStore.setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
+			if (!inMoveRef.current) return;
+			var coord = Util.getMousePosition(e);
+			if (e.target && (e.buttons === 4 || e.buttons === 1)){
+				gmatrix.e = (coord.x - offset.x)
+				gmatrix.f = (coord.y - offset.y) 
+				setGroupMatrix({
+					a: gmatrix.a,
+					b: gmatrix.b,
+					c: gmatrix.c,
+					d: gmatrix.d,
+					e: gmatrix.e,
+					f: gmatrix.f,
+				})
+			}
 		}
+		
 	}
  
 	useEffect(() => {
