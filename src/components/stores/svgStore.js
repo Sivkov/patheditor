@@ -5,6 +5,8 @@ import Part from "../../scripts/part";
 
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [] }; // Хранилище объекта SVG
+	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
+
 	constructor() {
 		makeAutoObservable(this, {
 			selectedCid: computed,
@@ -18,6 +20,7 @@ class SvgStore {
         });
     }
 
+	
 	get selectedCid () {
 		const selected = this.getSelectedElement();
 		if (selected) {
@@ -166,6 +169,10 @@ class SvgStore {
 		this.svgData['code'].forEach(element => {
                  console.log("printStore:", toJS(element));
         });
+	}
+
+	setSelectorCoords (val) {
+		this.selectorCoords =  val
 	}
 }
 

@@ -3,8 +3,8 @@ import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
 import logStore from '../stores/logStore.js';
-import svgStore from "../stores/svgStore.js";
 import log from '../../scripts/log.js'
+import svgStore from "../stores/svgStore.js";
 import { useEffect, useState, useRef } from 'react';
 import SVGPathCommander from 'svg-path-commander';
 import Util from '../../utils/util.js';

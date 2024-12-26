@@ -1,25 +1,26 @@
 import { observer } from "mobx-react-lite";
 import svgStore from "./stores/svgStore.js";
 import editorStore from "./stores/editorStore.js";
+import logStore from './stores/logStore.js';
+import log from './../scripts/log.js'
 import SVGPathCommander from 'svg-path-commander';
 import Util from "../utils/util.js";
 import { useEffect, useState } from "react";
 
 const Selector = observer(() => {
 
-	const { selectedPath, selectedCid } = svgStore;
-	const [selectorCoords, setSelectorCoords] = useState({ x: 0, y: 0, width: 0, height: 0 })
+	const { selectedPath, selectedCid, selectorCoords } = svgStore;
 	const [visibility, setVisibility] = useState( false )
 	const [ inMove, setInmove] = useState( false ) 
 	useEffect(()=>{
 		if (!selectedPath) {
-			setSelectorCoords({ x: 0, y: 0, width: 0, height: 0 })
+			svgStore.setSelectorCoords({ x: 0, y: 0, width: 0, height: 0 })
 			setVisibility(false)
 		} else {
 			setVisibility(true)
 			if (!inMove) {
 				const box = SVGPathCommander.getPathBBox(selectedPath);
-				setSelectorCoords({ x: box.x, y: box.y, width: box.width, height: box.height })
+				svgStore.setSelectorCoords({ x: box.x, y: box.y, width: box.width, height: box.height })
 			}		
 		}
 	},[ selectedCid ])
@@ -46,9 +47,7 @@ const Selector = observer(() => {
 		part.initialWidth = cbox.width
 
 		document.addEventListener('mousemove', handleMouseMove);
-		document.addEventListener('mouseleave', handleMouseUp);
 		document.addEventListener('mouseup', handleMouseUp);
-		console.log('handleMouseDown ** ** ' + part.resizingHandle)
 
 	}
 	const handleMouseMove = (e) => {
@@ -140,7 +139,7 @@ const Selector = observer(() => {
 
 		if (newCoords.height <= 0 || newCoords.width <= 0 || !newCoords.x || !newCoords.y) return;
 		
-		setSelectorCoords(newCoords);
+		svgStore.setSelectorCoords(newCoords);
 
  		let scaleX = newCoords.width / part.initialWidth
         let scaleY = newCoords.height / part.initialHeight
@@ -150,8 +149,6 @@ const Selector = observer(() => {
         translateX = newCoords.x - newCoords.x * scaleX - (part.initialRectLeft - newCoords.x) * scaleX
         translateY = newCoords.y - newCoords.y * scaleY - (part.initialRectTop - newCoords.y) * scaleY
 
-		console.log (selectorCoords.width, part.initialWidth)
-
 		let newPath = Util.applyTransform (svgStore.selectedPath, scaleX, scaleY, translateX, translateY)
 		let cid =  svgStore.getSelectedElement('cid') 
 		svgStore.updateElementValue (cid, 'contour', 'path', newPath )
@@ -160,17 +157,24 @@ const Selector = observer(() => {
 		part.initialWidth = newCoords.width 
 		part.initialRectLeft = newCoords.x
         part.initialRectTop = newCoords.y
-
-		let element =  document.querySelector('g[data-cid="5"] path')
-		element.setAttribute('d', newPath)
-
 	};
+
+	const addToLog =(mess)=> {
+		let now = new Date().getTime()
+		logStore.add ({time: now ,action: mess})
+		let data = {
+			id: now,
+			svg: JSON.stringify(svgStore.svgData)
+		}
+		log.save(data)	
+	}
 
 	const handleMouseUp = (e) => {
 		part = {};
 		document.removeEventListener('mousemove', handleMouseMove);
 		document.removeEventListener('mouseup', handleMouseUp);
 		setInmove(false)
+		addToLog('Contour changed by selector')
 
 		/* 
 		if (e.type === 'mouseup') {
