@@ -7,6 +7,7 @@ class SvgStore {
 	svgData = { width: 0, height: 0, code: [] }; // Хранилище объекта SVG
 	constructor() {
 		makeAutoObservable(this, {
+			selectedCid: computed,
 			selected: computed,
 			selectedPath: computed,
             selectedType: computed,
@@ -16,6 +17,16 @@ class SvgStore {
 			tecnology: computed,
         });
     }
+
+	get selectedCid () {
+		const selected = this.getSelectedElement();
+		if (selected) {
+			if (selected.hasOwnProperty('cid')){
+				return selected.path
+			}
+		}
+		return -1;
+	}
 
 	get selectedPath () {
 		const selected = this.getSelectedElement();
