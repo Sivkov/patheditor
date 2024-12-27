@@ -32,6 +32,7 @@ const Selector = observer(() => {
 	part.svg = document.getElementById("svg")
 
 	const handleMouseDown = (e) => {
+		//console.log (e.type)
 		setInmove(true)
 		if (editorStore.mode !== "resize") return;
 		part.resizingHandle = e.currentTarget.id;
@@ -49,10 +50,20 @@ const Selector = observer(() => {
 		document.addEventListener('mousemove', handleMouseMove);
 		document.addEventListener('mouseup', handleMouseUp);
 
+		document.addEventListener('touchmove', handleMouseMove);
+		document.addEventListener('touchend', handleMouseUp);
+
 	}
 	const handleMouseMove = (e) => {
 		let newCoords;
-		part.current = Util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+		//console.log (e.type)
+
+		if (e.type === 'touchmove') {
+			part.current = Util.convertScreenCoordsToSvgCoords(e.touches[0].clientX, e.touches[0].clientY);
+
+		} else {
+			part.current = Util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+		}
 		
 		switch (part.resizingHandle) {
 			case 'selectorGrip_resize_n':                
@@ -137,8 +148,7 @@ const Selector = observer(() => {
 				break;
 		}
 
-		if (newCoords.height <= 0 || newCoords.width <= 0 || !newCoords.x || !newCoords.y) return;
-		
+		if (newCoords.height <= 0 || newCoords.width <= 0 ) return;
 		svgStore.setSelectorCoords(newCoords);
 
  		let scaleX = newCoords.width / part.initialWidth
@@ -151,8 +161,14 @@ const Selector = observer(() => {
 
 		let newPath = Util.applyTransform (svgStore.selectedPath, scaleX, scaleY, translateX, translateY)
 		let cid =  svgStore.getSelectedElement('cid') 
-		svgStore.updateElementValue (cid, 'contour', 'path', newPath )
+		svgStore.updateElementValue (cid, 'contour', 'path', newPath )	
+		//console.log (newPath)
+		let classes = svgStore.getElementByCidAndClass ( cid, 'contour', 'class')
 
+		console.log ('classes' + classes)
+		if (classes.includes('outer')) {
+			svgStore.setNewPartSize(newCoords.width, newCoords.height)
+		}
  	 	part.initialHeight = newCoords.height
 		part.initialWidth = newCoords.width 
 		part.initialRectLeft = newCoords.x
@@ -173,26 +189,12 @@ const Selector = observer(() => {
 		part = {};
 		document.removeEventListener('mousemove', handleMouseMove);
 		document.removeEventListener('mouseup', handleMouseUp);
+
+		document.removeEventListener('touchmove', handleMouseMove);
+		document.removeEventListener('touchend', handleMouseUp);
+
 		setInmove(false)
 		addToLog('Contour changed by selector')
-
-		/* 
-		if (e.type === 'mouseup') {
-			 document.removeEventListener('mousemove', part.handleMouseMove);
-			 document.removeEventListener('mouseup', part.handleMouseUp);
-		} else if (e.type === 'touchend') {
-			 document.removeEventListener('touchmove', part.handleMouseMove);
-			 document.removeEventListener('touchend', part.handleMouseUp);
- 
-			 e.currentTarget.removeEventListener('touchmove', part.handleMouseMove);
-			 e.currentTarget.removeEventListener('touchend', part.handleMouseUp);
-		}
- 
-		log.add(__("Free transformation"));
-		panels.updateSortableList()
-		// if (document.querySelector(".selectedContour").classList.contains('outer')) part.normalizeIntends();
-		*/
-
 	}
 
 	return (
@@ -209,6 +211,7 @@ const Selector = observer(() => {
 				</rect>
 				<circle
 					onMouseDown={handleMouseDown}
+                    onTouchStart={ handleMouseDown }
 					id="selectorGrip_resize_nw"
 					fill="black" stroke="white"
 					r={circleSize}
@@ -220,6 +223,7 @@ const Selector = observer(() => {
 				</circle>
 				<circle
 					onMouseDown={handleMouseDown}
+                    onTouchStart={ handleMouseDown }
 					id="selectorGrip_resize_ne"
 					fill="black" stroke="white"
 					r={circleSize}
@@ -231,6 +235,7 @@ const Selector = observer(() => {
 				</circle>
 				<circle
 					onMouseDown={handleMouseDown}
+                    onTouchStart={ handleMouseDown }
 					id="selectorGrip_resize_sw"
 					fill="black" stroke="white"
 					r={circleSize}
@@ -242,6 +247,7 @@ const Selector = observer(() => {
 				</circle>
 				<circle
 					onMouseDown={handleMouseDown}
+                    onTouchStart={ handleMouseDown }
 					id="selectorGrip_resize_se"
 					fill="black" stroke="white"
 					r={circleSize}
@@ -253,6 +259,7 @@ const Selector = observer(() => {
 				</circle>
 				<circle
 					onMouseDown={ handleMouseDown }
+					onTouchStart={ handleMouseDown }
 					id="selectorGrip_resize_n"
 					fill="black" stroke="white"
 					r={circleSize}
@@ -264,6 +271,7 @@ const Selector = observer(() => {
 				</circle>
 				<circle
 					onMouseDown={handleMouseDown}
+					onTouchStart={ handleMouseDown }
 					id="selectorGrip_resize_w"
 					fill="black" stroke="white"
 					r={circleSize}
@@ -275,6 +283,7 @@ const Selector = observer(() => {
 				</circle>
 				<circle
 					onMouseDown={handleMouseDown}
+					onTouchStart={ handleMouseDown }
 					id="selectorGrip_resize_s"
 					fill="black" stroke="white"
 					r={circleSize}
@@ -286,6 +295,7 @@ const Selector = observer(() => {
 				</circle>
 				<circle
 					onMouseDown={handleMouseDown}
+					onTouchStart={ handleMouseDown }
 					id="selectorGrip_resize_e"
 					fill="black" stroke="white"
 					r={circleSize}
@@ -297,6 +307,7 @@ const Selector = observer(() => {
 				</circle>
 				<circle
 					onMouseDown={handleMouseDown}
+					onTouchStart={ handleMouseDown }
 					id="selectorGrip_central"
 					fill="white" stroke="black"
 					r={circleSize}

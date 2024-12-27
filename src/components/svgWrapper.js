@@ -7,6 +7,12 @@ import SvgComponent from './svg';
 import Util from './../utils/util';
 //import Arc from './../utils/arc.js';
 import Part from '../scripts/part.js';
+//import tch from './../scripts/touches'
+
+var tch = {}
+tch.evCache = new Array();
+var prevDiff = -1;
+
   
 
 const  SvgWrapper = observer (() => {
@@ -57,6 +63,95 @@ const  SvgWrapper = observer (() => {
 			f: comboMatrix.f
 		});
 	};
+
+	const touchZoom = (event, curDiff, prevDiff) =>{
+		console.log ('** touchZoom **')
+		var svg = document.getElementById("svg")
+        // Коэффициент масштабирования на основе разницы расстояний
+        let scale = curDiff / prevDiff;
+		var group = document.getElementById("group").transform.baseVal.consolidate().matrix
+
+        // Вычисление координат центра между двумя точками касания
+        let x = (tch.evCache[0].clientX + tch.evCache[1].clientX) / 2;
+        let y = (tch.evCache[0].clientY + tch.evCache[1].clientY) / 2;
+        let coords = Util.convertScreenCoordsToSvgCoords(x, y);
+    
+        // Применение трансформации
+		var gTransform = svg.createSVGMatrix()
+        gTransform = gTransform.translate(coords.x, coords.y);
+        gTransform = gTransform.scale(scale, scale);
+        gTransform = gTransform.translate(-coords.x, -coords.y);
+		let comboMatrix = Util.multiplyMatrices(group, gTransform)
+		
+		setMatrix({
+			a: comboMatrix.a,
+			b: comboMatrix.b,
+			c: comboMatrix.c,
+			d: comboMatrix.d,
+			e: comboMatrix.e,
+			f: comboMatrix.f
+		});
+    
+     /*    // Применение трансформации к элементу SVG
+        let transform = part.svg.createSVGTransform();
+        transform.setMatrix(part.gTransform);
+        part.group.transform.baseVal.initialize(transform);
+        part.updateRect() */
+    }
+
+ 
+	const pointerdown_handler = (ev) => {
+		ev.preventDefault()
+		// ev.stopPropagation()
+		console.log ('pointer_down_')
+		tch.evCache.push(ev);
+	}
+
+	const pointermove_handler = (ev) => {
+		console.log('pointer_move_');
+		ev.preventDefault()
+		// ev.stopPropagation()
+		for (let i = 0; i < tch.evCache.length; i++) {
+			if (ev.pointerId === tch.evCache[i].pointerId) {
+				tch.evCache[i] = ev;
+				break;
+			}
+		}
+	
+		if (tch.evCache.length === 2) {
+			let curDiff = Math.sqrt(
+				Math.pow(tch.evCache[1].clientX - tch.evCache[0].clientX, 2) +
+				Math.pow(tch.evCache[1].clientY - tch.evCache[0].clientY, 2)
+			);
+	
+			if (prevDiff > 0) {
+				if (curDiff !== prevDiff) {
+					touchZoom(ev, curDiff, prevDiff);
+				}
+			}
+			prevDiff = curDiff;
+		} 
+	}
+
+	const pointerup_handler = (ev) => {
+		ev.preventDefault()
+		// ev.stopPropagation()
+		console.log ('pointer_up_')
+		remove_event(ev);
+		if (tch.evCache.length < 2) prevDiff = -1;
+	}
+
+	const remove_event = (ev) => {
+		ev.preventDefault()
+		// ev.stopPropagation()
+		console.log ('remove_event_')
+		for (var i = 0; i <tch.evCache.length; i++) {
+			if (true ||tch.evCache[i].pointerId == ev.pointerId) {
+				tch.evCache.splice(i, 1);
+				break;
+			}
+		}
+	}
 
 	const startDrag = (e) =>{
 		//console.log ('startDrag')
@@ -210,7 +305,7 @@ const  SvgWrapper = observer (() => {
 			setRectParams( calculateRectAttributes())
 	},[matrix, gmatrix, offset])  
 
-    const updateRect =()=> {
+/*     const updateRect =()=> {
 		var svg = document.getElementById("svg")
         var rect = document.querySelector('#wrapper_svg').getBoundingClientRect();        
         var point = svg.createSVGPoint();
@@ -227,7 +322,7 @@ const  SvgWrapper = observer (() => {
         let height =  bottom.y - top.y    
         setRectParams({x:top.x, y:top.y, width: width, height: height})
 
-    } 
+    }  */
 
 	const calculateRectAttributes = () => {
 		const widthSVG = svgParams.width
@@ -255,11 +350,17 @@ const  SvgWrapper = observer (() => {
 				<div className="w-100 h-100">
 					<div className="d-flex" id="editor_main_wrapper">
 						<div id="wrapper_svg" ref={wrapperSVG}
-							onWheel={handleMouseWheel} 
-							onMouseDown={startDrag}
-							onMouseMove={drag} 
-							onMouseUp={endDrag}
-							onMouseLeave={leave}>		 
+		 					onWheel = {handleMouseWheel} 
+							onMouseDown = {startDrag}
+							onMouseMove = {drag} 
+							onMouseUp = {endDrag}
+							onMouseLeave = {leave}		 
+							/* TODO RESIZING using touches onPointerDown = {pointerdown_handler}
+							onPointerMove = {pointermove_handler}
+							onPointerUp = {pointerup_handler}
+							onPointerCancel = {pointerup_handler}
+							onPointerOut = {pointerup_handler}
+							onPointerLeave = {pointerup_handler}*/> 
 								<SvgComponent 
 									matrix={matrix} 
 									gmatrix={gmatrix} 

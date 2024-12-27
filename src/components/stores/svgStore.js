@@ -104,6 +104,11 @@ class SvgStore {
 		this.svgData = newData; // Устанавливаем новые данные SVG
 	}
 
+	setNewPartSize (x,y) {
+		this.svgData.width = x
+		this.svgData.height = y
+	}
+
 	clearSvgData() {
 		this.svgData = { width: 0, height: 0, code: [] }; // Очищаем данные SVG
 	}
@@ -152,6 +157,14 @@ class SvgStore {
 			return null;
 		}
 		return val ? selectedElement[val] || null : selectedElement;
+	}
+
+	getOuterElement(val = '') {	
+		const outer = this.svgData.code.find(element => element.class.includes('outer') && element.class.includes('contour'));
+		if (!outer) {
+			return null;
+		}
+		return val ? outer[val] || null : outer;
 	}
 
 	deleteSelected () {

@@ -12,7 +12,8 @@ import { toJS } from "mobx";
 
 const ContourPanel = observer(() => {
 
-	const { selected,
+	const { 
+			selected,
 			selectedPath,
 			selectedType,
 			selectedContourModeType, 
@@ -81,7 +82,7 @@ const ContourPanel = observer(() => {
 
 
 	useEffect(()=>{
-		console.log ('USING EFFECT')
+		//console.log ('USING EFFECT')
 		updateState()
  	},[ selected, selectedPath, activePoint])
 
@@ -200,8 +201,38 @@ const ContourPanel = observer(() => {
 
 			addToLog ('Contour changed ' + val )
 		}	
-	
 	}
+
+	const alignItems =(direction)=> {
+		console.log (direction)
+		let newPath, xDif=0, yDif=0;
+		let path = svgStore.getSelectedElement('path') 
+		let cid =  svgStore.getSelectedElement('cid') 
+		let classes = svgStore.getElementByCidAndClass ( cid, 'contour', 'class')
+		let outerPath = svgStore.getOuterElement('path')
+		let outerPathParams = SVGPathCommander.getPathBBox(outerPath)
+		let innerPathParams = SVGPathCommander.getPathBBox(path)
+		if ( classes.includes('outer')) {
+			return;
+		}
+		if (direction === 'left' ) {
+			xDif = outerPathParams.x - innerPathParams.x
+		} else if (direction === 'right' ) {
+			xDif = outerPathParams.x2 - innerPathParams.x2
+		} else if (direction === 'center-horizontal') {
+			yDif = outerPathParams.cy - innerPathParams.cy
+		} else if (direction === 'top') {
+			yDif = outerPathParams.y - innerPathParams.y
+		} else if (direction === 'center-vertical') {
+			xDif = outerPathParams.cx - innerPathParams.cx			
+		} else if (direction === 'bottom') {
+			yDif = outerPathParams.y2 - innerPathParams.y2
+		} 
+		console.log (xDif, yDif)
+		newPath = Util.applyTransform(path, 1, 1, xDif, yDif, {angle: angle, x:0, y:0})
+		svgStore.updateElementValue (cid, 'contour', 'path', newPath )
+
+	} 
 
 	const panelInfo = [
 		{
@@ -494,42 +525,48 @@ const ContourPanel = observer(() => {
 				<tr>
 				  <td>
 					<div className="d-flex align-items-center justify-content-around">
-					  <button
-						type="button"
-						className="btn text-white mt-1 btn_align btn_align-left"
-					  >
-						<Icon icon="solar:align-left-linear" width="28" height="28" />
-					  </button>
-					  <button
-						type="button"
-						className="btn text-white mt-1 btn_align btn_align-center-vertical"
-					  >
-						<Icon icon="solar:align-horizontal-center-linear" width="28" height="28" />
-					  </button>
-					  <button
-						type="button"
-						className="btn text-white mt-1 btn_align btn_align-right"
-					  >
-						<Icon icon="solar:align-right-linear" width="28" height="28" />
-					  </button>
-					  <button
-						type="button"
-						className="btn text-white mt-1 btn_align btn_align-top"
-					  >
-						<Icon icon="solar:align-top-linear" width="28" height="28" />
-					  </button>
-					  <button
-						type="button"
-						className="btn text-white mt-1 btn_align btn_align-center-horizontal"
-					  >
-						<Icon icon="solar:align-vertical-center-linear" width="28" height="28" />
-					  </button>
-					  <button
-						type="button"
-						className="btn text-white mt-1 btn_align btn_align-bottom"
-					  >
-						<Icon icon="solar:align-bottom-linear" width="28" height="28" />
-					  </button>
+						<button
+							type="button"
+							onMouseDown={() => alignItems('left')}
+							className="btn text-white mt-1 btn_align btn_align-left"
+ 						>
+							<Icon icon="solar:align-left-linear" width="28" height="28" />
+						</button>
+						<button
+							type="button"
+							onMouseDown={() => alignItems('center-vertical')}
+							className="btn text-white mt-1 btn_align btn_align-center-vertical"
+ 						>
+							<Icon icon="solar:align-horizontal-center-linear" width="28" height="28" />
+						</button>
+						<button
+							type="button"
+							onMouseDown={() => alignItems('right')}
+							className="btn text-white mt-1 btn_align btn_align-right"
+ 						>
+							<Icon icon="solar:align-right-linear" width="28" height="28" />
+						</button>
+						<button
+							type="button"
+							onMouseDown={() => alignItems('top')}
+							className="btn text-white mt-1 btn_align btn_align-top"
+ 						>
+							<Icon icon="solar:align-top-linear" width="28" height="28" />
+						</button>
+						<button
+							type="button"
+							onMouseDown={() => alignItems('center-horizontal')}
+							className="btn text-white mt-1 btn_align btn_align-center-horizontal"
+ 						>
+							<Icon icon="solar:align-vertical-center-linear" width="28" height="28" />
+						</button>
+						<button
+							type="button"
+							onMouseDown={() => alignItems('bottom')}
+							className="btn text-white mt-1 btn_align btn_align-bottom"
+ 						>
+							<Icon icon="solar:align-bottom-linear" width="28" height="28" />
+					  	</button>
 					</div>
 				  </td>
 				</tr>
