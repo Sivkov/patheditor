@@ -15,6 +15,7 @@ import React, { useEffect } from 'react';
           width: svg.width,
           height: svg.height,
           code: svg.code,
+          params:svg.params
         };
         svgStore.setSvgData(newSvgData); 
       };

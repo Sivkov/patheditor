@@ -64,7 +64,7 @@ class Part {
                 method: "GET",
                 url: `http://127.0.0.1/editor/getpart?handle=${handle}&program_no=${number}`,
             });
-			return Part.ncpToSvg ( response.data )
+			return Part.ncpToSvg ( response.data , number)
         } catch (error) {
             console.error("Ошибка при получении данных: ", error);
             //return null;
@@ -75,11 +75,11 @@ class Part {
     static add(create=false) {
     }
     
-    static ncpToSvg(ncpCode) {
+    static ncpToSvg(ncpCode, number) {
         let svg = []
         //const ncpLines = ncpCode.code
 
-        const ncpLines = CONSTANTS.code1
+        const ncpLines = CONSTANTS.code2
      
         let currentX, currentY
         let path = 'closed'
@@ -281,7 +281,10 @@ class Part {
              let  bc = b.class.split(' ').map(a => que.indexOf(a)).sort((a,b)=> b-a)[0]
              return bc-ac
         })
-		return {width: Part.width, height: Part.height,code:svg}        
+
+        let pcode = Util.getValueFromString(ncpLines[1], 'code', false).replaceAll('="', '').replaceAll('">)', '')
+        let uuid = Util.getValueFromString(ncpLines[2], 'uuid', false).replaceAll('="', '').replaceAll('">)', '')
+		return {width: Part.width, height: Part.height,code:svg, params:{ id: number, code: pcode, uuid: uuid}}        
     }
 
     static detectContourType (classes) {

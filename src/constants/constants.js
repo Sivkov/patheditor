@@ -38,6 +38,15 @@ const CONSTANTS = {
 				width: 350,
 				height: 300,
 			}
+		},
+		partPopup: {
+			mini: true,
+			style: {
+				top: 160,
+				left: 12,
+				width: 350,
+				height: 300,
+			}
 		}
     },
 	code1:[

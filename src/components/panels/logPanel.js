@@ -47,6 +47,7 @@ const LogPanel = observer(() => {
 					width: parsed.width,
 					height: parsed.height,
 					code: parsed.code,
+					params: parsed.params,
 				  };
 				svgStore.setSvgData(newSvgData)
 			}		

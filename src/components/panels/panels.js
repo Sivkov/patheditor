@@ -3,6 +3,7 @@ import LogPanel from './logPanel';
 import ToolsPanel from './toolsPanel';
 import ContourPanel from './contourPanel';
 import TecnologyPanel from './tecnologyPanel';
+import PartPanel from './partPanel';
 
 
 const Panels =  () => {
@@ -14,6 +15,7 @@ const Panels =  () => {
 			<ToolsPanel />
 			<ContourPanel />
 			<TecnologyPanel />
+			<PartPanel />
 		</>
 	);
 };

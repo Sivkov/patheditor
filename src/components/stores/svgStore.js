@@ -4,7 +4,7 @@ import { toJS } from "mobx";
 import Part from "../../scripts/part";
 
 class SvgStore {
-	svgData = { width: 0, height: 0, code: [] }; // Хранилище объекта SVG
+	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
 	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
 
 	constructor() {
@@ -110,7 +110,7 @@ class SvgStore {
 	}
 
 	clearSvgData() {
-		this.svgData = { width: 0, height: 0, code: [] }; // Очищаем данные SVG
+		this.svgData = { width: 0, height: 0, code: [] , params:{}}; // Очищаем данные SVG
 	}
 
 	getElementByCidAndClass(cid, className, val = '') {
