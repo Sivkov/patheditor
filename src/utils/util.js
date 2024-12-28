@@ -223,6 +223,82 @@ class Util {
 		return transformed
      
     }
+
+	static 	pathToPolyline(path, segments = 1) {
+		let points = [] 
+		let contourPath = SVGPathCommander.normalizePath(path);
+		let PX, PY, SX, SY;
+
+		contourPath.forEach((seg, i)=>{
+			if (seg.includes('M')) {
+				SX=seg[1]
+				SY=seg[2]
+				PX=seg[1]
+				PY=seg[2]
+			} else if ( seg.includes('L')) {
+				PX=seg[1]
+				PY=seg[2]    
+			} else if (seg.includes('V')) {
+				PY=seg[1]
+			} else if (seg.includes('H')) {
+				PX=seg[1]
+			} else if (seg.includes('A')) {
+				let fakePath = "M"+PX+" "+PY+' '+seg.join(' ')
+				const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+				pathElement.setAttribute("d", fakePath);
+				const totalLength = Math.round(pathElement.getTotalLength() / segments);
+				for (let i = 0; i < totalLength; i++) {
+					let point = pathElement.getPointAtLength(i * segments);
+					if (i == totalLength - segments) {
+						point = pathElement.getPointAtLength( pathElement.getTotalLength() );
+					}
+					const { x, y } = point;
+					points.push(`${x},${y}`);
+				}
+				PX=seg[6]
+				PY=seg[7]   
+			}  else if (seg.includes('z') || seg.includes('Z')) {
+				PX=SX
+				PY=SY   				
+			} 
+			points.push(`${PX},${PY}`);
+		})
+		return points.join(";");
+	}
+
+	static intersects(edge1, edge, asSegment=true) {
+		const a = edge1[0];
+		const b = edge1[1];
+		const e = edge[0];
+		const f = edge[1]
+		const a1 = (b.y - a.y);
+		const a2 = (f.y - e.y);
+		const b1 = (a.x - b.x);
+		const b2 = (e.x - f.x);
+		const denom = ((a1 * b2) - (a2 * b1));	   
+		if (denom === 0) {
+			return null;
+		}
+		const c1 = ((b.x * a.y) - (a.x * b.y));
+		const c2 = ((f.x * e.y) - (e.x * f.y));
+		
+		let point={}
+		point.x = ((b1 * c2) - (b2 * c1)) / denom;
+		point.y = ((a2 * c1) - (a1 * c2)) / denom;
+
+		if (asSegment) {
+			const uc = ((f.y - e.y) * (b.x - a.x) - (f.x - e.x) * (b.y - a.y));
+			const ua = (((f.x - e.x) * (a.y - e.y)) - (f.y - e.y) * (a.x - e.x)) / uc;
+			const ub = (((b.x - a.x) * (a.y - e.y)) - ((b.y - a.y) * (a.x - e.x))) / uc;
+
+			if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1) {
+				return point;
+			} else {
+				return null;
+			}
+		}	
+		return point;
+	}
 }
 
 export default Util;

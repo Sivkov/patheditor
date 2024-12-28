@@ -167,6 +167,15 @@ class SvgStore {
 		return val ? outer[val] || null : outer;
 	}
 
+	getFiltered (filter ='contour') {	
+		const filtered = this.svgData.code.filter(element => element.class.includes( filter));
+		if (!filtered) {
+			return [];
+		}
+		console.log ('filtered', toJS(filtered))
+		return filtered
+	}
+
 	deleteSelected () {
 		let selected = this.getSelectedElement()	
 		let cidSelected = selected.cid		

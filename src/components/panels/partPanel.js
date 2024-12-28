@@ -4,19 +4,39 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import svgStore from '../stores/svgStore';
 import { observer } from 'mobx-react-lite';
 import Util from '../../utils/util';
+import Part from '../../scripts/part';
+
 
 
 const PartPanel = observer(() => {
 
 	const checkCollisions =()=> {
 		console.log (' checkCollisions ')
+		let contours = svgStore.getFiltered('contour')
+		let collision = Part.partDetectCollision( contours )
+		console.log ( 'Colllsion', collision  )
+		collision.forEach((cid)=>{
+			let collider  =  svgStore.getElementByCidAndClass( cid, 'contour', 'class')
+			collider += ' collision'
+			svgStore.updateElementValue(cid, 'contour', 'class', collider)
+		})
+
+		setTimeout(()=>{
+			collision.forEach((cid)=>{
+				let collider  =  svgStore.getElementByCidAndClass( cid, 'contour', 'class')
+				collider = collider.replace(' collision', '')
+				svgStore.updateElementValue(cid, 'contour', 'class', collider)
+			})
+
+		},5000)
+
 	}
 
 	const { svgData } = svgStore
 	const panelInfo = [
 		{
 			id: 'partPopup',
-			fa: (<><i class="fa-solid fa-gear me-2"></i><div>Part data</div></>),
+			fa: (<><i className="fa-solid fa-gear me-2"></i><div>Part data</div></>),
 			content: (
 				<div className="d-flex">
 					<table className="table">

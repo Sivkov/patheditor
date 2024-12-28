@@ -1,6 +1,7 @@
 import axios from 'axios';
-import Util from '../utils/util';
+import util from '../utils/util';
 import CONSTANTS from '../constants/constants.js';
+import SVGPathCommander from 'svg-path-commander';
 
 
 class Part {
@@ -88,16 +89,16 @@ class Part {
         let jointContainerOpen = false;
         for (const line of ncpLines) {
             if (line.includes('(<Part id="')) {
-                Part.width = +Util.getAttributeValue(line, 'originx')
-                Part.height = +Util.getAttributeValue(line, 'originy')
+                Part.width = +util.getAttributeValue(line, 'originx')
+                Part.height = +util.getAttributeValue(line, 'originy')
 				Part.setSvgParams({width: Part.width, height: Part.height})                                
             } else if (line.includes('(<Inlet')) {
-                let x = Util.getValueFromString(line, 'x')
-                let y = Util.getValueFromString(line, 'y')
-                cid = Util.getAttributeValue(line, 'contour_id')
-                let innerOuter = Util.getAttributeValue(line, 'mode')
-                let macroValue = +Util.getAttributeValue(line, 'macro')
-                let pulseValue = +Util.getAttributeValue(line, 'pulse')
+                let x = util.getValueFromString(line, 'x')
+                let y = util.getValueFromString(line, 'y')
+                cid = util.getAttributeValue(line, 'contour_id')
+                let innerOuter = util.getAttributeValue(line, 'mode')
+                let macroValue = +util.getAttributeValue(line, 'macro')
+                let pulseValue = +util.getAttributeValue(line, 'pulse')
                 
                 /// !!!TODO при сохрание еслм два тов пирсинге -1 todo
                 if (pulseValue === -1) pulseValue = 2
@@ -120,10 +121,10 @@ class Part {
 
             } else if (line.includes('(<Outlet')) {
                 //svg += `"></path></g>`;
-                let x = +Util.getValueFromString(line, 'x')
-                let y = +Util.getValueFromString(line, 'y')
-                let innerOuter = Util.getAttributeValue(line, 'mode')
-                let macroValue = +Util.getAttributeValue(line, 'macro')
+                let x = +util.getValueFromString(line, 'x')
+                let y = +util.getValueFromString(line, 'y')
+                let innerOuter = util.getAttributeValue(line, 'mode')
+                let macroValue = +util.getAttributeValue(line, 'macro')
                 //svg += `<g data-cid="${this.lastContourId}" fill="none" class="outlet ${innerOuter} ${'macro' + macroValue}" stroke="lime" stroke-width="0.2">`
 
                 let outlet=  
@@ -148,10 +149,10 @@ class Part {
                 }
                 Part.joints=''
                 let eng = line.includes('mode="engraving"')
-                cid = Util.getAttributeValue(line, 'contour_id')
-                let macroValue = +Util.getAttributeValue(line, 'macro')
-                let innerOuter = Util.getAttributeValue(line, 'mode')
-                let openClosed = +Util.getAttributeValue(line, 'closed')
+                cid = util.getAttributeValue(line, 'contour_id')
+                let macroValue = +util.getAttributeValue(line, 'macro')
+                let innerOuter = util.getAttributeValue(line, 'mode')
+                let openClosed = +util.getAttributeValue(line, 'closed')
                 this.lastContourId = +cid
               
                 let contour = 
@@ -173,11 +174,11 @@ class Part {
             } else if (line.includes('G0 ')) {
                 // Обработайте команды G0 (быстрое перемещение)
                 if (true) {
-                    let x = Util.getValueFromString(line, 'x')
-                    let y = Util.getValueFromString(line, 'y')
+                    let x = util.getValueFromString(line, 'x')
+                    let y = util.getValueFromString(line, 'y')
                     if (x == null) x = currentX;
                     if (y == null) y = currentY;
-                    svg[svg.length-1]['path']+= `M${Util.round(x)} ${Util.round(Part.height - y)} `;
+                    svg[svg.length-1]['path']+= `M${util.round(x)} ${util.round(Part.height - y)} `;
                     currentX = x
                     currentY = y
                     path = 'continued'
@@ -188,28 +189,28 @@ class Part {
                 const yMatch = line.match(/y(\S+)/);
                 if (xMatch && yMatch) {
                     // If both x and y are matched, add an SVG 'L' command
-                    let x = Util.getValueFromString(line, 'x')
-                    let y = Util.getValueFromString(line, 'y')
+                    let x = util.getValueFromString(line, 'x')
+                    let y = util.getValueFromString(line, 'y')
                     if (x == null) x = currentX;
                     if (y == null) y = currentY;
 
                     if (path !== 'continued') {
-                        svg[svg.length-1]['path']+= `M${Util.round(x)} ${Util.round(Part.height - y)} `;
+                        svg[svg.length-1]['path']+= `M${util.round(x)} ${util.round(Part.height - y)} `;
                     } else {
-                        svg[svg.length-1]['path']+= `L${Util.round(x)} ${Util.round(Part.height - y)} `;
+                        svg[svg.length-1]['path']+= `L${util.round(x)} ${util.round(Part.height - y)} `;
                     }
                     currentX = x
                     currentY = y
 
                 } else if (xMatch) {
                     // If only x is matched, add an SVG 'H' command
-                    let x = Util.getValueFromString(line, 'x');
-                    svg[svg.length-1]['path']+= `H${Util.round(x)} `;
+                    let x = util.getValueFromString(line, 'x');
+                    svg[svg.length-1]['path']+= `H${util.round(x)} `;
                     currentX = x
                 } else if (yMatch) {
                     // If only y is matched, add an SVG 'V' command
-                    let y = Util.getValueFromString(line, 'y');
-                    svg[svg.length-1]['path'] += `V${Util.round(Part.height - y)} `;
+                    let y = util.getValueFromString(line, 'y');
+                    svg[svg.length-1]['path'] += `V${util.round(Part.height - y)} `;
                     currentY = y
                 }
                 path = 'continued'
@@ -217,38 +218,38 @@ class Part {
             } else if (line.includes('G2 ')) {
                 // Process G2 commands
                 if (true) {
-                    let x = Util.getValueFromString(line, 'x')
-                    let y = Util.getValueFromString(line, 'y')
-                    let i = Util.getValueFromString(line, 'i');
-                    let j = Util.getValueFromString(line, 'j');
+                    let x = util.getValueFromString(line, 'x')
+                    let y = util.getValueFromString(line, 'y')
+                    let i = util.getValueFromString(line, 'i');
+                    let j = util.getValueFromString(line, 'j');
 
                     if (i == null) i = 0;
                     if (j == null) j = 0;
                     if (x == null) x = currentX;
                     if (y == null) y = currentY;
 
-                    let r = Util.round(Math.sqrt(i ** 2 + j ** 2))
-                    let largeArcFlag = Util.getLargeArcFlag(currentX, currentY, x, y, i, j, false);
+                    let r = util.round(Math.sqrt(i ** 2 + j ** 2))
+                    let largeArcFlag = util.getLargeArcFlag(currentX, currentY, x, y, i, j, false);
 
-                    svg[svg.length-1]['path'] += `A${r} ${r} 0 ${largeArcFlag} 1 ${Util.round(x)} ${Util.round(Part.height - y)} `;
+                    svg[svg.length-1]['path'] += `A${r} ${r} 0 ${largeArcFlag} 1 ${util.round(x)} ${util.round(Part.height - y)} `;
                     currentX = x;
                     currentY = y;
                 }
             } else if (line.includes('G3 ')) {
                 // Process G3 commands
                 if (true) {
-                    let x = Util.getValueFromString(line, 'x')
-                    let y = Util.getValueFromString(line, 'y')
-                    let i = Util.getValueFromString(line, 'i');
-                    let j = Util.getValueFromString(line, 'j');
+                    let x = util.getValueFromString(line, 'x')
+                    let y = util.getValueFromString(line, 'y')
+                    let i = util.getValueFromString(line, 'i');
+                    let j = util.getValueFromString(line, 'j');
                     if (i == null) i = 0;
                     if (j == null) j = 0;
                     if (x == null) x = currentX;
                     if (y == null) y = currentY;
 
-                    let r = Util.round(Math.sqrt(i ** 2 + j ** 2))
-                    let largeArcFlag = Util.getLargeArcFlag(currentX, currentY, x, y, i, j, true);
-                    svg[svg.length-1]['path']+= `A${r} ${r} 0 ${largeArcFlag} 0 ${Util.round(x)} ${Util.round(Part.height - y)} `;
+                    let r = util.round(Math.sqrt(i ** 2 + j ** 2))
+                    let largeArcFlag = util.getLargeArcFlag(currentX, currentY, x, y, i, j, true);
+                    svg[svg.length-1]['path']+= `A${r} ${r} 0 ${largeArcFlag} 0 ${util.round(x)} ${util.round(Part.height - y)} `;
                     currentX = x;
                     currentY = y;
                 }
@@ -257,12 +258,12 @@ class Part {
                 jointContainerOpen = false
 
             } else if (line.includes('(<Joint')){
-                /*let x = +Util.getAttributeValue(line, 'x')
-                let y = +Util.getAttributeValue(line, 'y')
-                let dp = +Util.getAttributeValue(line, 'dp');
-                let length = +Util.getAttributeValue(line, 'length');
-                let path =  Util.getJoint(x,y)
-                let uuid = Util.uuid()
+                /*let x = +util.getAttributeValue(line, 'x')
+                let y = +util.getAttributeValue(line, 'y')
+                let dp = +util.getAttributeValue(line, 'dp');
+                let length = +util.getAttributeValue(line, 'length');
+                let path =  util.getJoint(x,y)
+                let uuid = util.uuid()
                 let jointClass = 'manual'
                 if (!jointContainerOpen){
                     jointContainerOpen = true
@@ -282,8 +283,8 @@ class Part {
              return bc-ac
         })
 
-        let pcode = Util.getValueFromString(ncpLines[1], 'code', false).replaceAll('="', '').replaceAll('">)', '')
-        let uuid = Util.getValueFromString(ncpLines[2], 'uuid', false).replaceAll('="', '').replaceAll('">)', '')
+        let pcode = util.getValueFromString(ncpLines[1], 'code', false).replaceAll('="', '').replaceAll('">)', '')
+        let uuid = util.getValueFromString(ncpLines[2], 'uuid', false).replaceAll('="', '').replaceAll('">)', '')
 		return {width: Part.width, height: Part.height,code:svg, params:{ id: number, code: pcode, uuid: uuid}}        
     }
 
@@ -313,6 +314,168 @@ class Part {
         }
         return -1
         
-    }   
+    }
+    
+    static partDetectCollision ( data ) {
+        var start = performance.now()
+        console.log ('partDetectCollision')
+        let inners = data 
+        console.log (data)
+
+        let polygons = {}
+        Part.collisionDetected = false
+        let detected =[]
+        
+		for (let i = 0; i < inners.length; i++) {
+            let id1= inners[i].cid
+            let p1 =  inners[i].path
+            let rect1 = SVGPathCommander.getPathBBox (p1)
+
+   
+            for (let j =i+1; j < inners.length; j++) {
+                let id2= inners[j].cid
+                if (id1 !== id2) {
+
+                   let p2 =  inners[j].path 
+                   let rect2 = SVGPathCommander.getPathBBox (p2)
+                   let collisionAABB = Part.intersectsAABB(rect1, rect2)    
+                    if (  collisionAABB  ) {   
+                            
+                        if (!polygons.hasOwnProperty(`${id1}`)) {
+                            polygons[`${id1}`] = Part.stringToEdges(  util.pathToPolyline( p1, 1 ) )
+                        }
+
+                        if (!polygons.hasOwnProperty(`${id2}`)) {
+                            polygons[`${id2}`] = Part.stringToEdges(  util.pathToPolyline( p2, 1 ) )
+                        }
+
+                        let collisionShape = Part.intersectsShape (  polygons[`${id1}`],  polygons[`${id2}`])
+                        if ( collisionShape ) {
+                            
+                            detected.push( inners[i].cid )
+                            detected.push( inners[j].cid )
+                            Part.collisionDetected = true
+                           
+                        } else {
+                            let insideShape = Part.insideShape(polygons[`${id1}`],  polygons[`${id2}`])
+                            if (!insideShape) {
+                                if ( inners[i].class.includes('outer')) {
+                                   // inners[j].classList.add('collision')
+                                   detected.push( inners[j].cid)
+
+                                }
+                                if ( inners[j].class.includes('outer')) {
+                                    //inners[i].classList.add('collision')   
+                                    detected.push( inners[i].cid)
+                         
+                                }
+                            }
+                        }
+                    } else {
+                        if ( inners[i].class.includes('outer')) {
+                            //inners[j].classList.add('collision')
+                            detected.push( inners[j].cid)
+
+                        }
+
+                        if ( inners[j].class.includes('outer')) {
+                            //inners[i].classList.add('collision')    
+                            detected.push( inners[i].cid)
+                        
+                        }
+                    }
+                }
+            }
+        }
+
+        var end = performance.now()
+        console.log("Обработка заняла времени " + (end - start) + " msec")
+        return [...new Set(detected)]        
+        
+    }
+
+    static intersectsAABB(a, b) {
+        a.top = a.y
+        b.top = b.y
+        a.bottom = a.y+ a.height
+        b.bottom = b.y+ b.height
+        a.right = a.x+ a.width
+        b.right = b.x+ b.width
+        a.left = a.x
+        b.left = b.x
+        
+
+		if ( a && typeof a.top === 'number' && b && typeof b.top === 'number' ) {
+     		return !(
+				a.right < b.left ||
+				a.bottom < b.top ||
+				a.left > b.right ||
+				a.top > b.bottom
+			);
+		}
+		return false
+	}
+
+    static stringToEdges(coordString) {
+        const coordinates = coordString.split(';');
+        const edges = [];
+    
+        for (let i = 0; i < coordinates.length-1 ; i++) {
+            const start = coordinates[i].split(',');
+          
+            const end = coordinates[i + 1] ? coordinates[i + 1].split(',') : coordinates[0].split(',');
+    
+            edges.push([
+                { x: parseFloat(start[0]), y: parseFloat(start[1]) },
+                { x: parseFloat(end[0]), y: parseFloat(end[1]) }
+            ]);
+        }
+    
+        return edges;
+    }
+
+    static intersectsShape (edges1, edges2) {
+        for (let i = 0; i < edges1.length; i++) {
+			const edge1 = edges1[i];
+			for (let j = 0; j < edges2.length; j++) {
+				const edge2 = edges2[j];
+				if (util.intersects(edge1, edge2, true)) {
+					return true;
+				}
+			}
+		}
+    }
+
+    static contains (point, vs) {
+		// ray-casting algorithm based on
+		// https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html		
+		var x = point[0], y = point[1];
+		var inside = false;
+		for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+			var xi = vs[i]['x'], yi = vs[i]['y'];
+			var xj = vs[j]['x'], yj = vs[j]['y'];
+			
+			var intersect = ((yi > y) != (yj > y))
+				&& (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+			if (intersect) inside = !inside;
+		}		
+		return inside;
+	};
+
+
+    static insideShape(a, b) {
+        let aHitArea = a.map( aa => aa[0])
+        let bHitArea = b.map( bb => bb[0])
+
+		if (
+			Part.contains([b[0][0].x, b[0][0].y], aHitArea ) ||
+			Part.contains([a[0][0].x, a[0][0].y], bHitArea)
+		) {
+			return true
+		} else {
+			return false
+		}
+	}
+
 } 
 export default Part;

@@ -1764,3 +1764,9 @@ top:var(--hEdge);
 .dropdown-menu .dropdown-item {
   color: var(--paleColor) !important;
 }
+
+.collision {
+  mix-blend-mode: overlay;
+  filter: brightness(125%) drop-shadow(4px 4px 4px rgb(255, 255, 255));
+  filter: invert(20%) sepia(100%) saturate(9000%) hue-rotate(0deg) brightness(120%) contrast(120%);
+}
