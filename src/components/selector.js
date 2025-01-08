@@ -20,6 +20,7 @@ const Selector = observer(() => {
 			setVisibility(true)
 			if (!inMove) {
 				const box = SVGPathCommander.getPathBBox(selectedPath);
+				//console.log (box)
 				svgStore.setSelectorCoords({ x: box.x, y: box.y, width: box.width, height: box.height })
 			}		
 		}
@@ -161,11 +162,11 @@ const Selector = observer(() => {
 
 		let newPath = Util.applyTransform (svgStore.selectedPath, scaleX, scaleY, translateX, translateY)
 		let cid =  svgStore.getSelectedElement('cid') 
-		svgStore.updateElementValue (cid, 'contour', 'path', newPath )	
-		//console.log (newPath)
+		//svgStore.updateElementValue (cid, 'contour', 'path', newPath )	
+		svgStore.updateContourPath (cid, 'contour', 'path', newPath )	
 		let classes = svgStore.getElementByCidAndClass ( cid, 'contour', 'class')
 
-		console.log ('classes' + classes)
+		//console.log ('classes' + classes)
 		if (classes.includes('outer')) {
 			svgStore.setNewPartSize(newCoords.width, newCoords.height)
 		}

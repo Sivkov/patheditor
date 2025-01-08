@@ -179,26 +179,9 @@ const ContourPanel = observer(() => {
 		if (e.key === 'Enter' || e.key === 'Return' || e.key === 'Tab') {
 			
 			if (e.key === 'Enter') e.preventDefault();			
-			let newPath =''
-			newPath = Util.transformContour(path, id, val, params)
-			svgStore.updateElementValue (cid, 'contour', 'path', newPath )
-
-			let start =  SVGPathCommander.normalizePath(newPath)[0]
-			let contourStart =  {x: start[start.length-2], y: start[start.length-1]}
-			let inlet = svgStore.getElementByCidAndClass (cid, 'inlet')
-			let outlet = svgStore.getElementByCidAndClass (cid, 'outlet')
-
-			if (inlet) {
-				let inletPath = SVGPathCommander.normalizePath(inlet.path)
-				let inletLastSeg = inletPath[inletPath.length-1]
-				let inletEnd = {x: inletLastSeg[inletLastSeg.length-2], y:inletLastSeg[inletLastSeg.length-1]}
-				let xDif = contourStart.x- inletEnd.x
-				let yDif = contourStart.y- inletEnd.y
-
-				let newInletPath = Util.applyTransform(inlet.path, 1, 1, xDif, yDif, {angle: angle, x:0, y:0})
-				svgStore.updateElementValue (cid, 'inlet', 'path', newInletPath )
-			}
-
+			let newPath = Util.transformContour(path, id, val, params)
+			newPath = SVGPathCommander.normalizePath( newPath ).toString().replaceAll(',', ' ')
+			svgStore.updateContourPath (cid, 'contour', 'path', newPath )
 			addToLog ('Contour changed ' + val )
 		}	
 	}
@@ -230,7 +213,8 @@ const ContourPanel = observer(() => {
 		} 
 		console.log (xDif, yDif)
 		newPath = Util.applyTransform(path, 1, 1, xDif, yDif, {angle: angle, x:0, y:0})
-		svgStore.updateElementValue (cid, 'contour', 'path', newPath )
+		//svgStore.updateElementValue (cid, 'contour', 'path', newPath )
+		svgStore.updateContourPath (cid, 'contour', 'path', newPath )
 
 	} 
 
@@ -603,11 +587,9 @@ const ContourPanel = observer(() => {
 			  </tbody>
 			</table>
 		  </div>
-		  
-				
-			),
-		  },   
-	]
+		),
+	},   
+]
 
 return (
 	<>

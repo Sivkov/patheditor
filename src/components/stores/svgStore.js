@@ -2,6 +2,8 @@
 import { makeAutoObservable, computed } from "mobx";
 import { toJS } from "mobx";
 import Part from "../../scripts/part";
+import SVGPathCommander from "svg-path-commander";
+import Util from "../../utils/util";
 
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
@@ -138,6 +140,40 @@ class SvgStore {
 		);
 		if (element && val in element) {
 			element[val] = newVal; // Обновляем значение указанного ключа
+		}
+	}
+
+
+	updateContourPath (cid, className, val, newVal, angle=false) {
+		if (!angle) {
+			angle ={angle: 0, x:0, y:0}
+		}
+
+		const inlet = svgStore.getElementByCidAndClass (cid, 'inlet')
+		const outlet = svgStore.getElementByCidAndClass (cid, 'outlet')
+
+		this.updateElementValue (cid, className, val, newVal)
+		let start =  SVGPathCommander.normalizePath(newVal)[0]
+		let contourStart =  {x: start[start.length-2], y: start[start.length-1]}
+
+		if (inlet) {
+			let inletPath = SVGPathCommander.normalizePath(inlet.path)
+			let inletLastSeg = inletPath[inletPath.length-1]
+			let inletEnd = {x: inletLastSeg[inletLastSeg.length-2], y:inletLastSeg[inletLastSeg.length-1]}
+			let xDif = contourStart.x- inletEnd.x
+			let yDif = contourStart.y- inletEnd.y
+			let newInletPath = Util.applyTransform(inlet.path, 1, 1, xDif, yDif, angle)
+			this.updateElementValue (cid, 'inlet', val, newInletPath)
+		}
+
+		if (outlet) {
+			let outletPath = SVGPathCommander.normalizePath(outlet.path)
+			let outletStart = outletPath[0]
+			let outletStartSeg = {x: outletStart[outletStart.length-2], y:outletStart[outletStart.length-1]}
+			let xDif = contourStart.x- outletStartSeg.x
+			let yDif = contourStart.y- outletStartSeg.y
+			let newOutletPath = Util.applyTransform(outlet.path, 1, 1, xDif, yDif, angle)
+			this.updateElementValue (cid, 'outlet', val, newOutletPath)
 		}
 	}
 
