@@ -181,6 +181,11 @@ const ContourPanel = observer(() => {
 			if (e.key === 'Enter') e.preventDefault();			
 			let newPath = Util.transformContour(path, id, val, params)
 			newPath = SVGPathCommander.normalizePath( newPath ).toString().replaceAll(',', ' ')
+			if(id === 'contourRotateValue') {
+				svgStore.updateContourPath (cid, 'contour', 'path', newPath, {angle: angle, x:activeCooord.x, y:activeCooord.y} )
+			} else {
+				svgStore.updateContourPath (cid, 'contour', 'path', newPath )
+			};
 			svgStore.updateContourPath (cid, 'contour', 'path', newPath )
 			addToLog ('Contour changed ' + val )
 		}	
