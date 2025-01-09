@@ -299,6 +299,403 @@ class Util {
 		}	
 		return point;
 	}
+
+	static 	getPerpendicularCoordinates(arcParams, length) {
+		const { clockwise, cx, cy, deltaAngle, endAngle, phi, rx, ry, startAngle } = arcParams;
+	
+		// Calculate coordinates of the point on the ellipse at startAngle
+		const x0 = cx + rx * Math.cos(startAngle) * Math.cos(phi) - ry * Math.sin(startAngle) * Math.sin(phi);
+		const y0 = cy + rx * Math.cos(startAngle) * Math.sin(phi) + ry * Math.sin(startAngle) * Math.cos(phi);
+	
+		// Calculate derivatives at startAngle
+		const xPrime = -rx * Math.sin(startAngle) * Math.cos(phi) - ry * Math.cos(startAngle) * Math.sin(phi);
+		const yPrime = -rx * Math.sin(startAngle) * Math.sin(phi) + ry * Math.cos(startAngle) * Math.cos(phi);
+	
+		// Slope of the tangent
+		const m = yPrime / xPrime;
+	
+		// Slope of the perpendicular
+		const mPerp = -1 / m;
+	
+		// Calculate coordinates of the end points of the perpendicular line
+		const dx = length / Math.sqrt(1 + mPerp * mPerp);
+		const dy = mPerp * dx;
+	
+		const x1 = x0 + dx;
+		const y1 = y0 + dy;
+		const x2 = x0 - dx;
+		const y2 = y0 - dy;
+
+		//this.showPoint( { x: x1, y: y1 },{ x: x2, y: y2 })
+
+		return {
+			point1: { x: x1, y: y1 },
+			point2: { x: x2, y: y2 }
+		};
+	}
+
+	static 	arraysAreEqual(arr1, arr2) {
+		if (arr1.length !== arr2.length) {
+		   return false;
+	   }
+		for (let i = 0; i < arr1.length; i++) {
+		   if (arr1[i] !== arr2[i]) {
+			   return false;
+		   }
+	   }
+		return true;
+   }
+
+	static svgArcToCenterParam(x1, y1, rx, ry, degree, fA, fS, x2, y2, centers=false) {
+		var cx, cy, startAngle, deltaAngle, endAngle, outputObj;
+		var PIx2 = Math.PI * 2.0;
+		var phi = degree * Math.PI / 180;
+
+		if (rx < 0) {
+			rx = -rx;
+		}
+		if (ry < 0) {
+			ry = -ry;
+		}
+		if (rx == 0.0 || ry == 0.0) { // invalid arguments
+			throw Error('rx and ry can not be 0');
+		}
+
+		// SVG use degrees, if your input is degree from svg,
+		// you should convert degree to radian as following line.
+		// phi = phi * Math.PI / 180;
+		var s_phi = Math.sin(phi);
+		var c_phi = Math.cos(phi);
+		var hd_x = (x1 - x2) / 2.0; // half diff of x
+		var hd_y = (y1 - y2) / 2.0; // half diff of y
+		var hs_x = (x1 + x2) / 2.0; // half sum of x
+		var hs_y = (y1 + y2) / 2.0; // half sum of y
+
+		// F6.5.1
+		var x1_ = c_phi * hd_x + s_phi * hd_y;
+		var y1_ = c_phi * hd_y - s_phi * hd_x;
+
+		// F.6.6 Correction of out-of-range radii
+		//   Step 3: Ensure radii are large enough
+		var lambda = (x1_ * x1_) / (rx * rx) + (y1_ * y1_) / (ry * ry);
+		if (lambda > 1) {
+			rx = rx * Math.sqrt(lambda);
+			ry = ry * Math.sqrt(lambda);
+		}
+
+		var rxry = rx * ry;
+		var rxy1_ = rx * y1_;
+		var ryx1_ = ry * x1_;
+		var sum_of_sq = rxy1_ * rxy1_ + ryx1_ * ryx1_; // sum of square
+		if (!sum_of_sq) {
+			throw Error('start point can not be same as end point');
+		}
+		var coe = Math.sqrt(Math.abs((rxry * rxry - sum_of_sq) / sum_of_sq));
+		if (fA == fS) { coe = -coe; }
+
+		// F6.5.2
+		var cx_ = coe * rxy1_ / ry;
+		var cy_ = -coe * ryx1_ / rx;
+
+		// F6.5.3
+		cx = c_phi * cx_ - s_phi * cy_ + hs_x;
+		cy = s_phi * cx_ + c_phi * cy_ + hs_y;
+
+		if (!centers) {
+
+			var xcr1 = (x1_ - cx_) / rx;
+			var xcr2 = (x1_ + cx_) / rx;
+			var ycr1 = (y1_ - cy_) / ry;
+			var ycr2 = (y1_ + cy_) / ry;
+
+			// F6.5.5
+			startAngle = this.radian(1.0, 0.0, xcr1, ycr1);
+
+			// F6.5.6
+			deltaAngle = this.radian(xcr1, ycr1, -xcr2, -ycr2);
+			while (deltaAngle > PIx2) { deltaAngle -= PIx2; }
+			while (deltaAngle < 0.0) { deltaAngle += PIx2; }
+			if (fS == false || fS == 0) { deltaAngle -= PIx2; }
+			endAngle = startAngle + deltaAngle;
+			while (endAngle > PIx2) { endAngle -= PIx2; }
+			while (endAngle < 0.0) { endAngle += PIx2; }
+
+			outputObj = {   
+				cx: cx,
+				cy: cy,
+				rx: rx,
+				ry: ry,
+				phi: phi,
+				startAngle: startAngle,
+				deltaAngle: deltaAngle,
+				endAngle: endAngle,
+				clockwise: (fS == true || fS == 1),
+				i:cx - x1,
+				j:y1 - cy,
+			}
+		}
+
+		if (centers) {
+			outputObj= { x: cx, y: cy }
+		}
+		return outputObj;
+	}
+
+	static leBetwenContourAndInlet ( path, contourPath, inlet=true) {
+		let  A, MX, MY, LX, LY,  PX, PY;
+		if(inlet){
+			if (path.length) {
+				path.forEach( seg=>{
+					if ( seg.includes('M')) {
+						MX=seg[1]
+						MY=seg[2]
+					}
+					if ( seg.includes('L')) {
+						LX=seg[1]
+						LY=seg[2]    
+					} else if (seg.includes('V')) {
+						LY=seg[1]
+						LX=MX 
+					} else if (seg.includes('H')) {
+						LY=MY
+						LX=seg[1]
+					}
+				}) 
+			}
+		
+			contourPath.forEach((seg, i, arr)=>{
+				if (i < 2){
+					if (seg.includes('M')) {
+						PX=seg[1]
+						PY=seg[2]
+					} else if ( seg.includes('L')) {
+						PX=seg[1]
+						PY=seg[2]    
+					} else if (seg.includes('V')) {
+						PY=seg[1]//-1
+					 } else if (seg.includes('H')) {
+						PX=seg[1]//-1
+					} else if (seg.includes('A')) {
+						PX=seg[6]
+						PY=seg[7]
+					}
+				}
+			})
+			
+			A = this.calculateAngleVector ( LX, LY, MX, MY, PX, PY)
+			return A
+		} else {
+			if(!path.hasOwnProperty('segments')){
+				path =  SVGPathCommander.normalizePath(path)
+			}
+            if (path.length) {
+                path.forEach((seg,i)=>{
+                    if ( seg.includes('M')) {
+                        MX=seg[1]
+                        MY=seg[2]
+                    }
+                    if ( seg.includes('L')) {
+                        LX=seg[1]
+                        LY=seg[2]    
+                    } else if (seg.includes('V')) {
+                        LY=seg[1]
+                        LX=MX 
+                    } else if (seg.includes('H')) {
+                        LY=MY
+                        LX=seg[1]
+                    }
+                }) 
+            }
+
+			if(!contourPath.hasOwnProperty('segments')){
+				contourPath =  SVGPathCommander.normalizePath(contourPath)
+			}
+
+            contourPath.forEach((seg, i)=>{
+                if (i < contourPath.length-1){
+                    if (seg.includes('M')) {
+                        PX=seg[1]
+                        PY=seg[2]
+                    } else if ( seg.includes('L')) {
+                        PX=seg[1]
+                        PY=seg[2]    
+                    } else if (seg.includes('V')) {
+                        PY=seg[1]
+                     } else if (seg.includes('H')) {
+                        PX=seg[1]
+                    } else if (seg.includes('A')) {
+                        PX=seg[6]
+                        PY=seg[7]
+                    }
+                }
+            })
+            A = this.calculateAngleVector ( MX, MY,  LX, LY, PX, PY)
+			return A			
+		}
+	}
+
+	static 	calculateAngleVector(x, y, x1, y1, x2, y2) {
+		// Calculate vectors
+		const vector1 = { x: x1 - x, y: y1 - y };
+		const vector2 = { x: x2 - x, y: y2 - y };
+	
+		// Calculate dot product
+		const dotProduct = vector1.x * vector2.x + vector1.y * vector2.y;
+	
+		// Calculate magnitudes
+		const magnitude1 = Math.sqrt(vector1.x * vector1.x + vector1.y * vector1.y);
+		const magnitude2 = Math.sqrt(vector2.x * vector2.x + vector2.y * vector2.y);
+	
+		// Check if magnitudes are non-zero to avoid division by zero
+		if (magnitude1 === 0 || magnitude2 === 0) {
+			return NaN; // Angle is undefined if either vector has zero length
+		}
+	
+		// Calculate cosine of the angle
+		const cosTheta = dotProduct / (magnitude1 * magnitude2);
+	
+		// Clamp the value of cosTheta to the range [-1, 1] to avoid NaN from Math.acos
+		const clampedCosTheta = Math.max(-1, Math.min(1, cosTheta));
+	
+		// Calculate angle in radians
+		let angleRad = Math.acos(clampedCosTheta);
+	
+		// Convert angle from radians to degrees
+		let angleDeg = angleRad * (180 / Math.PI);
+	
+		return angleDeg;
+	}
+
+
+	static 	detectInletLength (contourCommand, nearestSegment, endPoint, contourType) {
+		return 6
+		if (contourType === 'outer') return 6// VALUES.defaultInletLenght
+		//console.log (JSON.stringify(arguments))
+		const commandType = nearestSegment[0]
+		let contourOnSheet =document.querySelector(".selectedContour").getBBox()
+		let maxLength = contourOnSheet.width+ contourOnSheet.height
+
+            let centers, x1, y1;              
+			let ballsCutter = []
+            switch (commandType) {       
+                
+                case 'L':
+                    x1=nearestSegment[1]
+                    y1=nearestSegment[2]
+                    ballsCutter = this.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, maxLength)
+					
+                break;
+
+                case 'A':
+                    const rx = parseFloat(nearestSegment[1]);
+                    const ry = parseFloat(nearestSegment[2]);
+                    const flag1 = parseFloat(nearestSegment[3]);
+                    const flag2 = parseFloat(nearestSegment[4]);
+                    const flag3 = parseFloat(nearestSegment[5]);
+                    const EX = parseFloat(nearestSegment[6]);
+                    const EY = parseFloat(nearestSegment[7]);
+                    let CX= contourCommand[0][1]
+                    let CY= contourCommand[0][2]
+                    for (let i = 1; i < contourCommand.length; i++) {
+                        let seg = contourCommand[i];
+                        if ( this.arraysAreEqual(seg, nearestSegment)) {
+                            if (contourCommand[i - 1] && contourCommand[i - 1][0] === 'A') {
+                                CX = contourCommand[i - 1][6];
+                                CY = contourCommand[i - 1][7];
+                            } else if (contourCommand[i - 1] && contourCommand[i - 1][0] === 'L') {
+                                CX = contourCommand[i - 1][1];
+                                CY = contourCommand[i - 1][2];
+                            }
+                        }
+                    }          
+                    centers = this.svgArcToCenterParam (CX, CY, rx, ry, flag1, flag2, flag3, EX, EY, true) 
+                    ballsCutter.push( this.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, maxLength ))
+                    ballsCutter.push( this.findPointWithSameDirection(centers.x, centers.y, endPoint.x, endPoint.y, maxLength )) 
+                break;
+             } 
+
+		//console.log (ballsCutter)
+		let contourPoints=this.pathToPolyline( contourCommand.join(" ").replaceAll(',', ' '), 1).split(';').map ( a => a.split(',').map( aa => Number(aa)));
+		let x =  ballsCutter[0].x
+		let xx = ballsCutter[1].x
+		let y =  ballsCutter[0].y
+		let yy = ballsCutter[1].y
+		let intersections=[]
+		let minLenght=maxLength;
+
+		for (let ind = 1; ind < contourPoints.length-2; ind++) {
+			let cx =  contourPoints[ind][0]
+			let cxx = contourPoints[ind+1][0]
+			let cy =  contourPoints[ind][1]
+			let cyy = contourPoints[ind+1][1]
+
+			let intersection = this.intersects ([{x:cx,y:cy},{x:cxx,y:cyy}],[{x:x,y:y},{x:xx,y:yy}])
+			if (intersection) {
+				let dist = this.distance(intersection, endPoint)
+				if (Math.round(dist) > 0 && Math.round(dist) < minLenght) {
+					minLenght=Math.round(dist)
+				}				
+			}	
+		}
+		//console.log (minLenght)
+		if (minLenght-2 > 6 /*VALUES.defaultInletLenght*/) {
+			return 6//VALUES.defaultInletLenght	
+		}
+		return minLenght*0.5
+	}
+
+	static findPointWithSameDirection(x, y, x1, y1, L) {
+		// Вычисляем вектор направления отрезка
+		let directionVector = { x: x1 - x, y: y1 - y };
+	
+		// Находим длину вектора направления
+		let length = Math.sqrt(directionVector.x * directionVector.x + directionVector.y * directionVector.y);
+	
+		// Нормализуем вектор направления
+		let normalizedDirection = { x: directionVector.x / length, y: directionVector.y / length };
+	
+		// Вычисляем координаты точки на расстоянии L в направлении вектора
+		let pointX = x + normalizedDirection.x * L;
+		let pointY = y + normalizedDirection.y * L;
+	
+		return { x: pointX, y: pointY };
+	}
+
+	static angleBetweenPoints (x1, y1, x2, y2) {
+		const delta_x = x2 - x1;
+		const delta_y = y2 - y1;
+		const angle_AB = Math.atan2(delta_y, delta_x);
+		let angle_degrees_AB = angle_AB * 180 / Math.PI;
+		angle_degrees_AB = (angle_degrees_AB + 360) % 360
+		return angle_degrees_AB
+	}
+
+	static 	findTangentPoints(circleCenterX, circleCenterY, radius, pointX, pointY) {
+		// Расчет расстояния между центром окружности и точкой
+		var distance = Math.sqrt(Math.pow(pointX - circleCenterX, 2) + Math.pow(pointY - circleCenterY, 2));
+		
+		// Если расстояние больше радиуса, то точка находится вне окружности и касательных не существует
+		if (distance < radius) {
+			return null;
+		}
+		
+		// Находим угол между центром окружности и точкой
+		var angle = Math.atan2(pointY - circleCenterY, pointX - circleCenterX);
+		
+		// Находим углы касательных линий с учетом радиуса окружности и расстояния до точки
+		var tangentAngle = Math.acos(radius / distance);
+		
+		// Координаты точек касания касательных линий
+		var tangentPoint1X = circleCenterX + radius * Math.cos(angle + tangentAngle);
+		var tangentPoint1Y = circleCenterY + radius * Math.sin(angle + tangentAngle);
+		var tangentPoint2X = circleCenterX + radius * Math.cos(angle - tangentAngle);
+		var tangentPoint2Y = circleCenterY + radius * Math.sin(angle - tangentAngle);
+		
+		// Возвращаем координаты точек касания
+		return [{x: tangentPoint1X, y: tangentPoint1Y}, {x: tangentPoint2X, y: tangentPoint2Y}];
+	}
+
+
 }
 
 export default Util;

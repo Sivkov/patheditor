@@ -1581,6 +1581,7 @@ g.macro5{
     stroke-dasharray: 2px, 2px;
 }
 
+#operatingContourModeSelect,
 #operatingInletSelect,
 #operatingSelect,
 #piercingSelect{

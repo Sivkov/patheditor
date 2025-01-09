@@ -296,7 +296,7 @@ const ContourPanel = observer(() => {
 				  ><div></div>
 					 
 					  <select
-                        id="operatingInletSelect"
+                        id="operatingContourModeSelect"
                         className="form-select"
                         aria-label="Default select example"
 						value={selectedContourModeType} // Привязка состояния

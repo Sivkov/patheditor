@@ -11,6 +11,7 @@ import Direct from './../../img/Direct.jpg';
 import Straight from './../../img/Straight.jpg';
 import Tangent from './../../img/Tangent.jpg';
 import SVGPathCommander from 'svg-path-commander';
+import inlet from '../../scripts/inlet.js';
 
 
 const InletPanel = observer(() => {
@@ -24,6 +25,28 @@ const InletPanel = observer(() => {
 
 	const [type, setType] = useState(Straight)
 	const [mode, setMode] = useState(null)
+
+	const setNewInlet = (newType) =>{
+		console.log(newType)
+		if (type === newType) return;
+		let contourType = 'inner'
+		let resp = inlet.setInletType (newType, 5, false, 'set', selectedPath, selectedInletPath, contourType)
+		if (resp && resp.newInletPath && resp.newInletPath.length) {
+			svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+			addToLog( 'Set inlet type')
+
+		}
+	}
+
+	const addToLog =(mess)=> {
+		let now = new Date().getTime()
+		logStore.add ({time: now ,action: mess})
+		let data = {
+			id: now,
+			svg: JSON.stringify(svgStore.svgData)
+		}
+		log.save(data)	
+	}
 
 
 	useEffect(() => {
@@ -154,6 +177,7 @@ const InletPanel = observer(() => {
 											id="inletTypeStraight"
 											disabled={mode !== 'set'}
 											checked={type === 'Straight'}
+											onMouseDown={()=>{ setNewInlet('Straight')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeStraight">
 											<div>
@@ -169,7 +193,7 @@ const InletPanel = observer(() => {
 											id="inletTypeDirect"
 											disabled={mode !== 'set'}
 											checked={type === 'Direct'}
-
+											onMouseDown={()=>{ setNewInlet('Direct')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeDirect">
 											<div>
@@ -185,6 +209,8 @@ const InletPanel = observer(() => {
 											id="inletTypeHook"
 											disabled={mode !== 'set'}
 											checked={type === 'Hook'}
+											onMouseDown={()=>{ setNewInlet('Hook')}}
+
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeHook">
 											<div>
@@ -200,6 +226,7 @@ const InletPanel = observer(() => {
 											id="inletTypeTangent"
 											disabled={mode !== 'set'}
 											checked={type === 'Tangent'}
+											onMouseDown={()=>{ setNewInlet('Tangent')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeTangent">
 											<div>

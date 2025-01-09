@@ -36,7 +36,7 @@ class SvgStore {
 		const selected = this.getSelectedElement();
 		if (selected) {
 			if (selected.hasOwnProperty('cid')){
-				return selected.path
+				return selected.cid
 			}
 		}
 		return -1;

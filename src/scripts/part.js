@@ -80,7 +80,7 @@ class Part {
         let svg = []
         //const ncpLines = ncpCode.code
 
-        const ncpLines = CONSTANTS.code2
+        const ncpLines = CONSTANTS.code3
      
         let currentX, currentY
         let path = 'closed'
