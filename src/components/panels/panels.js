@@ -4,6 +4,8 @@ import ToolsPanel from './toolsPanel';
 import ContourPanel from './contourPanel';
 import TecnologyPanel from './tecnologyPanel';
 import PartPanel from './partPanel';
+import InletPanel from './inletPanel';
+import OutletPanel from './outletPanel';
 
 
 const Panels =  () => {
@@ -16,6 +18,8 @@ const Panels =  () => {
 			<ContourPanel />
 			<TecnologyPanel />
 			<PartPanel />
+			<InletPanel />
+			<OutletPanel />
 		</>
 	);
 };

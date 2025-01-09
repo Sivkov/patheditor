@@ -19,8 +19,17 @@ class SvgStore {
 			selectedInletModeType: computed,
 			selectedContourModeType: computed,
 			tecnology: computed,
+			selectedInletPath: computed,
+			selectedOutletPath: computed,
         });
     }
+
+	get selectedInletPath () {
+		let cid = this.selected.cid
+		if (typeof cid === 'number') {
+			return this.getElementByCidAndClass(cid, 'inlet', 'path')	
+		}	
+	}
 
 	
 	get selectedCid () {
