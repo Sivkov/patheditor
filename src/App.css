@@ -7,6 +7,13 @@
   src: url('./fonts/agencyfbcyrillic.ttf');
 }
 
+@font-face {
+  font-family: 'GOST Type A';
+  font-style: normal;
+  font-weight: normal;
+  src: url('./fonts/GOST type A Standard.ttf');
+}
+
 :root {
   --edge:32px;
   --pEdge:8px;
@@ -1769,4 +1776,9 @@ top:var(--hEdge);
   mix-blend-mode: overlay;
   filter: brightness(125%) drop-shadow(4px 4px 4px rgb(255, 255, 255));
   filter: invert(20%) sepia(100%) saturate(9000%) hue-rotate(0deg) brightness(120%) contrast(120%);
+}
+
+
+.popup_input_label  {
+    font-family: 'GOST Type A', serif; /* Заголовки с использованием нового шрифта */
 }
