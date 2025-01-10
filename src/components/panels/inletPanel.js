@@ -12,6 +12,8 @@ import Straight from './../../img/Straight.jpg';
 import Tangent from './../../img/Tangent.jpg';
 import SVGPathCommander from 'svg-path-commander';
 import inlet from '../../scripts/inlet.js';
+import util from '../../utils/util.js';
+
 
 
 const InletPanel = observer(() => {
@@ -25,6 +27,13 @@ const InletPanel = observer(() => {
 
 	const [type, setType] = useState(Straight)
 	const [mode, setMode] = useState(null)
+	const [TangentL, setTangentL] = useState(0);
+	const [TangentR, setTangentR] = useState(0);
+	const [HookL, setHookL] = useState(0);
+	const [HookR, setHookR] = useState(0);
+	const [DirectA, setDirectA] = useState(0);
+	const [DirectL, setDirectL] = useState(0);
+
 
 	const setNewInlet = (newType) =>{
 		console.log(newType)
@@ -34,7 +43,7 @@ const InletPanel = observer(() => {
 		if (resp && resp.newInletPath && resp.newInletPath.length) {
 			svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
 			addToLog( 'Set inlet type')
-
+			setInletParams ()
 		}
 	}
 
@@ -48,10 +57,187 @@ const InletPanel = observer(() => {
 		log.save(data)	
 	}
 
+	const setInletParams = (inletMode) => {
+		if (inletMode === 'Tangent') {
+            let R;
+            let path =  SVGPathCommander.normalizePath(selectedInletPath)
+            path.forEach((seg)=>{
+                if (seg[0] === "A" ) {
+                    R=seg[1]
+                }
+            })
+            setTangentR(R)
+            let L = Math.round(util.arcLength(selectedInletPath)*1000)/1000
+            setTangentL(L)
+        } else if (inletMode === 'Direct') {
+          
+            let A, MX, MY, LX, LY, D, PX, PY;
+            let path =  SVGPathCommander.normalizePath(selectedInletPath)
+            if (path.length) {
+                path.forEach( seg=>{
+                    if ( seg.includes('M')) {
+                        MX=seg[1]
+                        MY=seg[2]
+                    }
+                    if ( seg.includes('L')) {
+                        LX=seg[1]
+                        LY=seg[2]    
+                    }
+                }) 
+            }
+
+            let contour =  SVGPathCommander.normalizePath(selectedPath)
+            contour.forEach((seg, i)=>{
+                if (i<2){
+                    if (seg.includes('M')) {
+                        PX=seg[1]
+                        PY=seg[2]
+                    } else if ( seg.includes('L')) {
+                        PX=seg[1]
+                        PY=seg[2]    
+                    } else if (seg.includes('V')) {
+                        PY=seg[1]
+                     } else if (seg.includes('H')) {
+                        PX=seg[1]
+                    } else if (seg.includes('A')) {
+                        PX=seg[6]
+                        PY=seg[7]
+                    }
+                }
+            })
+
+            A = Math.round(util.calculateAngleVector ( LX, LY, MX, MY, PX, PY)*100)/100
+            D = util.distance( MX, MY, LX, LY )
+
+            if (contour[1][0] === 'A' ) {
+                let nearestSegment = contour[1]
+                const rx = parseFloat(nearestSegment[1]);
+                const ry = parseFloat(nearestSegment[2]);
+                const flag1 = parseFloat(nearestSegment[3]);
+                const flag2 = parseFloat(nearestSegment[4]);
+                const flag3 = parseFloat(nearestSegment[5]);
+                const EX = parseFloat(nearestSegment[6]);
+                const EY = parseFloat(nearestSegment[7]);
+                let C = util.svgArcToCenterParam (LX, LY, rx, ry, flag1, flag2, flag3, EX, EY, true)   
+                let OP = util.rotatePoint(C.x, C.y,  LX, LY,0, 270)
+                A = Math.round(util.calculateAngleVector ( LX, LY, MX, MY, OP.x, OP.y)*100)/100
+                if (rx !== ry) {
+                    console.log( 'rx !=== ry' )
+                }
+            }
+
+            setDirectA(A)
+            setDirectL(D)
+
+        } else if (inletMode === 'Hook') {
+
+            let MX, MY, LX, LY, R, EX, EY, D;
+            let path =  SVGPathCommander.normalizePath(selectedInletPath)
+            if (path.length) {
+                path.forEach( seg=>{
+                    if ( seg.includes('M')) {
+                        MX=seg[1]
+                        MY=seg[2]
+                    }
+                    if ( seg.includes('L')) {
+                        LX=seg[1]
+                        LY=seg[2]    
+                    } else if (seg.includes('V')) {
+                        LY=seg[1]
+                        LX=MX 
+                    } else if (seg.includes('H')) {
+                        LY=MY
+                        LX=seg[1]
+                    } else if (seg.includes('A')){
+                        R=seg[1]
+                        EX=seg[6]
+					    EY=seg[7]
+                    }
+                }) 
+            }
+            D = util.round( util.distance( MX, MY, EX, EY ), 3)
+            setHookR(R)
+            setHookL(D)
+        }
+	} 
+
+	useEffect(()=>{
+		let resp;
+		if (HookR &&  HookL && selectedInletPath) {
+			resp = inlet.inletHookR (HookR, HookL, selectedInletPath)
+			if ( resp ) {
+				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+			}
+		}		
+	},[HookR])
+
+
+	useEffect(()=>{
+		let resp;
+		if (HookR &&  HookL && selectedInletPath) {
+			resp = inlet.inletHookL (HookL, HookR, selectedInletPath)
+			if ( resp ) {
+				if (resp.hasOwnProperty ('updateHook')) {
+					
+					setHookR (resp.updateHook)
+				} else {
+					svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+				} 				
+			}
+		}		
+	},[HookL])
+
+
+	useEffect(()=>{
+		let resp;
+		if (TangentR && TangentL  && selectedInletPath) {
+			resp = inlet.inletTangentR (TangentR, TangentL, selectedInletPath)
+			if ( resp ) {
+				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+			}
+		}		
+	},[TangentR])
+
+
+	useEffect(()=>{
+		let resp;
+		if (TangentR && TangentL  && selectedInletPath) {
+			resp = inlet.inletTangentL (TangentL, selectedInletPath)
+			if ( resp ) {
+				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+			}
+		}		
+	},[TangentL])
+
+
+	useEffect(()=>{
+		let resp;
+		if (DirectL && selectedInletPath) {
+			resp = inlet.inletDirectL (DirectL, selectedInletPath)
+			if ( resp ) {
+				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+			}
+		}		
+	},[DirectL])
+
+/* 	useEffect(()=>{
+		let resp;
+		if (DirectA && selectedInletPath) {
+			resp = inlet.inletDirectA (DirectL, selectedInletPath, selectedPath)
+			if ( resp ) {
+				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+			}
+		}		
+	},[DirectA])
+ */
+
+
+
 
 	useEffect(() => {
 		let inletMode = inlet.detectInletType ( selectedInletPath )
 		setType(inletMode)
+		setInletParams(inletMode)
 	}, [selectedInletPath, selectedCid])
 
 	const panelInfo = [
@@ -257,6 +443,8 @@ const InletPanel = observer(() => {
 																	min="0.1"
 																	id="inletHookR"
 																	step="0.05"
+																	value={HookR}
+																	onChange={(e) => setHookR(parseFloat(e.target.value))}
 																/>
 															</div>
 															<div className="ml-2">
@@ -269,13 +457,15 @@ const InletPanel = observer(() => {
 															<div className='popup_input_label'>d</div>
 														</div>
 															<div>
-																<input
-																	className="popup_input mx-2"
-																	type="number"
-																	min="0.1"
-																	id="inletHookL"
-																	step="0.1"
-																/>
+															<input
+																className="popup_input mx-2"
+																type="number"
+																min="0.1"
+																id="inletHookL"
+																step="0.1"
+																value={HookL}
+																onChange={(e) => setHookL(parseFloat(e.target.value))}
+															/>
 															</div>
 															<div className="ml-2">
 																<div className='popup_input_label'>mm</div>
@@ -298,6 +488,8 @@ const InletPanel = observer(() => {
 																		min="0.1"
 																		id="inletDirectL"
 																		step="0.5"
+																		onChange={(e) => setDirectL(parseFloat(e.target.value))}
+																		value={DirectL}
 																	/>
 																</div>
 																<div className="ml-2">
@@ -317,6 +509,8 @@ const InletPanel = observer(() => {
 																	step={1}
 																	min={0}
 																	/* max={180} */
+																	onChange={(e) => setDirectA(parseFloat(e.target.value))}
+																	value={DirectA}
 																/>
 																</div>
 																<div className="ml-2">
@@ -337,7 +531,9 @@ const InletPanel = observer(() => {
 																		type="number"
 																		min={0.1}
 																		id="inletTangentR"
-																		step={0.05}
+																		step={0.1}
+																		onChange={(e) => setTangentR(parseFloat(e.target.value))}
+																		value={TangentR}
 																	/>
 																</div>
 																<div className="ml-2">
@@ -355,7 +551,9 @@ const InletPanel = observer(() => {
 																		type="number"
 																		min={0.1}
 																		id="inletTangentL"
-																		step={0.05}
+																		step={0.5}
+																		onChange={(e) => setTangentL(parseFloat(e.target.value))}
+																		value={TangentL}
 																	/>
 																</div>
 																<div className="ml-2">

@@ -23,76 +23,6 @@ class Inlet {
         return pointIndex               
     }
 
-    inletTangentR (radius) {
-		if (  inlet.inletModeEdit !=='inletModeEdit') return;
-        console.log ("inletTangentR")
-        let x1, y1, x2, y2 ,flag1, flag2, flag3, rO;
-        let arcLength = +document.querySelector("#inletTangentL").value
-
-        if (radius <= 0 || arcLength <= 0 || 2*Math.PI*radius < arcLength ) {
-            throw Error ("radius it too small")
-            return
-        }
-
-        let pathArc  = SVGPathCommander.normalizePath (this.inletPath)
-        if (pathArc.length) {
-			pathArc.forEach( seg=>{
-				if ( seg.includes('A')) {
-                    flag1=seg[3]
-                    flag2=seg[4]
-                    flag3=seg[5]
-				 	x2=seg[6]
-					y2=seg[7]
-                    rO=seg[1]
-
-				}
-				if ( seg.includes('M')) {
-					x1=seg[1]
-					y1=seg[2]
-				}
-			}) 
-		}
-
-        if ( x1 === x2 && y1===y2 ) return;
-        var centers = util.svgArcToCenterParam (x1, y1, rO, rO, flag1, flag2, flag3, x2, y2, true) 
-        var newCenters =  util.getNewEndPoint(centers.x, centers.y, x2, y2, radius)
-        let endPoint = util.calculateEndPoint( newCenters.x, newCenters.y, radius, x2, y2, arcLength, flag3);
-
-        if ( pathArc.length && pathArc[1].includes("A") ) {
-            pathArc[1][1]=radius
-            pathArc[1][2]=radius
-        }
-
-        if ( pathArc.length && pathArc[0].includes("M") ) {
-            pathArc[0][1]=endPoint.x
-            pathArc[0][2]=endPoint.y   
-        }
-
-       if ( Math.abs(arcLength) > Math.PI*radius) {
-            pathArc[1][4]=1
-        } else {
-            pathArc[1][4]=0 
-        }
-
-        this.inletPath = pathArc.toString().replaceAll(',', ' ')
-        let maxArcLength =Math.PI*radius*2
-
-        if ( arcLength > maxArcLength ) {
-             console.log ("Error detected  " + (maxArcLength - arcLength))
-        }
-
-        let resp ={}
-        resp.newInleType = "Tangent"
-		resp.oldInletType = "Tangent"
-		resp.oldInletPath =  document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`).getAttribute('d')
-		resp.newInletPath = pathArc.toString().replaceAll(',', ' ')
-        resp.contourType = document.querySelector(`.contour[data-cid="${this.dataCid}"]`).classList.contains('inner') ? "inner" : "outer"
-		resp.action = 'change'
-        resp.element=document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`)
-        console.log ('inletTangentR')
-        this.updateInletAndOutlet (resp, false)       
-    }
-
     detectInletType (selectedInletPath) {
         let inletMode = 'Straight'
 		if (selectedInletPath) {
@@ -116,11 +46,75 @@ class Inlet {
         return inletMode
     }
 
-    inletTangentL (arcLength) {
-		if (  inlet.inletModeEdit !=='inletModeEdit') return;
-        console.log ("inletTangentL")
+    inletTangentR (radius, arcLength, inletPath) {
+        console.log ("inletTangentR")
+        let x1, y1, x2, y2 ,flag1, flag2, flag3, rO;
+ 
+        if (radius <= 0 || arcLength <= 0 || 2*Math.PI*radius < arcLength ) {
+            //throw Error ("radius it too small")
+            return false
+        }
+
+        let pathArc  = SVGPathCommander.normalizePath (inletPath)
+        if (pathArc.length) {
+			pathArc.forEach( seg=>{
+				if ( seg.includes('A')) {
+                    flag1=seg[3]
+                    flag2=seg[4]
+                    flag3=seg[5]
+				 	x2=seg[6]
+					y2=seg[7]
+                    rO=seg[1]
+
+				}
+				if ( seg.includes('M')) {
+					x1=seg[1]
+					y1=seg[2]
+				}
+			}) 
+		}
+
+        if ( x1 === x2 && y1===y2 ) return false;
+        var centers = util.svgArcToCenterParam (x1, y1, rO, rO, flag1, flag2, flag3, x2, y2, true) 
+        if (!centers) return false
+        var newCenters =  util.getNewEndPoint(centers.x, centers.y, x2, y2, radius)
+        let endPoint = util.calculateEndPoint( newCenters.x, newCenters.y, radius, x2, y2, arcLength, flag3);
+
+        if ( pathArc.length && pathArc[1].includes("A") ) {
+            pathArc[1][1]=radius
+            pathArc[1][2]=radius
+        }
+
+        if ( pathArc.length && pathArc[0].includes("M") ) {
+            pathArc[0][1]=endPoint.x
+            pathArc[0][2]=endPoint.y   
+        }
+
+       if ( Math.abs(arcLength) > Math.PI*radius) {
+            pathArc[1][4]=1
+        } else {
+            pathArc[1][4]=0 
+        }
+
+        inletPath = pathArc.toString().replaceAll(',', ' ')
+        let maxArcLength =Math.PI*radius*2
+
+        if ( arcLength > maxArcLength ) {
+             return false
+        }
+
+        let resp ={}
+        resp.newInleType = "Tangent"
+		resp.oldInletType = "Tangent"
+		resp.newInletPath = pathArc.toString().replaceAll(',', ' ')
+		resp.action = 'change'
+        return resp
+    }
+
+    inletTangentL (arcLength, inletPath) {
+        console.log ("inletTangentL"+ arcLength)
         let radius, x1, y1, x2, y2 ,flag1, flag2, flag3;
-		let pathArc  = SVGPathCommander.normalizePath (this.inletPath)
+		let pathArc  = SVGPathCommander.normalizePath (inletPath)
 		if (pathArc.length) {
 			pathArc.forEach( seg=>{
 				if ( seg.includes('A')) {
@@ -138,16 +132,14 @@ class Inlet {
 			}) 
 		}
 
-        if (radius <= 0 || arcLength <= 0 || arcLength > 2*Math.PI*radius ) {
-            throw Error ("length it too big")
-            return
-        }
-        //if (flag3 === 1 ) arcLength=-arcLength
-        if (x1 === x2 && y1===y2) return;
-        var centers =	util.svgArcToCenterParam(x1, y1, radius, radius, flag1, flag2, flag3, x2, y2, true) 
-        let endPoint = util.calculateEndPoint(centers.x, centers.y, radius, x2, y2, arcLength, flag3);
+        if (radius <= 0 || arcLength <= 0  || arcLength > 2*Math.PI*radius ) {
+            return false
+        } 
 
-        //console.log ( endPoint )
+        if (x1 === x2 && y1===y2) return false;
+        var centers = util.svgArcToCenterParam(x1, y1, radius, radius, flag1, flag2, flag3, x2, y2, true) 
+        if (centers) return false;
+        let endPoint = util.calculateEndPoint(centers.x, centers.y, radius, x2, y2, arcLength, flag3);
 
         if ( pathArc.length && pathArc[0].includes("M") ) {
             pathArc[0][1]=endPoint.x
@@ -158,31 +150,19 @@ class Inlet {
         } else {
             pathArc[1][4]=0 
         }
-
-        /* this.inletPath = pathArc.toString()
-        document.querySelector("#inletPath").innerHTML = this.inletPath
-        document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`).setAttribute('d', this.inletPath ) */
-
         let resp ={}
         resp.newInleType = "Tangent"
 		resp.oldInletType = "Tangent"
-		resp.oldInletPath =   document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`).getAttribute('d')
+        resp.action = 'change'
 		resp.newInletPath = pathArc.toString().replaceAll(',', ' ')
-        resp.contourType = document.querySelector(`.contour[data-cid="${this.dataCid}"]`).classList.contains('inner') ? "inner" : "outer"
-		resp.action = 'change'
-        resp.element=document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`)
-        console.log ('inletTangentL')
-        this.updateInletAndOutlet (resp, false)
+		return resp
     }
 
-    inletDirectA(newAxis) {
-		if (  inlet.inletModeEdit !=='inletModeEdit') return;
-        if (newAxis < 0 || newAxis > 180 ) return;
-        let contourElement= document.querySelector(`.contour[data-cid="${inlet.dataCid}"] path`)
-        let contourPath = contourElement.getAttribute('d')
+    inletDirectA(newAxis, inletPath, contourPath, outerInner='inner') {
 
+        if (newAxis < 0 || newAxis > 180 ) return false;
         let MX, MY, LX, LY, PX, PY;
-        let path =  SVGPathCommander.normalizePath(this.inletPath)
+        let path =  SVGPathCommander.normalizePath(inletPath)
         if (path.length) {
             path.forEach( seg=>{
                 if ( seg.includes('M')) {
@@ -241,34 +221,27 @@ class Inlet {
         }
         let pathDirection = Number(SVGPathCommander.getDrawDirection(contour))
         console.log (newAxis,oldAxis)
-        let outerInner = document.querySelector(`.contour[data-cid="${this.dataCid}"]`).classList.contains('inner') ? "inner" : "outer"
         if (pathDirection === 1 && outerInner === 'outer'){
              newAxis=180-newAxis
              oldAxis=180-oldAxis
         }
         
         let newEndPoint= util.rotatePoint(MX, MY, LX, LY, oldAxis, newAxis)
-        if (inlet.inletPath.includes("NaN")) {
-            return
+        if (inletPath.includes("NaN")) {
+            return false
         }
 
         let resp ={}
         resp.newInleType = "Direct"
 		resp.oldInletType = "Direct"
-		resp.oldInletPath =   document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`).getAttribute('d')
-		resp.newInletPath = `M${newEndPoint.x} ${newEndPoint.y} L${LX} ${LY}`
-        resp.contourType = document.querySelector(`.contour[data-cid="${this.dataCid}"]`).classList.contains('inner') ? "inner" : "outer"
-		resp.action = 'change'
-        resp.element=document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`)
-        console.log ('inletDirectA')
-        this.updateInletAndOutlet (resp, false)
+ 		resp.newInletPath = `M${newEndPoint.x} ${newEndPoint.y} L${LX} ${LY}`
+ 		return resp
     }
 
-    inletDirectL(D) {
-		if (  inlet.inletModeEdit !=='inletModeEdit') return;
+    inletDirectL(D, inletPath) {
         console.log (D)
         let MX, MY, LX, LY;
-        let path =  SVGPathCommander.normalizePath(this.inletPath)
+        let path =  SVGPathCommander.normalizePath(inletPath)
         if (path.length) {
             path.forEach( seg=>{
                 if ( seg.includes('M')) {
@@ -298,32 +271,18 @@ class Inlet {
         let resp ={}
         resp.newInleType = "Direct"
 		resp.oldInletType = "Direct"
-		resp.oldInletPath =   document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`).getAttribute('d')
-		resp.newInletPath = path.toString().replaceAll(',', ' ')
-        resp.contourType = document.querySelector(`.contour[data-cid="${this.dataCid}"]`).classList.contains('inner') ? "inner" : "outer"
-		resp.action = 'change'
-        resp.element=document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`)
-        console.log ('inletDirectL')
-        this.updateInletAndOutlet (resp, false)
+ 		resp.newInletPath = path.toString().replaceAll(',', ' ')
+ 		resp.action = 'change'
+        return resp
  
     }
 
-    inletHookL (D) {
-		if (  inlet.inletModeEdit !=='inletModeEdit') return;
-        let radius = +document.querySelector("#inletHookR").value
-        console.log (D, radius)
-        if (D <= 0  ) {
-            document.querySelector("#inletHookL").value = radius*2
-            throw Error ("Impossible length")
-            return
+    inletHookL (D, radius, inletPath) {
+        if (D <= 0  || D * 0.5 < radius ) {
+            return false
         }
-        if ( D * 0.5 < radius ) {
-            document.querySelector("#inletHookL").value = radius*2
-            return
-        }
-
         let MX, MY, LX, LY, EX, EY;
-        let path =  SVGPathCommander.normalizePath(this.inletPath)
+        let path =  SVGPathCommander.normalizePath( inletPath)
         if (path.length) {
             path.forEach( seg=>{
                 if ( seg.includes('M')) {
@@ -357,22 +316,15 @@ class Inlet {
         let resp ={}
         resp.newInleType = "Hook"
 		resp.oldInletType = "Hook"
-		resp.oldInletPath =   document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`).getAttribute('d')
-		resp.newInletPath = path.toString().replaceAll(',', ' ')
-        resp.contourType = document.querySelector(`.contour[data-cid="${this.dataCid}"]`).classList.contains('inner') ? "inner" : "outer"
-		resp.action = 'change'
-        resp.element=document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`)
-        this.updateInletAndOutlet (resp, false)
-        console.log ('inletHookL')        
-        this.inletHookR( +document.querySelector("#inletHookR").value) 
+ 		resp.newInletPath = path.toString().replaceAll(',', ' ')
+ 		resp.action = 'change'
+        return resp
     }
 
-    inletHookR (radius) {
-		if (  inlet.inletModeEdit !=='inletModeEdit') return;
-        console.log (radius)
+    inletHookR (radius, inletLength, inletPath) {
+		console.log ('inletHookR', arguments)
         let MX, MY, LX, LY, R, EX, EY, flag1, flag2, flag3;
-        let path =  SVGPathCommander.normalizePath(this.inletPath)
-        let inletLength = +document.querySelector("#inletHookL").value
+        let path =  SVGPathCommander.normalizePath(inletPath)
         if (path.length) {
             path.forEach( seg=>{
                 if ( seg.includes('M')) {
@@ -399,20 +351,17 @@ class Inlet {
             }) 
         }
 
-        if (radius <= 0  ) {
-            document.querySelector("#inletHookR").value = inletLength*0.5
-            throw Error ("radius it too small " + radius)
-            return
-        }
-
-        if ( radius > inletLength*0.5 ) {
-            document.querySelector("#inletHookR").value = inletLength*0.5
-            return
+        if (radius <= 0 ) {
+            return false
         }
         
+        if ( radius > inletLength*0.5 ) {
+            return {'updateHook': inletLength*0.5}
+        }
+       
         let centers = util.svgArcToCenterParam (LX, LY, R, R, flag1, flag2, flag3, EX, EY, true) 
         let newCenters =  util.getNewEndPoint(centers.x, centers.y, EX, EY, radius)
-        let c = util.dist (newCenters.x,newCenters.y, MX, MY)
+        let c = util.distance (newCenters.x,newCenters.y, MX, MY)
 		let b = radius
 		let a = Math.sqrt((c**2) - (b**2) )
 		let theta = Math.PI - Math.atan(a/b)
@@ -420,7 +369,7 @@ class Inlet {
         let endPoint = util.calculateEndPoint( newCenters.x, newCenters.y, radius, EX, EY, arcLength, flag3);
 
         if ( radius > inletLength*0.5 ) {
-            return
+            return false
         }
 
         if ( path.length && path[1].includes("L") ) {
@@ -435,13 +384,10 @@ class Inlet {
         let resp ={}
         resp.newInleType = "Hook"
 		resp.oldInletType = "Hook"
-		resp.oldInletPath =   document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`).getAttribute('d')
-		resp.newInletPath = path.toString().replaceAll(',', ' ')
-        resp.contourType = document.querySelector(`.contour[data-cid="${this.dataCid}"]`).classList.contains('inner') ? "inner" : "outer"
-		resp.action = 'change'
-        resp.element=document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`)
-        console.log ('inletHookR')        
-        this.updateInletAndOutlet (resp, false)
+ 		resp.newInletPath = path.toString().replaceAll(',', ' ')
+ 		resp.action = 'change'
+       
+        return resp
     }
 
     detectCommandContainingPoint(pathString, point, threshold) {
@@ -459,7 +405,7 @@ class Inlet {
                 case 'M':
                     const mx = parseFloat(command[1]);
                     const my = parseFloat(command[2]);
-                    if ( util.dist (point.x, point.y, mx, my) <= threshold ) {
+                    if ( util.distance (point.x, point.y, mx, my) <= threshold ) {
                         return {command, index, pathCommands};
                     }
                     currentX = mx;
@@ -1760,8 +1706,8 @@ class Inlet {
         let x1, y1, x2, y2 ,flag1, flag2, flag3, rO;
         let arcLength = util.arcLength(inlet.outletPath)
         if (radius <= 0 || arcLength <= 0 || 2*Math.PI*radius < arcLength ) {
-            throw Error ("radius it too small")
-            return
+            //throw Error ("radius it too small")
+            return false
         }
 
         let pathArc  = SVGPathCommander.normalizePath( this.outletPath )
@@ -1924,7 +1870,7 @@ class Inlet {
         let centers = util.svgArcToCenterParam (MX, MY, R, R, flag1, flag2, flag3, EX, EY, true) 
         let newCenters =  util.findPointWithSameDirection (MX, MY, centers.x, centers.y, radius) 
 
-        let c = util.dist (newCenters.x,newCenters.y, LX, LY)
+        let c = util.distance (newCenters.x,newCenters.y, LX, LY)
 		let b = radius
 		let a = Math.sqrt((c**2) - (b**2) )
 		let theta = Math.PI*2 -(Math.PI - Math.atan(a/b))

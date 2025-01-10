@@ -1,5 +1,6 @@
 import svgPath from "svgpath";
 import SVGPathCommander from "svg-path-commander";
+import inlet from "../scripts/inlet";
 
 class Util {
 	static radian(ux, uy, vx, vy) {
@@ -12,11 +13,29 @@ class Util {
 		return rad;
 	}
 
-	static distance(point1, point2) {
-		const dx = point1.x - point2.x;
-		const dy = point1.y - point2.y;
-		return Math.sqrt(dx * dx + dy * dy);
-	}
+	static distance(arg1, arg2, arg3 = null, arg4 = null) {
+        let x1, y1, x2, y2;
+
+        if (arg2 !== null && arg3 === null && arg4 === null) {
+            // Если переданы два объекта с координатами
+            x1 = arg1.x;
+            y1 = arg1.y;
+            x2 = arg2.x;
+            y2 = arg2.y;
+        } else if (arg2 !== null && arg3 !== null && arg4 !== null) {
+            // Если переданы четыре отдельных числа
+            x1 = arg1;
+            y1 = arg2;
+            x2 = arg3;
+            y2 = arg4;
+        } else {
+            throw new Error("Invalid arguments. Use either two points as objects or four numbers.");
+        }
+
+        const dx = x1 - x2;
+        const dy = y1 - y2;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
 
 	static convertScreenCoordsToSvgCoords(x, y) {
 		var svg = document.getElementById("svg")
@@ -358,6 +377,7 @@ class Util {
 			ry = -ry;
 		}
 		if (rx == 0.0 || ry == 0.0) { // invalid arguments
+			return false
 			throw Error('rx and ry can not be 0');
 		}
 
@@ -388,6 +408,7 @@ class Util {
 		var ryx1_ = ry * x1_;
 		var sum_of_sq = rxy1_ * rxy1_ + ryx1_ * ryx1_; // sum of square
 		if (!sum_of_sq) {
+			return false
 			throw Error('start point can not be same as end point');
 		}
 		var coe = Math.sqrt(Math.abs((rxry * rxry - sum_of_sq) / sum_of_sq));
@@ -566,7 +587,6 @@ class Util {
 		return angleDeg;
 	}
 
-
 	static 	detectInletLength (contourCommand, nearestSegment, endPoint, contourType) {
 		return 6
 		if (contourType === 'outer') return 6// VALUES.defaultInletLenght
@@ -695,6 +715,101 @@ class Util {
 		return [{x: tangentPoint1X, y: tangentPoint1Y}, {x: tangentPoint2X, y: tangentPoint2Y}];
 	}
 
+	static arcLength (svgArc) {
+
+		let radius, x1, y1, x2, y2, flag1, flag2, flag3;
+		let pathArc  = SVGPathCommander.normalizePath (svgArc)
+		if (pathArc.length) {
+			pathArc.forEach( seg=>{
+				if ( seg.includes('A')) {
+					radius=seg[1]
+					x2=seg[6]
+					y2=seg[7]
+					flag1=seg[3]
+                    flag2=seg[4]
+                    flag3=seg[5]
+				}
+				if ( seg.includes('M')) {
+					x1=seg[1]
+					y1=seg[2]
+				}
+
+				if ( seg.includes('L')) {
+					x1=seg[1]
+					y1=seg[2]
+				}
+			}) 
+		}
+ 	
+	 	const chordLength = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+		const theta = 2 * Math.asin(Math.round( (chordLength / (2 * radius)) * 10**5) /10**5);
+		inlet.theta = theta
+		let arcLength = radius * theta;
+		if (flag2 === 1 ) arcLength = 2*radius*Math.PI - arcLength
+		return +arcLength;
+	}
+
+	static rotatePoint(MX, MY, LX, LY, oldAxis, newAxis) {
+		// Step 1: Find the difference between the new and old axes
+		const angleDifference = newAxis - oldAxis;
+	
+		// Step 2: Convert the difference to radians
+		const angleRadians = angleDifference * (Math.PI / 180);
+	
+		// Step 3: Find the coordinates of the vector from LX, LY to MX, MY
+		const dx = MX - LX;
+		const dy = MY - LY;
+	
+		// Step 4: Rotate the vector
+		const newX = LX + dx * Math.cos(angleRadians) - dy * Math.sin(angleRadians);
+		const newY = LY + dx * Math.sin(angleRadians) + dy * Math.cos(angleRadians);
+	
+		// Return the new coordinates of the point
+		return { x:newX, y:newY };
+	}
+
+	static 	getNewEndPoint(MX, MY, LX, LY, newLength) {
+		// Step 1: Calculate the vector of the line segment
+		const dx = LX - MX;
+		const dy = LY - MY;
+		const originalLength = Math.sqrt(dx ** 2 + dy ** 2);
+	
+		// Step 2: Normalize the direction of the original segment
+  
+		// Step 3: Scale the normalized direction by the new length
+		const newEndPointX = LX - dx * newLength/originalLength;
+		const newEndPointY = LY - dy * newLength/originalLength;
+	
+		// Step 4: Return the coordinates of the new end point
+		return { x: newEndPointX, y: newEndPointY };
+	}
+
+	static 	calculateEndPoint(centerX, centerY, radius, startX, startY, arcLength, flag3) {
+		// Step 1: Calculate the initial angle of the arc
+		let endX, endY;
+		const startAngle = Math.atan2(startY - centerY, startX - centerX);
+	
+		// Step 2: Calculate the angular distance based on arc length and radius
+		//const angularDistance = arcLength / radius;
+		const angularDistance = arcLength / radius;
+	
+		if (flag3 === 0) {
+			// Step 3: Calculate the angle of the end point
+			const endAngle = startAngle + angularDistance;
+		
+			// Step 4: Calculate the coordinates of the end point
+			endX = centerX + radius * Math.cos(endAngle);
+			endY = centerY + radius * Math.sin(endAngle);
+		} else {
+			// Step 3: Calculate the angle of the end point (counter-clockwise)
+			const endAngle = startAngle - angularDistance; // Subtract angular distance for counter-clockwise direction
+			// Step 4: Calculate the coordinates of the end point
+			endX = centerX + radius * Math.cos(endAngle);
+			endY = centerY + radius * Math.sin(endAngle);
+		}
+		// Return the coordinates of the end point
+		return { x: endX, y: endY };
+	}	
 
 }
 
