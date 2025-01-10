@@ -2,15 +2,16 @@ import util from '../utils/util';
 import SVGPathCommander from 'svg-path-commander';
 import part from "./part";
 import arc from './arc';
+import { pointInSvgPath } from 'point-in-svg-path';
 
 class Inlet {
     constructor () {
         this.inletInMove = false
         this.inletType = false
-        this.inletAngle =  false
+        this.inletAngle = false
     }
 
-    pointIndex (x,y, x1,y1, fx ,fy) {
+    pointIndex (x, y, x1, y1, fx, fy) {
         let pointIndex
         let d1 = util.distance( {x:x, y: y}, {x:fx, y:fy})
         let d2 = util.distance( {x:x1, y:y1}, {x:fx, y:fy})     
@@ -20,37 +21,6 @@ class Inlet {
             pointIndex=1   
         }
         return pointIndex               
-    }
-
-    show () {
-        let el =document.querySelector('.selectedContour')
-        if (!el) return;
-        this.dataCid = +el.dataset.cid
-        this.inlet = document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`)
-        this.outlet = document.querySelector(`.outlet[data-cid="${this.dataCid}"] path`)
-        if ( this.inlet && this.inlet.hasAttribute('d')) {
-            this.inletPath = this.inlet.getAttribute('d')
-            //console.log (this.inletPath)
-        }   else {
-            this.inletPath = ''
-        } 
-        if ( this.outlet && this.outlet.hasAttribute('d')) {
-            this.outletPath = this.outlet.getAttribute('d')
-         }   else {
-            this.outletPath = ''
-        } 
-
-        this.inletType = this.detectInletType ()  
-        this.outletType = this.detectOutletType (this.outletPath, this.dataCid )             
-        if (this.inletType) {
-            this.updateInletPanel(this.inletType)
-        }
-        if (this.outletType) {
-            this.updateOutletPanel(this.outletType)
-        }       
-    }
-
-    detectNoInletOutlet () {        
     }
 
     inletTangentR (radius) {
@@ -108,9 +78,7 @@ class Inlet {
         let maxArcLength =Math.PI*radius*2
 
         if ( arcLength > maxArcLength ) {
-            //$('#inletTangentL').val(maxArcLength);
-            //$('#inletTangentL').trigger('change');
-            console.log ("Error detected  " + (maxArcLength - arcLength))
+             console.log ("Error detected  " + (maxArcLength - arcLength))
         }
 
         let resp ={}
@@ -207,7 +175,7 @@ class Inlet {
         this.updateInletAndOutlet (resp, false)
     }
 
-    inletDirectA(newAxis ) {
+    inletDirectA(newAxis) {
 		if (  inlet.inletModeEdit !=='inletModeEdit') return;
         if (newAxis < 0 || newAxis > 180 ) return;
         let contourElement= document.querySelector(`.contour[data-cid="${inlet.dataCid}"] path`)
@@ -399,7 +367,7 @@ class Inlet {
         this.inletHookR( +document.querySelector("#inletHookR").value) 
     }
 
-    inletHookR ( radius ) {
+    inletHookR (radius) {
 		if (  inlet.inletModeEdit !=='inletModeEdit') return;
         console.log (radius)
         let MX, MY, LX, LY, R, EX, EY, flag1, flag2, flag3;
@@ -593,7 +561,7 @@ class Inlet {
         return null; 
     }
 
-	detectPreviousPoint(segments, currentIndex) {
+    detectPreviousPoint(segments, currentIndex) {
 		let currentX = 0;
 		let currentY = 0;
 		let index = 0
@@ -866,7 +834,10 @@ class Inlet {
                     y1=nearestSegment[2]
                     let perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, IL)
                     checkPoint =util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1)
-                    var pointIn = true //true // util.pointInSvgPath(contour , checkPoint[0].x, checkPoint[0].y)
+                    var pointIn = pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
+                    console.log ('pointIn' + pointIn)
+                    console.log (contour , checkPoint[0].x, checkPoint[0].y)
+
                     if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                         pointIndex=0
                     } else {
@@ -905,7 +876,12 @@ class Inlet {
                         let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
                         let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
                         let startPoint 
-                        pointIn = true //true // util.pointInSvgPath(contour , perpPoint.point1.x, perpPoint.point1.y)
+                        pointIn = pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
+
+
+                        console.log ('pointIn' + pointIn)
+                        console.log (contour , checkPoint[0].x, checkPoint[0].y)
+
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             startPoint = perpPoint.point1
                         }  else {
@@ -952,7 +928,13 @@ class Inlet {
                     } else {
                         centers = util.svgArcToCenterParam (CX, CY, rx, ry, flag1, flag2, flag3, EX, EY, true) 
                         let inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, 1)
-                        var pointIn = true //true // util.pointInSvgPath(contour , (inletPoint.x), (inletPoint.y))                    
+                        var pointIn = pointInSvgPath(contourPath , (inletPoint.x), (inletPoint.y))    
+                        
+                        
+                        console.log ('pointIn' + pointIn)
+                        console.log (contour , (inletPoint.x), (inletPoint.y))
+
+
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, IL)
                         } else {
@@ -1014,7 +996,7 @@ class Inlet {
                     let y1=nearestSegment[2]
                     let perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, r*2) 
                     checkPoint=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1) 
-                    pointIn = true //true // util.pointInSvgPath(contour , (checkPoint[0].x), (checkPoint[0].y))
+                    pointIn = pointInSvgPath(contourPath , (checkPoint[0].x), (checkPoint[0].y))
                     if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                         pointIndex=0
                     } else {
@@ -1040,7 +1022,7 @@ class Inlet {
                         centers={}
                         perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, r)
                         checkPoint = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1) 
-                        pointIn = true//true // util.pointInSvgPath(contour , checkPoint[0].x, checkPoint[0].y)
+                        pointIn = pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             centers.x=perpendicular[0].x
                             centers.y=perpendicular[0].y    
@@ -1070,7 +1052,7 @@ class Inlet {
                         let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
                         let perpPoint = util.getPerpendicularCoordinates(arcParams, r);
                         let startPoint 
-                        pointIn = true // util.pointInSvgPath(contour , perpPoint.point1.x, perpPoint.point1.y)
+                        pointIn = pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             startPoint = perpPoint.point1
                         }  else {
@@ -1097,7 +1079,7 @@ class Inlet {
     
                             inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, radius)
                             checkPoint = util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, 1)
-                            var pointIn = true // util.pointInSvgPath(contour , checkPoint.x, checkPoint.y)
+                            var pointIn = pointInSvgPath(contourPath , checkPoint.x, checkPoint.y)
                             if (Math.abs(arcLength) > Math.PI*radius) {
                                 flag2=1
                             } else {
@@ -1144,7 +1126,7 @@ class Inlet {
                     let y1=nearestSegment[2]
                     perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, IL) 
                     checkPoint = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1) 
-                    pointIn = true // util.pointInSvgPath(contour , checkPoint[0].x, checkPoint[0].y)
+                    pointIn = pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
 
                     if ( endPoint.x===x1 && endPoint.y=== y1) {
                         return
@@ -1197,7 +1179,7 @@ class Inlet {
                         let centers= util.svgArcToCenterParam ( CX, CY, rx, ry, flag1, flag2, flag3, EX, EY, true)
                         let inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, 1)
                         let startPoint 
-                        var pointIn = true // util.pointInSvgPath(contour , (inletPoint.x), (inletPoint.y))                    
+                        var pointIn = pointInSvgPath(contourPath , (inletPoint.x), (inletPoint.y))                    
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             startPoint = util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, IL)
                         }  else {
@@ -1214,7 +1196,7 @@ class Inlet {
                         let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
                         let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
                         let startPoint 
-                        pointIn = true // util.pointInSvgPath(contour , perpPoint.point1.x, perpPoint.point1.y)
+                        pointIn = pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             startPoint = perpPoint.point1
                         }  else {
@@ -1235,13 +1217,12 @@ class Inlet {
         }
 
         let resp={}
-        resp.newInleType =  newInleType
+        resp.newInleType = newInleType
 		resp.oldInletType = oldInletType
 		resp.oldInletPath = oldInletPath
 		resp.newInletPath = newInletPath
 		resp.action = action
         resp.contourType =  contourType
-        //resp.element=element
         return resp     
     }
 
@@ -1288,7 +1269,8 @@ class Inlet {
             for (let i = 0; i < totalLength-1; i++) {
                 let point = pathElement.getPointAtLength(i * seg);
                 //console.log (point)
-                let fill = true // util.pointInSvgPath( contour, point.x, point.y) 
+                // тут нужен путь не элемент!!! TODO
+                let fill = pointInSvgPath(contour, point.x, point.y) 
                 if ((type === 'inner' && !fill) || (type === 'outer' && fill)) {
                     console.log ('shit')
                     return false
@@ -1299,7 +1281,7 @@ class Inlet {
             for (let i = 1; i < totalLength; i++) {
                 let point = pathElement.getPointAtLength(i * seg);
                 //console.log (point)
-                let fill = true // util.pointInSvgPath( contour, point.x, point.y) 
+                let fill = pointInSvgPath( contour, point.x, point.y) 
                 if ((type === 'inner' && !fill) || (type === 'outer' && fill)) {
                     console.log ('shit')
                     return false
@@ -1388,7 +1370,7 @@ class Inlet {
                     y1=nearestSegment[2]
                     let perpendicular = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, IL)
                     checkPoint = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1)
-                    var pointIn = true // util.pointInSvgPath(contour , checkPoint[0].x, checkPoint[0].y)
+                    var pointIn = pointInSvgPath(contour , checkPoint[0].x, checkPoint[0].y)
                     if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                         pointIndex=0
                     } else {
@@ -1429,7 +1411,7 @@ class Inlet {
                         let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
                         let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
                         let startPoint 
-                        pointIn = true // util.pointInSvgPath(contour , perpPoint.point1.x, perpPoint.point1.y)
+                        pointIn = pointInSvgPath(contour , perpPoint.point1.x, perpPoint.point1.y)
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             startPoint = perpPoint.point1
                         }  else {
@@ -1477,7 +1459,7 @@ class Inlet {
                     } else {
                         centers = util.svgArcToCenterParam (CX, CY, rx, ry, flag1, flag2, flag3, EX, EY, true) 
                         let inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, 1)
-                        var pointIn = true // util.pointInSvgPath(contour , (inletPoint.x), (inletPoint.y))                    
+                        var pointIn = pointInSvgPath(contour , (inletPoint.x), (inletPoint.y))                    
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, IL)
                         } else {
@@ -1538,7 +1520,7 @@ class Inlet {
                     let y1=nearestSegment[2]
                     let perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, IL) 
                     checkPoint=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1) 
-                    pointIn = true // util.pointInSvgPath(contour , (checkPoint[0].x), (checkPoint[0].y))
+                    pointIn = pointInSvgPath(contourPath , (checkPoint[0].x), (checkPoint[0].y))
                     if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                         newOutletPath= `M ${endPoint.x} ${endPoint.y} A ${r} ${r} 0 0 ${clockwise} ${perpendicular[0].x} ${perpendicular[0].y}`                   
                     } else {
@@ -1563,7 +1545,7 @@ class Inlet {
                         centers={}
                         perpendicular=util.findPerpendicularPoints(  endPoint.x,endPoint.y, x1, y1, r) 
                         checkPoint=util.findPerpendicularPoints(  endPoint.x,endPoint.y, x1, y1, 1)                         
-                        pointIn = true // util.pointInSvgPath(contour , checkPoint[0].x, checkPoint[0].y)
+                        pointIn = pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             centers.x=perpendicular[0].x
                             centers.y=perpendicular[0].y
@@ -1578,7 +1560,7 @@ class Inlet {
                         }
                         let pp = util.calculateEndPoint(centers.x, centers.y, radius, endPoint.x, endPoint.y , arcLength, clockwise===0 ? 1:0);               
                         newOutletPath= `M ${endPoint.x}, ${endPoint.y} A ${radius} ${radius}  0  ${flag2} ${clockwise} ${pp.x} ${pp.y} `   
-                        //pointIn = true // util.pointInSvgPath(contour , pp.x, pp.y)                        
+                        //pointIn = pointInSvgPath(contourPath , pp.x, pp.y)                        
                     }              
                     break;
                 case 'A':
@@ -1594,7 +1576,7 @@ class Inlet {
                         let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
                         let perpPoint = util.getPerpendicularCoordinates(arcParams, 1);
                         let startPoint 
-                        pointIn = true // util.pointInSvgPath(contour , perpPoint.point1.x, perpPoint.point1.y)
+                        pointIn = pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             startPoint = perpPoint.point1
                         }  else {
@@ -1622,7 +1604,7 @@ class Inlet {
                             inletPoint = util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, radius)
 
                             checkPoint = util.findPointWithSameDirection(  endPoint.x, endPoint.y,startPoint.x, startPoint.y, 1)
-                            var pointIn = true // util.pointInSvgPath(contour , checkPoint.x, checkPoint.y)
+                            var pointIn = pointInSvgPath(contourPath , checkPoint.x, checkPoint.y)
                             if (Math.abs(arcLength) > Math.PI*radius) {
                                 flag2=1
                             } else {
@@ -1666,7 +1648,7 @@ class Inlet {
                     let y1=nearestSegment[2]
                     perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, IL) 
                     checkPoint=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1) 
-                    pointIn = true // util.pointInSvgPath(contour , checkPoint[0].x, checkPoint[0].y)
+                    pointIn = pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
                     //здесь обрабатывается тот редкий случай когда точка совпадает с началом линии и к ней никак не построить перпендикуляр
                     if ( endPoint.x===x1 && endPoint.y=== y1) {
                         return
@@ -1719,7 +1701,7 @@ class Inlet {
                         let centers = util.svgArcToCenterParam ( CX, CY, rx, ry, flag1, flag2, flag3, EX, EY, true)
                         let inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, 1)
                         let startPoint 
-                        var pointIn = true // util.pointInSvgPath(contour , (inletPoint.x), (inletPoint.y))                    
+                        var pointIn = pointInSvgPath(contourPath , (inletPoint.x), (inletPoint.y))                    
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             startPoint = util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, IL)
                         }  else {
@@ -1737,7 +1719,7 @@ class Inlet {
                         let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
                         let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
                         let startPoint 
-                        pointIn = true // util.pointInSvgPath(contour , perpPoint.point1.x, perpPoint.point1.y)
+                        pointIn = pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             startPoint = perpPoint.point1
                         }  else {
@@ -2467,9 +2449,7 @@ class Inlet {
                     intersection = util.intersects (PP,[{x:x,y:y},{x:xx,y:yy}])
                     if (intersection) {
                         inletPoints.splice(ind);
-                        let IL = util.distance ({x:MX,y:MY},{x:intersection.x,y:intersection,y})
                         inletPoints.push([intersection.x, intersection.y])
-
                         break;
                     }	
                     intersection=false

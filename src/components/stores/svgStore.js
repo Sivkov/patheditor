@@ -31,7 +31,6 @@ class SvgStore {
 		}	
 	}
 
-	
 	get selectedCid () {
 		const selected = this.getSelectedElement();
 		if (selected) {
@@ -151,7 +150,6 @@ class SvgStore {
 			element[val] = newVal; // Обновляем значение указанного ключа
 		}
 	}
-
 
 	updateContourPath (cid, className, val, newVal, angle=false) {
 		if (!angle) {

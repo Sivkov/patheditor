@@ -50,26 +50,7 @@ const InletPanel = observer(() => {
 
 
 	useEffect(() => {
-		let inletMode = 'Straight'
-		if (selectedInletPath) {
-			let path = SVGPathCommander.normalizePath(selectedInletPath).map(a => a.join(' ')).join(' ')
-			if (path && path.length) {
-				if (path.includes('L') || path.includes('H') || path.includes('V')) {
-					inletMode = 'Direct'
-					if (path.includes('A')) {
-						inletMode = 'Hook'
-					}
-					/*                     
-					// пока рисуем треугольник определяем так
-					if (path.match(/L/g) && path.match(/L/gm).length && path.match(/L/gm).length === 3) {
-					inletMode= Straight      
-					} */
-				} else if (path.includes('A')) {
-					inletMode = 'Tangent'
-				}
-			}
-		}
-
+		let inletMode = inlet.detectInletType ( selectedInletPath )
 		setType(inletMode)
 	}, [selectedInletPath, selectedCid])
 
