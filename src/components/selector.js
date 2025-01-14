@@ -24,10 +24,10 @@ const Selector = observer(() => {
 				svgStore.setSelectorCoords({ x: box.x, y: box.y, width: box.width, height: box.height })
 			}		
 		}
-	},[ selectedCid ])
+	},[ selectedCid, selectedPath ])
 
 
-	let circleSize = 2
+	let circleSize = 0.5
 	//circleSize = circleSize > 2 ? 2 : circleSize
 	let part = {};
 	part.svg = document.getElementById("svg")

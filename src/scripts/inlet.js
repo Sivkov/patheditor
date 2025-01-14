@@ -138,7 +138,7 @@ class Inlet {
 
         if (x1 === x2 && y1===y2) return false;
         var centers = util.svgArcToCenterParam(x1, y1, radius, radius, flag1, flag2, flag3, x2, y2, true) 
-        if (centers) return false;
+        if (!centers) return false;
         let endPoint = util.calculateEndPoint(centers.x, centers.y, radius, x2, y2, arcLength, flag3);
 
         if ( pathArc.length && pathArc[0].includes("M") ) {
@@ -278,11 +278,11 @@ class Inlet {
     }
 
     inletHookL (D, radius, inletPath) {
-        if (D <= 0  || D * 0.5 < radius ) {
+        if (D <= 0  || D * 0.5 <= radius ) {
             return false
         }
-        let MX, MY, LX, LY, EX, EY;
-        let path =  SVGPathCommander.normalizePath( inletPath)
+        let MX, MY, LX, LY, EX, EY, r;
+        let path =  SVGPathCommander.normalizePath(inletPath)
         if (path.length) {
             path.forEach( seg=>{
                 if ( seg.includes('M')) {
@@ -292,24 +292,31 @@ class Inlet {
                 if ( seg.includes('L')) {
                     LX=seg[1]
                     LY=seg[2]    
-                } else if (seg.includes('V')) {
-                    LY=seg[1]
-                    LX=MX 
-                } else if (seg.includes('H')) {
-                    LY=MY
-                    LX=seg[1]
                 } else if (seg.includes('A')){
                     EX=seg[6]
                     EY=seg[7]
+                    r=seg[2]
                 }
             }) 
         }
 
         let newEndPoint = util.getNewEndPoint(MX, MY, EX, EY, D);
+        let centers = util.findPointWithSameDirection (EX, EY, MX, MY, r)
+        let tangent = util.findTangentPoints(centers.x, centers.y, radius, newEndPoint.x, newEndPoint.y) 
+        if (!tangent)return false;
+        let d1 = util.distance(LX, LY, tangent[0].x, tangent[0].y)
+        let d2 = util.distance(LX, LY, tangent[1].x, tangent[1].y)
+        let pointIndex = d1 > d2 ? 1 : 0
+
         path.forEach( seg=>{
             if ( seg.includes('M')) {
                 seg[1]=newEndPoint.x
                 seg[2]=newEndPoint.y    
+            } 
+
+            if ( seg.includes('L')) {
+                seg[1]=tangent[pointIndex].x
+                seg[2]=tangent[pointIndex].y
             } 
         }) 
 
@@ -322,7 +329,6 @@ class Inlet {
     }
 
     inletHookR (radius, inletLength, inletPath) {
-		console.log ('inletHookR', arguments)
         let MX, MY, LX, LY, R, EX, EY, flag1, flag2, flag3;
         let path =  SVGPathCommander.normalizePath(inletPath)
         if (path.length) {
@@ -334,13 +340,8 @@ class Inlet {
                 if ( seg.includes('L')) {
                     LX=seg[1]
                     LY=seg[2]    
-                } else if (seg.includes('V')) {
-                    LY=seg[1]
-                    LX=MX 
-                } else if (seg.includes('H')) {
-                    LY=MY
-                    LX=seg[1]
-                } else if (seg.includes('A')){
+                } 
+                if (seg.includes('A')){
                     R=seg[1]
                     EX=seg[6]
                     EY=seg[7]
@@ -354,11 +355,11 @@ class Inlet {
         if (radius <= 0 ) {
             return false
         }
-        
+
         if ( radius > inletLength*0.5 ) {
-            return {'updateHook': inletLength*0.5}
+            return false
         }
-       
+             
         let centers = util.svgArcToCenterParam (LX, LY, R, R, flag1, flag2, flag3, EX, EY, true) 
         let newCenters =  util.getNewEndPoint(centers.x, centers.y, EX, EY, radius)
         let c = util.distance (newCenters.x,newCenters.y, MX, MY)
@@ -367,10 +368,6 @@ class Inlet {
 		let theta = Math.PI - Math.atan(a/b)
 		let arcLength = radius * theta;
         let endPoint = util.calculateEndPoint( newCenters.x, newCenters.y, radius, EX, EY, arcLength, flag3);
-
-        if ( radius > inletLength*0.5 ) {
-            return false
-        }
 
         if ( path.length && path[1].includes("L") ) {
             path[1][1]=endPoint.x

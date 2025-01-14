@@ -811,6 +811,115 @@ class Util {
 		return { x: endX, y: endY };
 	}	
 
+	static angleBetwenContourAndInlet ( path, contourPath, inlet=true) {
+		let  A, MX, MY, LX, LY,  PX, PY;
+		if(inlet){
+			if (path.length) {
+				path.forEach( seg=>{
+					if ( seg.includes('M')) {
+						MX=seg[1]
+						MY=seg[2]
+					}
+					if ( seg.includes('L')) {
+						LX=seg[1]
+						LY=seg[2]    
+					} else if (seg.includes('V')) {
+						LY=seg[1]
+						LX=MX 
+					} else if (seg.includes('H')) {
+						LY=MY
+						LX=seg[1]
+					}
+				}) 
+			}
+		
+			contourPath.forEach((seg, i, arr)=>{
+				if (i < 2){
+					if (seg.includes('M')) {
+						PX=seg[1]
+						PY=seg[2]
+					} else if ( seg.includes('L')) {
+						PX=seg[1]
+						PY=seg[2]    
+					} else if (seg.includes('V')) {
+						PY=seg[1]//-1
+					 } else if (seg.includes('H')) {
+						PX=seg[1]//-1
+					} else if (seg.includes('A')) {
+						PX=seg[6]
+						PY=seg[7]
+					}
+				}
+			})
+			
+			A = this.calculateAngleVector ( LX, LY, MX, MY, PX, PY)
+			return A
+		} else {
+			if(!path.hasOwnProperty('segments')){
+				path =  SVGPathCommander.normalizePath(path)
+			}
+            if (path.length) {
+                path.forEach((seg,i)=>{
+                    if ( seg.includes('M')) {
+                        MX=seg[1]
+                        MY=seg[2]
+                    }
+                    if ( seg.includes('L')) {
+                        LX=seg[1]
+                        LY=seg[2]    
+                    } else if (seg.includes('V')) {
+                        LY=seg[1]
+                        LX=MX 
+                    } else if (seg.includes('H')) {
+                        LY=MY
+                        LX=seg[1]
+                    }
+                }) 
+            }
+
+			if(!contourPath.hasOwnProperty('segments')){
+				contourPath =  SVGPathCommander.normalizePath(contourPath)
+			}
+
+            contourPath.forEach((seg, i)=>{
+                if (i < contourPath.length-1){
+                    if (seg.includes('M')) {
+                        PX=seg[1]
+                        PY=seg[2]
+                    } else if ( seg.includes('L')) {
+                        PX=seg[1]
+                        PY=seg[2]    
+                    } else if (seg.includes('V')) {
+                        PY=seg[1]
+                     } else if (seg.includes('H')) {
+                        PX=seg[1]
+                    } else if (seg.includes('A')) {
+                        PX=seg[6]
+                        PY=seg[7]
+                    }
+                }
+            })
+            A = this.calculateAngleVector ( MX, MY,  LX, LY, PX, PY)
+			return A			
+		}
+	}
+
+	static findPerpendicularPoints(x, y, x1, y1, L) {
+		//return [point1, point2];
+	   let dx = x1-x
+	   let dy = y1-y
+	   //Длина
+	   let len = Math.sqrt(dx*dx+dy*dy)
+	   //Нормализованный вектор (единичной длины)
+	   let udx = dx / len
+	   let udy = dy / len
+	   //Перпендикулярный единичный вектор
+	   let nx = - udy
+	   let ny =  udx
+	   //Точки (C, D) на перпендикуляре на расстоянии R
+	   return [{x:x + nx * L, y: y + ny * L}, {x:x - nx * L, y:y - ny * L}]
+   }
+
 }
 
 export default Util;
