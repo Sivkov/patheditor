@@ -31,14 +31,15 @@ const InletPanel = observer(() => {
 	const [TangentR, setTangentR] = useState(0);
 	const [HookL, setHookL] = useState(0);
 	const [HookR, setHookR] = useState(0);
-	const [DirectA, setDirectA] = useState(0);
+	const [DirectA, setDirectA] = useState(90);
 	const [DirectL, setDirectL] = useState(0);
 
 
 	const setNewInlet = (newType) =>{
 		console.log(newType)
 		if (type === newType) return;
-		let contourType = 'inner'
+		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
+		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
 		let resp = inlet.setInletType (newType, 5, false, 'set', selectedPath, selectedInletPath, contourType)
 		if (resp && resp.newInletPath && resp.newInletPath.length) {
 			svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
@@ -181,7 +182,6 @@ const InletPanel = observer(() => {
 		}		
 	},[HookR])
 
-
  	useEffect(()=>{
 		let resp;
 		if (HookR &&  HookL && selectedInletPath) {
@@ -192,8 +192,6 @@ const InletPanel = observer(() => {
 				} else {
 					if ( SVGPathCommander.isValidPath( resp.newInletPath ) ) {
 						svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-						//let resp1 = inlet.inletHookR (HookR, HookL, resp.newInletPath)
-						//svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp1.newInletPath )
 					} else {
 						console.log ('Invalid PATH')
 					}				
@@ -201,7 +199,6 @@ const InletPanel = observer(() => {
 			}
 		}		
 	},[HookL])
-
 
 	useEffect(()=>{
 		let resp;
@@ -215,7 +212,6 @@ const InletPanel = observer(() => {
 		}		
 	},[TangentR])
 
-
 	useEffect(()=>{
 		let resp;
 		if (TangentR && TangentL  && selectedInletPath) {
@@ -227,7 +223,6 @@ const InletPanel = observer(() => {
 			}
 		}		
 	},[TangentL])
-
 
 	useEffect(()=>{
 		let resp;
@@ -244,7 +239,9 @@ const InletPanel = observer(() => {
 	useEffect(()=>{
 		let resp;
 		if (DirectA && selectedInletPath) {
-			resp = inlet.inletDirectA (DirectL, selectedInletPath, selectedPath)
+			let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
+			let contourType = classes.includes('inner') ? 'inner' : 'outer'
+			resp = inlet.inletDirectA (DirectA, selectedInletPath, selectedPath, contourType)
 			if ( resp && SVGPathCommander.isValidPath( resp.newInletPath ) ) {
 				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
 			}

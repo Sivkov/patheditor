@@ -172,13 +172,7 @@ class Inlet {
                 if ( seg.includes('L')) {
                     LX=seg[1]
                     LY=seg[2]    
-                } else if (seg.includes('V')) {
-                    LY=seg[1]
-                    LX=MX 
-                } else if (seg.includes('H')) {
-                    LY=MY
-                    LX=seg[1]
-                }
+                } 
             }) 
         }
 
@@ -191,10 +185,6 @@ class Inlet {
                 } else if ( seg.includes('L')) {
                     PX=seg[1]
                     PY=seg[2]    
-                } else if (seg.includes('V')) {
-                    PY=seg[1]
-                } else if (seg.includes('H')) {
-                    PX=seg[1]
                 } else if (seg.includes('A')) {
                     PX=seg[6]
                     PY=seg[7]
@@ -361,6 +351,7 @@ class Inlet {
         }
              
         let centers = util.svgArcToCenterParam (LX, LY, R, R, flag1, flag2, flag3, EX, EY, true) 
+        if (!centers) return false;
         let newCenters =  util.getNewEndPoint(centers.x, centers.y, EX, EY, radius)
         let c = util.distance (newCenters.x,newCenters.y, MX, MY)
 		let b = radius
