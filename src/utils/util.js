@@ -1,6 +1,8 @@
 import svgPath from "svgpath";
 import SVGPathCommander from "svg-path-commander";
 import inlet from "../scripts/inlet";
+import arc from "../scripts/arc";
+import inside from 'point-in-polygon-hao'
 
 class Util {
 	static radian(ux, uy, vx, vy) {
@@ -257,12 +259,9 @@ class Util {
 			} else if ( seg.includes('L')) {
 				PX=seg[1]
 				PY=seg[2]    
-			} else if (seg.includes('V')) {
-				PY=seg[1]
-			} else if (seg.includes('H')) {
-				PX=seg[1]
 			} else if (seg.includes('A')) {
-				let fakePath = "M"+PX+" "+PY+' '+seg.join(' ')
+
+				/* let fakePath = "M"+PX+" "+PY+' '+seg.join(' ')
 				const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
 				pathElement.setAttribute("d", fakePath);
 				const totalLength = Math.round(pathElement.getTotalLength() / segments);
@@ -273,16 +272,62 @@ class Util {
 					}
 					const { x, y } = point;
 					points.push(`${x},${y}`);
+				} */	
+				
+				let cc = arc.svgArcToCenterParam( PX, PY,seg[1], seg[2], seg[3], seg[4], seg[5], seg[6], seg[7])
+				let startAngle = cc.startAngle
+				let endAngle = cc.endAngle
+				let radiusX = seg[1]
+				let radiusY = seg[2]
+				let clockwise =  cc.clockwise
+				let rotationAngle = seg[3]
+				let centerX = cc.cx 
+				let centerY = cc.cy
+				let step = 0.1
+
+				startAngle = ((startAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+				endAngle = ((endAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+	
+				if (clockwise && startAngle > endAngle) {
+					endAngle += 2 * Math.PI;
+				} else if (!clockwise && startAngle < endAngle) {
+					startAngle += 2 * Math.PI;
 				}
+	
+				const phi = rotationAngle * Math.PI / 180;
+				const sinPhi = Math.sin(phi);
+				const cosPhi = Math.cos(phi);
+				const totalSteps = Math.ceil(Math.abs(endAngle - startAngle) / step);
+
+				// Итерация по точкам дуги
+				for (let i = 0; i < totalSteps; i++) {
+					const isLast = i === totalSteps; // Проверяем последний шаг
+					const angle = isLast ? endAngle : clockwise 
+						? startAngle + i * step 
+						: startAngle - i * step;
+				
+					// Координаты без учёта поворота
+					const localX = radiusX * Math.cos(angle);
+					const localY = radiusY * Math.sin(angle);
+				
+					// Поворот вокруг центра
+					const x = centerX + localX * cosPhi - localY * sinPhi;
+					const y = centerY + localX * sinPhi + localY * cosPhi;				
+					points.push(`${x},${y}`);
+				}
+			
 				PX=seg[6]
-				PY=seg[7]   
+				PY=seg[7]  
+
 			}  else if (seg.includes('z') || seg.includes('Z')) {
 				PX=SX
 				PY=SY   				
 			} 
 			points.push(`${PX},${PY}`);
+
 		})
-		return points.join(";");
+		console.log ('Points:    '+ points)
+ 		return points.join(";");
 	}
 
 	static intersects(edge1, edge, asSegment=true) {
@@ -906,19 +951,37 @@ class Util {
 
 	static findPerpendicularPoints(x, y, x1, y1, L) {
 		//return [point1, point2];
-	   let dx = x1-x
-	   let dy = y1-y
-	   //Длина
-	   let len = Math.sqrt(dx*dx+dy*dy)
-	   //Нормализованный вектор (единичной длины)
-	   let udx = dx / len
-	   let udy = dy / len
-	   //Перпендикулярный единичный вектор
-	   let nx = - udy
-	   let ny =  udx
-	   //Точки (C, D) на перпендикуляре на расстоянии R
-	   return [{x:x + nx * L, y: y + ny * L}, {x:x - nx * L, y:y - ny * L}]
-   }
+		let dx = x1 - x
+		let dy = y1 - y
+		//Длина
+		let len = Math.sqrt(dx * dx + dy * dy)
+		//Нормализованный вектор (единичной длины)
+		let udx = dx / len
+		let udy = dy / len
+		//Перпендикулярный единичный вектор
+		let nx = - udy
+		let ny = udx
+		//Точки (C, D) на перпендикуляре на расстоянии R
+		return [{ x: x + nx * L, y: y + ny * L }, { x: x - nx * L, y: y - ny * L }]
+	}
+
+	static transformCoordinates(input) {
+		const values = input.split(';')
+		const transformed = [];
+		for (let i = 0; i < values.length; i++) {
+			let splitted= values[i].split(',').map(Number)
+			transformed.push([splitted[0], splitted[1]]);
+		}
+		return [transformed];
+	}
+
+	static pointInSvgPath(path, x, y) {
+		console.log(arguments)
+		let polyline = this.pathToPolyline(path)
+		let polygon = this.transformCoordinates(polyline)
+		let pointIn = inside([x, y], polygon)
+		return pointIn
+	}
 
 }
 
