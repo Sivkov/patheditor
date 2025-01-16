@@ -99,7 +99,7 @@ const LogPanel = observer(() => {
 return (
 	<>
 		{panelInfo.map((element, index) => (
-			<Panel key={'panel' + index+4} element={element} index={index+1} />
+			<Panel key={'panel' + index+3} element={element} index={3} />
 		))}
 	</>
 	);

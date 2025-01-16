@@ -326,7 +326,7 @@ class Util {
 			points.push(`${PX},${PY}`);
 
 		})
-		console.log ('Points:    '+ points)
+		//console.log ('Points:    '+ points)
  		return points.join(";");
 	}
 

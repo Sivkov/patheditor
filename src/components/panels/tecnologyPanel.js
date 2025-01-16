@@ -111,7 +111,7 @@ const TecnologyPanel =  observer(() => {
 	return (
 		<>
 			{panelInfo.map((element, index) => (
-				<Panel key={'panel' + index+2} element={element} index={index+2} />
+				<Panel key={'panel' + index+7} element={element} index={index+7} />
 			))}
 		</>
 	);

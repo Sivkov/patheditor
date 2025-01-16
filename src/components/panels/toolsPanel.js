@@ -120,7 +120,7 @@ const ToolsPanel = observer(() => {
 return (
 	<>
 		{panelInfo.map((element, index) => (
-			<Panel key={'panel' + index+1} element={element} index={index+1} />
+			<Panel key={'panel' + index+8} element={element} index={index+8} />
 		))}
 	</>
 	);

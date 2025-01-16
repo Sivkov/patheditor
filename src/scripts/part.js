@@ -283,9 +283,43 @@ class Part {
              return bc-ac
         })
 
+        let cids = [] 
+        svg.map(a => cids.push(a.cid))
+        cids = [ ...new Set (cids)]
+        console.log (cids)
+        cids.forEach((id, i, arr) =>{
+            console.log ('cui')
+            let contour = svg.filter(a=> a.cid === id && a.class.includes('contour'))
+            let inlet = svg.filter(a=> a.cid === id && a.class.includes('inlet'))
+            let outlet = svg.filter(a=> a.cid === id && a.class.includes('outlet'))
+
+            if (!inlet.length) {
+                let ad = {
+                    cid: Number(id), 
+                    class: contour[0].class.replace('contour', 'inlet'), 
+                    path: '',
+                    stroke: 'red', 
+                    strokeWidth: 0.2
+                }
+                svg.push(ad)
+            }
+
+            if (!outlet.length) {
+                let ad = {
+                    cid: Number(id), 
+                    class: contour[0].class.replace('contour', 'outlet'), 
+                    path: '',
+                    stroke: 'red', 
+                    strokeWidth: 0.2
+                }
+                svg.push(ad)
+            }
+        })
+
         let pcode = util.getValueFromString(ncpLines[1], 'code', false).replaceAll('="', '').replaceAll('">)', '')
         let uuid = util.getValueFromString(ncpLines[2], 'uuid', false).replaceAll('="', '').replaceAll('">)', '')
-		return {width: Part.width, height: Part.height,code:svg, params:{ id: number, code: pcode, uuid: uuid}}        
+		//console.log (svg)        
+        return {width: Part.width, height: Part.height,code:svg, params:{ id: number, code: pcode, uuid: uuid}}        
     }
 
     static detectContourType (classes) {

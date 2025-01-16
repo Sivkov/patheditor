@@ -27,7 +27,7 @@ class SvgStore {
 	get selectedInletPath () {
 		let cid = this.selected.cid
 		if (typeof cid === 'number') {
-			return this.getElementByCidAndClass(cid, 'inlet', 'path')	
+			return this.getElementByCidAndClass(cid, 'inlet', 'path')	|| ''
 		}	
 	}
 

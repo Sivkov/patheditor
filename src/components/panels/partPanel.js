@@ -85,7 +85,7 @@ const PartPanel = observer(() => {
 	return (
 		<>
 			{panelInfo.map((element, index) => (
-				<Panel key={'panel' + 3} element={element} index={3} />
+				<Panel key={'panel' + 6} element={element} index={6} />
 			))}
 		</>
 	);
