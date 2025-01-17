@@ -31,6 +31,13 @@ class SvgStore {
 		}	
 	}
 
+	get selectedOutletPath () {
+		let cid = this.selected.cid
+		if (typeof cid === 'number') {
+			return this.getElementByCidAndClass(cid, 'outlet', 'path')	|| ''
+		}	
+	}
+
 	get selectedCid () {
 		const selected = this.getSelectedElement();
 		if (selected) {
@@ -163,7 +170,7 @@ class SvgStore {
 		let start =  SVGPathCommander.normalizePath(newVal)[0]
 		let contourStart =  {x: start[start.length-2], y: start[start.length-1]}
 
-		if (inlet) {
+		if (inlet && inlet.path) {
 			let inletPath = SVGPathCommander.normalizePath(inlet.path)
 			let inletLastSeg = inletPath[inletPath.length-1]
 			let inletEnd = {x: inletLastSeg[inletLastSeg.length-2], y:inletLastSeg[inletLastSeg.length-1]}
@@ -173,7 +180,7 @@ class SvgStore {
 			this.updateElementValue (cid, 'inlet', val, newInletPath)
 		}
 
-		if (outlet) {
+		if (outlet && outlet.path) {
 			let outletPath = SVGPathCommander.normalizePath(outlet.path)
 			let outletStart = outletPath[0]
 			let outletStartSeg = {x: outletStart[outletStart.length-2], y:outletStart[outletStart.length-1]}

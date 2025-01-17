@@ -19,7 +19,6 @@ import util from '../../utils/util.js';
 const InletPanel = observer(() => {
 
 	const {
-		selected,
 		selectedCid,
 		selectedPath,
 		selectedInletPath
