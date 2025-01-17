@@ -37,6 +37,60 @@ const OutletPanel = observer(() => {
 		setType(outletMode)
  	}, [ selectedOutletPath, selectedCid])
 
+	 useEffect(() => {
+		let mode = inlet.detectInletType ( selectedOutletPath )
+		setOutletParams(mode)
+	}, [ selectedCid, mode])
+
+	 useEffect(()=>{
+		let resp;
+		if (DirectL && selectedOutletPath) {
+			resp = inlet.outletDirectL (DirectL, selectedOutletPath)
+			if ( resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
+				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
+			} else {
+				console.log ('Invalid PATH')
+			}
+		}		
+	},[DirectL])
+
+
+	useEffect(()=>{
+		let resp;
+		if (DirectA && selectedOutletPath) {
+			let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
+			let contourType = classes.includes('inner') ? 'inner' : 'outer'
+			resp = inlet.outletDirectA (DirectA, selectedOutletPath, selectedPath, contourType)
+			if ( resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
+				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
+			}
+		}		
+	},[DirectA])
+
+	useEffect(()=>{
+		let resp;
+		if (TangentR && TangentL  && selectedOutletPath) {
+			resp = inlet.outletTangentR (TangentR, TangentL, selectedOutletPath)
+			if ( resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
+				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
+			} else {
+				console.log ('Invalid PATH')
+			}
+		}		
+	},[TangentR])
+
+	useEffect(()=>{
+		let resp;
+		if (TangentR && TangentL  && selectedOutletPath) {
+			resp = inlet.outletTangentL (TangentL, selectedOutletPath)
+			if ( resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
+				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
+			} else {
+				console.log ('Invalid PATH')
+			}
+		}		
+	},[TangentL])	
+
 
 	const setNewOutlet = (newType) =>{
 		console.log(newType)
@@ -80,12 +134,12 @@ const OutletPanel = observer(() => {
             if (path && path.length) {
                 path.forEach( seg=>{
                     if ( seg.includes('M')) {
-                        MX=seg[1]
-                        MY=seg[2]
+                        LX=seg[1]
+                        LY=seg[2]
                     }
                     if ( seg.includes('L')) {
-                        LX=seg[1]
-                        LY=seg[2]    
+                        MX=seg[1]
+                        MY=seg[2]    
                     }
                 }) 
             }
@@ -99,10 +153,6 @@ const OutletPanel = observer(() => {
                     } else if ( seg.includes('L')) {
                         PX=seg[1]
                         PY=seg[2]    
-                    } else if (seg.includes('V')) {
-                        PY=seg[1]
-                     } else if (seg.includes('H')) {
-                        PX=seg[1]
                     } else if (seg.includes('A')) {
                         PX=seg[6]
                         PY=seg[7]
@@ -135,31 +185,22 @@ const OutletPanel = observer(() => {
 
         } else if (mode === 'Hook') {
 
-            let MX, MY, LX, LY, R, EX, EY, D;
+            let MX, MY, LX, LY, R, D;
             let path =  SVGPathCommander.normalizePath(selectedOutletPath)
             if (path.length) {
                 path.forEach( seg=>{
                     if ( seg.includes('M')) {
                         MX=seg[1]
                         MY=seg[2]
-                    }
-                    if ( seg.includes('L')) {
+                    } else if ( seg.includes('L')) {
                         LX=seg[1]
                         LY=seg[2]    
-                    } else if (seg.includes('V')) {
-                        LY=seg[1]
-                        LX=MX 
-                    } else if (seg.includes('H')) {
-                        LY=MY
-                        LX=seg[1]
                     } else if (seg.includes('A')){
                         R=seg[1]
-                        EX=seg[6]
-					    EY=seg[7]
                     }
                 }) 
             }
-            D = util.round( util.distance( MX, MY, EX, EY ), 3)
+            D = util.round( util.distance( MX, MY, LX, LY ), 3)
             setHookR(R)
             setHookL(D)
         }
