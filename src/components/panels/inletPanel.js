@@ -39,11 +39,32 @@ const InletPanel = observer(() => {
 		if (type === newType) return;
 		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
-		let resp = inlet.setInletType (newType, 5, false, 'set', selectedPath, selectedInletPath, contourType)
+		let resp = inlet.setInletType (newType, false, false, 'set', selectedPath, selectedInletPath, contourType)
 		if (resp && resp.newInletPath && resp.newInletPath.length) {
 			svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
 			addToLog( 'Set inlet type')
 			setInletParams ()
+		}
+	}
+
+	const setInletForAll = () =>{
+		console.log ('setInletForAll')
+		let inletMode = inlet.detectInletType ( selectedInletPath )
+		let inlets = svgStore.getFiltered("inlet")
+		if (inletMode) {
+			for (let i in  inlets ) {
+				let element = inlets[i]
+				let contourType = element.class.includes('inner') ? 'inner' : 'outer'	
+				let inletPath = element.path
+				let contour = svgStore.getElementByCidAndClass ( element.cid, 'contour')
+
+				let resp = inlet.setInletType (inletMode, element.cid, false, 'set', contour.path, inletPath, contourType)
+				if (resp && resp.newInletPath && resp.newInletPath.length) {
+					svgStore.updateElementValue ( element.cid, 'inlet', 'path', resp.newInletPath )
+					setInletParams ()
+				}
+			}
+			addToLog(`Set inlet type ${inletMode} for all`)
 		}
 	}
 
@@ -423,6 +444,7 @@ const InletPanel = observer(() => {
 										<button
 											className="btn btn-sm btn-primary btn_inletApplyForAll"
 											id="inletApplyForAll"
+											onMouseDown={ () =>{ setInletForAll() } }
 										>
 											Apply for all
 										</button>

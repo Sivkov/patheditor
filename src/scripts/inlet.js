@@ -1080,7 +1080,7 @@ class Inlet {
 		resp.oldInletPath = oldInletPath
 		resp.newInletPath = newInletPath
 		resp.action = action
-        resp.contourType =  contourType
+        resp.contourType = contourType
         return resp     
     }
 
@@ -1150,7 +1150,7 @@ class Inlet {
         return true
     }
 
-    setOutletType (newOutleType,dataCid=false, endPoint=false, action='set', contourPath, oldOutletPath, contourType='inner'){
+    setOutletType (newOutleType, dataCid=false, endPoint=false, action='set', contourPath, oldOutletPath, contourType='inner'){
         //debugger
         console.log ('setOutletType')
         let centers, IL, checkPoint; 
@@ -1176,7 +1176,7 @@ class Inlet {
         const oldOutletType = inlet.detectInletType(oldOutletPath)
         if ( action === 'set') {
             if (!oldOutletType || !newOutleType || (newOutleType === oldOutletType)) {
-                return
+                return false
             }
         }
 
@@ -1797,7 +1797,7 @@ class Inlet {
  		resp.newOutletPath = path
 		resp.action = 'change'
         return resp
-     }
+    }
 
     outletDirectL(D, path) {
         console.log (D)

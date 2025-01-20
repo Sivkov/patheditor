@@ -122,11 +122,32 @@ const OutletPanel = observer(() => {
 		if (type === newType) return;
 		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
-		let resp = inlet.setOutletType (newType, 5, false, 'set', selectedPath, selectedOutletPath, contourType)
+		let resp = inlet.setOutletType (newType, false, false, 'set', selectedPath, selectedOutletPath, contourType)
 		if (resp && resp.newOutletPath && resp.newOutletPath.length) {
 			svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
 			addToLog( 'Set outlet type')
 			setOutletParams ()
+		}
+	}
+
+	const setOutletForAll = () =>{
+		console.log ('setoutletForAll')
+		let mode = inlet.detectInletType ( selectedOutletPath )
+		let outlets = svgStore.getFiltered("outlet")
+		if (mode) {
+			for (let i in  outlets ) {
+				let element = outlets[i]
+				let contourType = element.class.includes('inner') ? 'inner' : 'outer'	
+				let outletPath = element.path
+				let contour = svgStore.getElementByCidAndClass ( element.cid, 'contour')
+
+				let resp = inlet.setOutletType (mode, element.cid, false, 'set', contour.path, outletPath, contourType)
+				if (resp && resp.newOutletPath && resp.newOutletPath.length) {
+					svgStore.updateElementValue ( element.cid, 'outlet', 'path', resp.newOutletPath )
+					setOutletParams ()
+				}
+			}
+			addToLog(`Set outlet type ${mode} for all`)
 		}
 	}
 
@@ -387,6 +408,7 @@ const OutletPanel = observer(() => {
 										<button
 											className="btn btn-sm btn-primary btn_outletApplyForAll"
 											id="outletApplyForAll"
+											onMouseDown={()=>{ setOutletForAll()}}
 										>
 											Apply for all
 										</button>

@@ -176,10 +176,10 @@ const  SvgWrapper = observer (() => {
 
 	const drag =(e) =>{
 		//console.log ('Drag ' + e.currentTarget.id +'  '+inMoveRef.current)
-		//console.log (e.buttons)	
+		//console.log (e.buttons)
+		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
+		coordsStore.setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
 		if (e.target && ((e.buttons === 4 ) || editorStore.mode== 'drag')) {
-			let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
-			coordsStore.setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
 			if (!inMoveRef.current) return;
 			var coord = Util.getMousePosition(e);
 			if (e.target && (e.buttons === 4 || e.buttons === 1)){
