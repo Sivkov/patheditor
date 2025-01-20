@@ -99,7 +99,7 @@ class Inlet {
         }
 
         pathArc = pathArc.toString().replaceAll(',', ' ')
-        if (!SVGPathCommander.isValidPath(pathArc)) return false;
+        //if (!SVGPathCommander.isValidPath(pathArc)) return false;
         let maxArcLength =Math.PI*radius*2
         if ( arcLength > maxArcLength ) {
              return false
@@ -153,7 +153,7 @@ class Inlet {
             pathArc[1][4]=0 
         }
         pathArc = pathArc.toString().replaceAll(',', ' ')
-        if (!SVGPathCommander.isValidPath( pathArc )) return false;
+        //if (!SVGPathCommander.isValidPath( pathArc )) return false;
 
         let resp ={}
         resp.newInleType = "Tangent"
@@ -226,7 +226,7 @@ class Inlet {
             return false
         }
 
-        if (!SVGPathCommander.isValidPath( `M${newEndPoint.x} ${newEndPoint.y} L${LX} ${LY}` )) return false;
+        //if (!SVGPathCommander.isValidPath( `M${newEndPoint.x} ${newEndPoint.y} L${LX} ${LY}` )) return false;
         let resp ={}
         resp.newInleType = "Direct"
 		resp.oldInletType = "Direct"
@@ -265,7 +265,7 @@ class Inlet {
             } 
         }) 
         path = path.toString().replaceAll(',', ' ')
-        if (!SVGPathCommander.isValidPath( path )) return false;
+        //if (!SVGPathCommander.isValidPath( path )) return false;
         let resp ={}
         resp.newInleType = "Direct"
 		resp.oldInletType = "Direct"
@@ -318,7 +318,7 @@ class Inlet {
             } 
         }) 
         path = path.toString().replaceAll(',', ' ')
-        if (!SVGPathCommander.isValidPath( path )) return false;
+        //if (!SVGPathCommander.isValidPath( path )) return false;
         let resp ={}
         resp.newInleType = "Hook"
 		resp.oldInletType = "Hook"
@@ -380,7 +380,7 @@ class Inlet {
         }
 
         path = path.toString().replaceAll(',', ' ')
-        if (!SVGPathCommander.isValidPath( path )) return false;
+        //if (!SVGPathCommander.isValidPath( path )) return false;
         let resp ={}
         resp.newInleType = "Hook"
 		resp.oldInletType = "Hook"
@@ -1618,7 +1618,7 @@ class Inlet {
         }
 
         pathArc = pathArc.toString().replaceAll(',', ' ')
-        if (!SVGPathCommander.isValidPath( pathArc )) return false;
+        //if (!SVGPathCommander.isValidPath( pathArc )) return false;
 
         let resp ={}
         resp.newOutleType = "Tangent"
@@ -1668,7 +1668,7 @@ class Inlet {
         }
 
         pathArc = pathArc.toString().replaceAll(',', ' ')
-        if (!SVGPathCommander.isValidPath( pathArc )) return false;
+        //if (!SVGPathCommander.isValidPath( pathArc )) return false;
         let resp ={}
         resp.newOutleType = "Tangent"
 		resp.oldOutletType = "Tangent"
@@ -1678,13 +1678,11 @@ class Inlet {
 
     }
 
-    outletHookR ( radius ) {
-		if (  inlet.outletModeEdit !=='outletModeEdit') return;
+    outletHookR ( radius, outletLength, path ) {
         console.log ('outletHookR   '+radius)
         radius = Number(radius)
         let MX, MY, LX, LY, R, EX, EY, flag1, flag2, flag3;
-        let path =  SVGPathCommander.normalizePath( this.outletPath)
-        let outletLength = +document.querySelector("#outletHookL").value
+        path =  SVGPathCommander.normalizePath( path)
         if (path.length) {
             path.forEach( seg=>{
                 if ( seg.includes('M')) {
@@ -1712,19 +1710,16 @@ class Inlet {
         }
 
         if (radius <= 0  ) {
-            document.querySelector("#outletHookR").value = outletLength*0.5
-            //throw Error ("radius it too small")
-            return
+            return false
         }
 
         if ( radius > outletLength*0.5 ) {
-            document.querySelector("#outletHookR").value = outletLength*0.5
-            return
+            return false
         }
         
         let centers = util.svgArcToCenterParam (MX, MY, R, R, flag1, flag2, flag3, EX, EY, true) 
+        if (!centers) return false
         let newCenters =  util.findPointWithSameDirection (MX, MY, centers.x, centers.y, radius) 
-
         let c = util.distance (newCenters.x,newCenters.y, LX, LY)
 		let b = radius
 		let a = Math.sqrt((c**2) - (b**2) )
@@ -1741,77 +1736,68 @@ class Inlet {
             path[1][6]=endPoint.x
             path[1][7]=endPoint.y
         }
+        path = path.toString().replaceAll(',', ' ')
+        //if (!SVGPathCommander.isValidPath( path )) return false;
         let resp ={}
         resp.newOutleType = "Hook"
 		resp.oldOutletType = "Hook"
-		resp.oldOutletPath = document.querySelector(`.outlet[data-cid="${this.dataCid}"] path`).getAttribute('d')
-		resp.newOutletPath = path.toString().replaceAll(',', ' ')
-        resp.contourType = document.querySelector(`.contour[data-cid="${this.dataCid}"]`).classList.contains('inner') ? "inner" : "outer"
-		resp.action = 'change'
-        resp.element=  document.querySelector(`.outlet[data-cid="${this.dataCid}"] path`)
-        this.updateInletAndOutlet (false, resp)  
+ 		resp.newOutletPath = path
+ 		resp.action = 'change'
         console.log( "outletHookR")
-
+        return resp
     }
 
-    outletHookL (D) {
-		if (  inlet.outletModeEdit !=='outletModeEdit') return;
-        let radius = +document.querySelector("#outletHookR").value
-        console.log (D, radius)
-        if (D <= 0  ) {
-            document.querySelector("#outletHookL").value = radius*2
-            throw Error ("Impossible length")
-            return
-        }
-        if ( D * 0.5 < radius ) {
-            document.querySelector("#outletHookL").value = radius*2
-            return
+    outletHookL (D, radius, path) {
+        if (D <= 0 || D * 0.5 < radius ) {
+            return false
         }
 
-        let MX, MY, LX, LY, EX, EY;
-        let path =  SVGPathCommander.normalizePath(this.outletPath)
+        let MX, MY, LX, LY, EX, EY, r;
+        path =  SVGPathCommander.normalizePath(path)
         if (path.length) {
             path.forEach( seg=>{
                 if ( seg.includes('M')) {
                     MX=seg[1]
                     MY=seg[2]
-                }
-                if ( seg.includes('L')) {
+                } else if ( seg.includes('L')) {
                     LX=seg[1]
                     LY=seg[2]    
-                } else if (seg.includes('V')) {
-                    LY=seg[1]
-                    LX=MX 
-                } else if (seg.includes('H')) {
-                    LY=MY
-                    LX=seg[1]
                 } else if (seg.includes('A')){
                     EX=seg[6]
                     EY=seg[7]
+                    r=seg[2]
                 }
             }) 
         }
 
-        let newEndPoint = util.getNewEndPoint(LX, LY, MX, MY,  D);
+        let newEndPoint = util.findPointWithSameDirection (MX, MY, LX, LY,  D);
+        let centers = util.findPointWithSameDirection (MX, MY, LX, LY, r)
+        let tangent = util.findTangentPoints(centers.x, centers.y, radius, newEndPoint.x , newEndPoint.y) 
+        if (!tangent)return false;
+        let d1 = util.distance(EX, EY, tangent[0].x, tangent[0].y)
+        let d2 = util.distance(EX, EY, tangent[1].x, tangent[1].y)
+        let pointIndex = d1 > d2 ? 1 : 0
+
         path.forEach( seg=>{
             if ( seg.includes('L')) {
                 seg[1]=newEndPoint.x
                 seg[2]=newEndPoint.y    
             } 
+            if ( seg.includes('A')) {
+                seg[6]=tangent[pointIndex].x
+                seg[7]=tangent[pointIndex].y
+            } 
         }) 
+
+        path = path.toString().replaceAll(',', ' ')
+        //if (!SVGPathCommander.isValidPath( path )) return false;
         let resp ={}
         resp.newOutleType = "Hook"
 		resp.oldOutletType = "Hook"
-		resp.oldOutletPath = document.querySelector(`.outlet[data-cid="${this.dataCid}"] path`).getAttribute('d')
-		resp.newOutletPath = path.toString().replaceAll(',', ' ')
-        resp.contourType = document.querySelector(`.contour[data-cid="${this.dataCid}"]`).classList.contains('inner') ? "inner" : "outer"
+ 		resp.newOutletPath = path
 		resp.action = 'change'
-        resp.element=  document.querySelector(`.outlet[data-cid="${this.dataCid}"] path`)
-        this.updateInletAndOutlet (false, resp)  
-        this.outletHookR( +document.querySelector("#outletHookR").value)
-        console.log ('outletHookL')
-
-    }
+        return resp
+     }
 
     outletDirectL(D, path) {
         console.log (D)
@@ -1844,7 +1830,7 @@ class Inlet {
             } 
         }) 
         path = path.toString().replaceAll(',', ' ')
-        if (!SVGPathCommander.isValidPath( path )) return false;
+        //if (!SVGPathCommander.isValidPath( path )) return false;
         let resp ={}
         resp.newOutleType = "Direct"
 		resp.oldOutletType = "Direct"
@@ -1913,7 +1899,7 @@ class Inlet {
         if (path.includes("NaN")) {
             return false
         }
-        if (!SVGPathCommander.isValidPath( `M${MX} ${MY} L${ newEndPoint.x} ${newEndPoint.y}` )) return false;
+        //if (!SVGPathCommander.isValidPath( `M${MX} ${MY} L${ newEndPoint.x} ${newEndPoint.y}` )) return false;
         let resp ={}
         resp.newOutleType = "Direct"
 		resp.oldOutletType = "Direct"

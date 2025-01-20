@@ -36,7 +36,7 @@ const CONSTANTS = {
 				top: 120,
 				left: 12,
 				width: 350,
-				height: 300,
+				height: 600,
 			}
 		},
 		partPopup: {
@@ -54,7 +54,7 @@ const CONSTANTS = {
 				top: 200,
 				left: 12,
 				width: 350,
-				height: 300,
+				height: 360,
 			}
 		},
 		inletPopup: {
@@ -63,7 +63,7 @@ const CONSTANTS = {
 				top: 240,
 				left: 12,
 				width: 350,
-				height: 300,
+				height: 400,
 			}
 		},
     },

@@ -89,7 +89,32 @@ const OutletPanel = observer(() => {
 				console.log ('Invalid PATH')
 			}
 		}		
-	},[TangentL])	
+	},[TangentL])
+	
+	useEffect(()=>{
+		let resp;
+		if (HookR &&  HookL && selectedOutletPath) {
+			resp = inlet.outletHookR (HookR, HookL, selectedOutletPath)
+			if (resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
+					svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
+				} else {
+					console.log ('Invalid PATH')
+			}				
+		}		
+	},[HookR])
+
+	useEffect(()=>{
+		let resp;
+		if (HookR &&  HookL && selectedOutletPath) {
+			resp = inlet.outletHookL (HookL, HookR, selectedOutletPath)
+			if ( resp &&  SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
+				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
+			} else {
+				console.log ('Invalid PATH')
+			}				
+			
+		}		
+	},[HookL])
 
 
 	const setNewOutlet = (newType) =>{

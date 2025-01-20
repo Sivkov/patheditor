@@ -165,19 +165,11 @@ const InletPanel = observer(() => {
 		let resp;
 		if (HookR &&  HookL && selectedInletPath) {
 			resp = inlet.inletHookR (HookR, HookL, selectedInletPath)
-			if (resp) {
-				if (resp.hasOwnProperty ('updateHook')) {
-					setHookR (resp.updateHook)
+			if (resp && SVGPathCommander.isValidPath( resp.newInletPath ) ) {
+					svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
 				} else {
-					if ( SVGPathCommander.isValidPath( resp.newInletPath ) ) {
-						svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-					} else {
-						console.log ('Invalid PATH')
-					}	
-				}
-			} else {
-				console.log ('Invalid PATH')			
-			}
+					console.log ('Invalid PATH')
+			}	
 		}		
 	},[HookR])
 
@@ -185,17 +177,11 @@ const InletPanel = observer(() => {
 		let resp;
 		if (HookR &&  HookL && selectedInletPath) {
 			resp = inlet.inletHookL (HookL, HookR, selectedInletPath)
-			if ( resp) {
-				if (resp.hasOwnProperty ('updateHook')) {
-					setHookL (resp.updateHook)
+			if ( resp &&  SVGPathCommander.isValidPath( resp.newInletPath ) ) {
+					svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
 				} else {
-					if ( SVGPathCommander.isValidPath( resp.newInletPath ) ) {
-						svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-					} else {
-						console.log ('Invalid PATH')
-					}				
-				} 				
-			}
+					console.log ('Invalid PATH')
+			}				
 		}		
 	},[HookL])
 
