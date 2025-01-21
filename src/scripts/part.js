@@ -80,7 +80,7 @@ class Part {
         let svg = []
         //const ncpLines = ncpCode.code
 
-        const ncpLines = CONSTANTS.code3
+        const ncpLines = CONSTANTS.code2
      
         let currentX, currentY
         let path = 'closed'
@@ -292,8 +292,8 @@ class Part {
             let contour = svg.filter(a=> a.cid === id && a.class.includes('contour'))
             let inlet = svg.filter(a=> a.cid === id && a.class.includes('inlet'))
             let outlet = svg.filter(a=> a.cid === id && a.class.includes('outlet'))
-
-            if (!inlet.length) {
+            
+            if (!inlet.length && !contour[0].class.includes('engraving')) {
                 let ad = {
                     cid: Number(id), 
                     class: contour[0].class.replace('contour', 'inlet'), 
@@ -304,7 +304,7 @@ class Part {
                 svg.push(ad)
             }
 
-            if (!outlet.length) {
+            if (!outlet.length && !contour[0].class.includes('engraving')) {
                 let ad = {
                     cid: Number(id), 
                     class: contour[0].class.replace('contour', 'outlet'), 

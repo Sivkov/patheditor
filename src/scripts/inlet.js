@@ -45,6 +45,26 @@ class Inlet {
         return inletMode
     }
 
+    detectInletLength (path) {
+        let type = this.detectInletType ( path )
+        let IL =6 
+        path = SVGPathCommander.normalizePath( path )
+        if (type === 'Tangent') {
+            path.forEach( seg=>{     
+                if (seg.includes('A')){                    
+                    IL = seg[2]*2
+                }
+            })
+        } else if (type === 'Hook' || type === 'Direct') {
+            let start = {x: path[0][1], y: path[0][2]}
+            let lastSeg = path[path.length-1]
+            let end = {x: lastSeg[lastSeg.length-2], y: lastSeg[lastSeg.length-1]}
+            IL =  util.distance (start, end)
+        }
+        console.log ('Detected length ' + IL)
+        return Math.round(IL*1000)/1000
+    }
+
     inletTangentR (radius, arcLength, inletPath) {
         console.log ("inletTangentR")
         let x1, y1, x2, y2 ,flag1, flag2, flag3, rO; 
@@ -716,18 +736,6 @@ class Inlet {
             endPoint = {x:contourCommand[0][1], y:contourCommand[0][2]}
         }
 
-        /*try {
-            if (!document.querySelector(`.contour[data-cid="${inlet.dataCid}"]`).classList.contains("noInlet")){
-                //let start = util.getFirstPointOfPath(element.getAttribute('d'))
-                //let end = util.getLastPointOfPath(element.getAttribute('d'))
-                let start = util.getFirstPointOfPath( contourPath)
-                let end = util.getLastPointOfPath( contourPath)
-                IL = Math.round(util.distance(start, end)*100)/100
-            }           
-        } catch (e) {
-            console.log ("cant find inlet length")
-        } */
-
         const oldInletType = inlet.detectInletType(oldInletPath)
         if ( action === 'set') {
             if (!oldInletType || !newInleType || (newInleType === oldInletType)) {
@@ -746,7 +754,8 @@ class Inlet {
             let L = oldInletPathSegs[1]
             inletAngle = util.angleBetweenPoints ( M[1], M[2], L[1], L[2] )
         } 
-        if (!IL && newInleType !== "Straight" ) IL = 6//util.detectInletLength(contourCommand, nearestSegment, endPoint, contourType)
+
+        IL = this.detectInletLength ( oldInletPath )
         
         if (newInleType === "Straight") {
             //newInletPath= `M ${endPoint.x} ${endPoint.y} L ${endPoint.x-1} ${endPoint.y-1}  L ${endPoint.x+1} ${endPoint.y-1} L ${endPoint.x} ${endPoint.y}`
@@ -1161,18 +1170,7 @@ class Inlet {
         if (!endPoint) {
             endPoint = {x:contourCommand[0][1], y:contourCommand[0][2]}
         }
-        /*try {
-            if (!document.querySelector(`.contour[data-cid="${inlet.dataCid}"]`).classList.contains("noOutlet")
-            ){
-                let start = util.getFirstPointOfPath(element.getAttribute('d'))
-                let end = util.getLastPointOfPath(element.getAttribute('d'))
-                IL = Math.round(util.distance(start, end)*100)/100
-            }           
-        } catch (e) {
-            console.log ("cant find outlet length")
-        } */
-        if (!IL) IL=6
-
+        IL = this.detectInletLength ( oldOutletPath ) 
         const oldOutletType = inlet.detectInletType(oldOutletPath)
         if ( action === 'set') {
             if (!oldOutletType || !newOutleType || (newOutleType === oldOutletType)) {

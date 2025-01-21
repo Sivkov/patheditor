@@ -32,6 +32,7 @@ const InletPanel = observer(() => {
 	const [HookR, setHookR] = useState(0);
 	const [DirectA, setDirectA] = useState(90);
 	const [DirectL, setDirectL] = useState(0);
+	const [safemode, setSafeMode] = useState(false)
 
 
 	const setNewInlet = (newType) =>{
@@ -88,7 +89,7 @@ const InletPanel = observer(() => {
                 }
             })
             setTangentR(R)
-            let L =  util.arcLength(selectedInletPath)//Math.round(util.arcLength(selectedInletPath)*1000)/1000
+            let L =  util.arcLength(selectedInletPath)
             setTangentL(L)
         } else if (inletMode === 'Direct') {
           
@@ -152,23 +153,13 @@ const InletPanel = observer(() => {
 
         } else if (inletMode === 'Hook') {
 
-            let MX, MY, LX, LY, R, EX, EY, D;
+            let MX, MY, R, EX, EY, D;
             let path =  SVGPathCommander.normalizePath(selectedInletPath)
             if (path.length) {
                 path.forEach( seg=>{
                     if ( seg.includes('M')) {
                         MX=seg[1]
                         MY=seg[2]
-                    }
-                    if ( seg.includes('L')) {
-                        LX=seg[1]
-                        LY=seg[2]    
-                    } else if (seg.includes('V')) {
-                        LY=seg[1]
-                        LX=MX 
-                    } else if (seg.includes('H')) {
-                        LY=MY
-                        LX=seg[1]
                     } else if (seg.includes('A')){
                         R=seg[1]
                         EX=seg[6]
@@ -276,12 +267,15 @@ const InletPanel = observer(() => {
 							<tr>
 								<td colSpan={3}>
 									<div className="ms-4 d-flex">
-										<input id="preventDangerInlets" className="" type="checkbox" />
+										<input 
+											id="preventDangerInlets" className="" 
+											type="checkbox" 
+											onChange={ (e)=>{ setSafeMode(e.target.checked);}}/>
 										<label
 											className="form-check-label ms-2"
 											htmlFor="preventDangerInlets"
 										>
-											Prevent danger inlets
+											Prevent danger inlets and outlets
 										</label>
 									</div>
 								</td>
@@ -433,7 +427,7 @@ const InletPanel = observer(() => {
 												type === "Hook" ? Hook :
 													type === "Direct" ? Direct :
 														type === "Tangent" ? Tangent : ''
-										}
+										} alt="no img"
 										/>
 									</div>
 								</td>
@@ -512,7 +506,7 @@ const InletPanel = observer(() => {
 																		type="number"
 																		min="0.1"
 																		id="inletDirectL"
-																		step="0.5"
+																		step="0.1"
 																		onChange={(e) => setDirectL(parseFloat(e.target.value))}
 																		value={ Math.round( DirectL *1000)/1000}
 																	/>
@@ -578,8 +572,7 @@ const InletPanel = observer(() => {
 																		id="inletTangentL"
 																		step={0.1}
 																		onChange={(e) => setTangentL(parseFloat(e.target.value))}
-																		//onInput={(e) => setTangentL(parseFloat(e.target.value))}
-																		value={ Math.round(TangentL*1000)/1000 }
+ 																		value={ Math.round(TangentL*1000)/1000 }
 																	/>
 																</div>
 																<div className="ml-2">

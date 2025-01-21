@@ -398,7 +398,7 @@ const OutletPanel = observer(() => {
 													type === "Direct" ? Direct :
 														type === "Tangent" ? Tangent : ''
 										}
-										/>
+										alt="pic"/>
 									</div>
 								</td>
 							</tr>
@@ -476,7 +476,7 @@ const OutletPanel = observer(() => {
 																		type="number"
 																		min="0.1"
 																		id="outletDirectL"
-																		step="0.5"
+																		step="0.1"
 																		onChange={(e) => setDirectL(parseFloat(e.target.value))}
 																		value={ Math.round( DirectL *1000)/1000}
 																	/>
