@@ -156,17 +156,21 @@ const  SvgWrapper = observer (() => {
 	const startDrag = (e) =>{
 		//console.log ('startDrag')
 		inMoveRef.current = 1;	
-		if (e.target && ((e.buttons === 4 ) || editorStore.mode== 'drag')) {            
+		if (e.target && (e.buttons === 4  || editorStore.mode== 'drag')) {            
 			let off = Util.getMousePosition(e);
 			let transforms = document.getElementById("group1").transform.baseVal.consolidate().matrix
             off.x -= transforms.e;
             off.y -= transforms.f;
 			setOffset({x:off.x,y:off.y})
-        }
+        } 
 	}
 
 	const endDrag =(e) =>{
-		inMoveRef.current = 0;		
+		inMoveRef.current = 0;	
+		if ( editorStore.mode === 'inletInMoving') {
+			editorStore.setMode ('inletCanMove')	
+		}	
+		console.log ('endDrag in mode  ' + editorStore.mode)
 		// ('endDrag ' + inMoveRef.current)
 	}
 
@@ -175,9 +179,7 @@ const  SvgWrapper = observer (() => {
 	}
 
 	const drag =(e) =>{
-		//console.log ('Drag ' + e.currentTarget.id +'  '+inMoveRef.current)
-		//console.log (e.buttons)
-		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
+ 		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
 		coordsStore.setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
 		if (e.target && ((e.buttons === 4 ) || editorStore.mode== 'drag')) {
 			if (!inMoveRef.current) return;
@@ -194,8 +196,9 @@ const  SvgWrapper = observer (() => {
 					f: gmatrix.f,
 				})
 			}
-		}
-		
+		} else if ( e.buttons === 1  &&   editorStore.mode === 'inletInMoving') {
+			console.log ( e.buttons+ '  Drag in mode  ' + editorStore.mode)
+		}		
 	}
  
 	useEffect(() => {

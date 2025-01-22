@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
 import logStore from '../stores/logStore.js';
 import svgStore from "../stores/svgStore.js";
+import editorStore from "../stores/editorStore.js";
 import { useEffect, useState } from 'react';
 import log from './../../scripts/log.js'
 import Hook from './../../img/Hook.jpg';
@@ -253,6 +254,13 @@ const InletPanel = observer(() => {
 	useEffect(() => {
 		let inletMode = inlet.detectInletType ( selectedInletPath )
 		setInletParams(inletMode)
+		if (mode === 'move') {
+			editorStore.setMode('inletCanMove')
+			console.log ('We can move inlet cause editor store  '+editorStore.mode)
+		} else {
+			editorStore.setMode('resize')
+			console.log ('editor store mode ' + editorStore.mode)
+		}
 	}, [ selectedCid, mode])
 
 	const panelInfo = [

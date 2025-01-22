@@ -906,6 +906,208 @@ class Util {
 		return pointIn
 	}
 
+	static findNearestPointOnSegment(x, y, x1, y1, x2, y2) {
+		const dx = x2 - x1;
+		const dy = y2 - y1;
+		const dx1 = x - x1;
+		const dy1 = y - y1;
+	
+		// Найдем длину отрезка
+		const segmentLength = Math.sqrt(dx * dx + dy * dy);
+	
+		// Найдем проекцию точки на прямую, содержащую отрезок
+		const dotProduct = (dx1 * dx + dy1 * dy) / segmentLength;
+		
+		let nearestX, nearestY;
+	
+		// Если проекция находится внутри отрезка
+		if (dotProduct >= 0 && dotProduct <= segmentLength) {
+			nearestX = x1 + dx * dotProduct / segmentLength;
+			nearestY = y1 + dy * dotProduct / segmentLength;
+		} else {
+			// Если проекция находится за границами отрезка, ближайшей точкой будет один из концов отрезка
+			if (dotProduct < 0) {
+				nearestX = x1;
+				nearestY = y1;
+			} else {
+				nearestX = x2;
+				nearestY = y2;
+			}
+		}
+	
+		return { x: nearestX, y: nearestY };
+	}
+
+/* 	static findNearestPointOnCircle(x, y, xc, yc, rx, ry) {
+		// Найдем расстояние между центром окружности и точкой (x, y)
+		const distance = Math.sqrt((x - xc) ** 2 + (y - yc) ** 2);
+		
+		// Если точка (x, y) уже находится на окружности, то это и есть ближайшая точка
+		if (distance === rx) {
+			return { x: x, y: y };
+		}
+		
+		let nearestX, nearestY;
+	
+		// Если точка (x, y) находится вне окружности, найдем ближайшую точку на окружности
+		if (true) {
+			// Нормализуем вектор от центра окружности до точки (x, y)
+			const unitVectorX = (x - xc) / distance;
+			const unitVectorY = (y - yc) / distance;
+	
+			// Умножим единичный вектор на радиус окружности, чтобы получить вектор к ближайшей точке
+			const nearestVectorX = unitVectorX * rx;
+			const nearestVectorY = unitVectorY * ry;
+	
+			// Сложим координаты центра окружности с координатами вектора, чтобы получить координаты ближайшей точки
+			nearestX = xc + nearestVectorX;
+			nearestY = yc + nearestVectorY;
+		} 
+	
+		return { x: nearestX, y: nearestY };
+	} */
+
+	
+
+ 	static findNearestPointOnEllipse(x, y, xc, yc, rx, ry) {
+		// Вычисляем расстояние от центра эллипса до точки (x, y) с нормализацией
+		const normalizedX = (x - xc) / rx;
+		const normalizedY = (y - yc) / ry;
+		const distance = Math.sqrt(normalizedX ** 2 + normalizedY ** 2);
+	
+		// Если точка уже находится на эллипсе, возвращаем ее
+		if (distance === 1) {
+			return { x: x, y: y };
+		}
+	
+		// Нормализуем вектор от центра эллипса до точки (x, y)
+		const unitVectorX = normalizedX / distance;
+		const unitVectorY = normalizedY / distance;
+	
+		// Умножаем нормализованный вектор на радиусы эллипса, чтобы получить координаты ближайшей точки на эллипсе
+		const nearestX = xc + unitVectorX * rx;
+		const nearestY = yc + unitVectorY * ry;
+	
+		return { x: nearestX, y: nearestY };
+	} 
+
+	static normalizedAngle (startAngle)	{
+		return (startAngle < 0 ? startAngle + 2 * Math.PI : startAngle) % (2 * Math.PI);
+    }
+
+	static 	findNearestPointOnPath(pathString, point) {
+		const pathCommands = SVGPathCommander.normalizePath (pathString)
+        let nearestPoint  = {}
+		let nearestPointOnCommand ={}
+		let minDistance = Infinity
+		let tangentAngle
+		let centers
+		let dist 
+        let currentX = 0;
+        let currentY = 0;
+		         
+        for (const command of pathCommands) {
+            const commandType = command[0]
+            switch (commandType) {
+                case 'M':
+                    currentX = parseFloat(command[1]);;
+                    currentY = parseFloat(command[2]);;				
+                    break;
+                case 'L':
+                    const x = parseFloat(command[1]);
+                    const y = parseFloat(command[2]);   
+					nearestPointOnCommand = this.findNearestPointOnSegment(point.x, point.y, x, y, currentX, currentY )
+					dist = this.distance({x:point.x, y:point.y}, {x:nearestPointOnCommand.x, y:nearestPointOnCommand.y})
+					if (dist < minDistance) {
+						minDistance = dist
+						nearestPoint = nearestPointOnCommand
+ 						tangentAngle = Math.atan2(nearestPoint.y-currentY, nearestPoint.x-currentX) * (180 / Math.PI);
+						nearestPoint.a = tangentAngle
+						nearestPoint.command = command.join(' ')
+					}
+					currentX = x;
+                    currentY = y;
+					break;
+
+                case 'A':
+                    // Extract command for arc command
+                    let rx = parseFloat(command[1]);
+                    let ry = parseFloat(command[2]);
+                    let flag1 = parseFloat(command[3]);
+                    const flag2 = parseFloat(command[4]);
+                    const flag3 = parseFloat(command[5]);
+                    const sweepFlag = parseFloat(command[5]);
+                    const EX = parseFloat(command[6]);
+                    const EY = parseFloat(command[7]);
+                    const x1 = currentX;
+                    const y1 = currentY;
+                    const x2 = EX;
+                    const y2 = EY; 
+					if (flag1 === 90 && rx !== ry)  {
+						flag1 = 0
+ 						rx = parseFloat(command[2]);
+						ry = parseFloat(command[1]);
+					}
+
+ 					let arcParams = arc.svgArcToCenterParam (x1, y1, rx, ry, flag1, flag2, flag3, EX, EY) /* 
+ 					if (rx === ry) {
+						nearestPointOnCommand = this.findNearestPointOnCircle(  point.x, point.y, arcParams.cx, arcParams.cy, rx, ry)
+					} else {
+						nearestPointOnCommand = this.findNearestPointOnEllipse( point.x, point.y, arcParams.cx, arcParams.cy, rx, ry)
+					} */
+					nearestPointOnCommand = this.findNearestPointOnEllipse( point.x, point.y, arcParams.cx, arcParams.cy, rx, ry)
+
+ 					let angleRad = Math.atan2(nearestPointOnCommand.y - arcParams.cy, nearestPointOnCommand.x - arcParams.cx);
+
+                    let startAngleDeg = this.normalizedAngle( arcParams.startAngle)
+                    let endAngleDeg = this.normalizedAngle(arcParams.endAngle) 
+                    let angleDeg = this.normalizedAngle( angleRad )
+               
+                    let between=false;
+                    // стрелки
+                    if (sweepFlag === 0 ) {
+                        if ( startAngleDeg > endAngleDeg) {
+                            if (startAngleDeg > angleDeg && angleDeg > endAngleDeg) {
+                                between=true;
+                            }
+                        } else {
+                            if (startAngleDeg > angleDeg || angleDeg > endAngleDeg){
+                                between=true;
+                            }
+                        }
+                    } else {
+                        if ( endAngleDeg > startAngleDeg) {
+                            if (endAngleDeg> angleDeg && angleDeg > startAngleDeg) {
+                                between=true;
+                            }
+                        } else {
+                            if (endAngleDeg> angleDeg || angleDeg > startAngleDeg){
+                                between=true;
+                            }
+                        }
+                    }
+
+					if (between) {
+						let distanceArc  = this.distance({x:point.x,y:point.y}, {x:nearestPointOnCommand.x,y:nearestPointOnCommand.y})
+						if (distanceArc <  minDistance) {
+							minDistance = distanceArc
+							nearestPoint = nearestPointOnCommand
+							tangentAngle = Math.atan2(nearestPoint.y-arcParams.cy, nearestPoint.x-arcParams.cx) * (180 / Math.PI);
+							nearestPoint.a = tangentAngle
+							nearestPoint.command = command.join(' ')
+							nearestPoint.centers = {x:arcParams.cx, y:arcParams.cy, r:rx} 
+
+						}
+					} 
+				    currentX = EX;
+                    currentY = EY;
+                    break;
+            }
+        }
+		//createSVG ([nearestPoint.x, nearestPoint.y])
+ 		return nearestPoint
+	}
+
 }
 
 export default Util;
