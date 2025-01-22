@@ -938,64 +938,43 @@ class Util {
 		return { x: nearestX, y: nearestY };
 	}
 
-/* 	static findNearestPointOnCircle(x, y, xc, yc, rx, ry) {
-		// Найдем расстояние между центром окружности и точкой (x, y)
-		const distance = Math.sqrt((x - xc) ** 2 + (y - yc) ** 2);
-		
-		// Если точка (x, y) уже находится на окружности, то это и есть ближайшая точка
-		if (distance === rx) {
-			return { x: x, y: y };
-		}
-		
-		let nearestX, nearestY;
+	static findNearestPointOnEllipse(x, y, xc, yc, rx, ry, xAxisRotation) {
+		// Вращение точки (x, y) в обратную сторону на xAxisRotation
+		const radians = (Math.PI / 180) * xAxisRotation; // Угол вращения в радианах
+		const cosAngle = Math.cos(radians);
+		const sinAngle = Math.sin(radians);
 	
-		// Если точка (x, y) находится вне окружности, найдем ближайшую точку на окружности
-		if (true) {
-			// Нормализуем вектор от центра окружности до точки (x, y)
-			const unitVectorX = (x - xc) / distance;
-			const unitVectorY = (y - yc) / distance;
+		// Преобразование точки в системе координат эллипса с учетом вращения
+		const dx = x - xc;
+		const dy = y - yc;
+		const rotatedX = cosAngle * dx + sinAngle * dy;
+		const rotatedY = -sinAngle * dx + cosAngle * dy;
 	
-			// Умножим единичный вектор на радиус окружности, чтобы получить вектор к ближайшей точке
-			const nearestVectorX = unitVectorX * rx;
-			const nearestVectorY = unitVectorY * ry;
-	
-			// Сложим координаты центра окружности с координатами вектора, чтобы получить координаты ближайшей точки
-			nearestX = xc + nearestVectorX;
-			nearestY = yc + nearestVectorY;
-		} 
-	
-		return { x: nearestX, y: nearestY };
-	} */
-
-	
-
- 	static findNearestPointOnEllipse(x, y, xc, yc, rx, ry) {
-		// Вычисляем расстояние от центра эллипса до точки (x, y) с нормализацией
-		const normalizedX = (x - xc) / rx;
-		const normalizedY = (y - yc) / ry;
+		// Нормализация координат как ранее
+		const normalizedX = rotatedX / rx;
+		const normalizedY = rotatedY / ry;
 		const distance = Math.sqrt(normalizedX ** 2 + normalizedY ** 2);
 	
-		// Если точка уже находится на эллипсе, возвращаем ее
-		if (distance === 1) {
-			return { x: x, y: y };
-		}
+		// Нахождение ближайшей точки в "круговой" системе координат
+		const nearestX = normalizedX / distance; // Нормализация на окружности
+		const nearestY = normalizedY / distance;
 	
-		// Нормализуем вектор от центра эллипса до точки (x, y)
-		const unitVectorX = normalizedX / distance;
-		const unitVectorY = normalizedY / distance;
+		// Масштабирование обратно с учетом радиусов эллипса
+		const scaledX = nearestX * rx;
+		const scaledY = nearestY * ry;
 	
-		// Умножаем нормализованный вектор на радиусы эллипса, чтобы получить координаты ближайшей точки на эллипсе
-		const nearestX = xc + unitVectorX * rx;
-		const nearestY = yc + unitVectorY * ry;
+		// Возвращаем найденную точку в исходную систему координат (с учетом обратного вращения)
+		const finalX = cosAngle * scaledX - sinAngle * scaledY + xc;
+		const finalY = sinAngle * scaledX + cosAngle * scaledY + yc;
 	
-		return { x: nearestX, y: nearestY };
-	} 
+		return { x: finalX, y: finalY };
+	}
 
 	static normalizedAngle (startAngle)	{
 		return (startAngle < 0 ? startAngle + 2 * Math.PI : startAngle) % (2 * Math.PI);
     }
 
-	static 	findNearestPointOnPath(pathString, point) {
+	static findNearestPointOnPath(pathString, point) {
 		const pathCommands = SVGPathCommander.normalizePath (pathString)
         let nearestPoint  = {}
 		let nearestPointOnCommand ={}
@@ -1049,14 +1028,8 @@ class Util {
 						ry = parseFloat(command[1]);
 					}
 
- 					let arcParams = arc.svgArcToCenterParam (x1, y1, rx, ry, flag1, flag2, flag3, EX, EY) /* 
- 					if (rx === ry) {
-						nearestPointOnCommand = this.findNearestPointOnCircle(  point.x, point.y, arcParams.cx, arcParams.cy, rx, ry)
-					} else {
-						nearestPointOnCommand = this.findNearestPointOnEllipse( point.x, point.y, arcParams.cx, arcParams.cy, rx, ry)
-					} */
-					nearestPointOnCommand = this.findNearestPointOnEllipse( point.x, point.y, arcParams.cx, arcParams.cy, rx, ry)
-
+ 					let arcParams = this.svgArcToCenterParam (x1, y1, rx, ry, flag1, flag2, flag3, EX, EY)  
+					nearestPointOnCommand = this.findNearestPointOnEllipse( point.x, point.y, arcParams.cx, arcParams.cy, rx, ry, flag1)
  					let angleRad = Math.atan2(nearestPointOnCommand.y - arcParams.cy, nearestPointOnCommand.x - arcParams.cx);
 
                     let startAngleDeg = this.normalizedAngle( arcParams.startAngle)
