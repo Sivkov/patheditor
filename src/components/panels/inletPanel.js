@@ -254,13 +254,7 @@ const InletPanel = observer(() => {
 	useEffect(() => {
 		let inletMode = inlet.detectInletType ( selectedInletPath )
 		setInletParams(inletMode)
-		if (mode === 'move') {
-			editorStore.setMode('inletCanMove')
-			console.log ('We can move inlet cause editor store  '+editorStore.mode)
-		} else {
-			editorStore.setMode('resize')
-			console.log ('editor store mode ' + editorStore.mode)
-		}
+		editorStore.setInletMode(mode)
 	}, [ selectedCid, mode])
 
 	const panelInfo = [

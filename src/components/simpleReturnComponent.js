@@ -16,8 +16,6 @@ const SimpleReturnComponent = observer(() => {
 		selectedInletPath
 	} = svgStore;
 
-	const [point, setPoint] = useState({x:0,y:0})
-
 	useEffect(() => {
 		const fetchData = async () => {
 			const svg = await Part.getPartCode(handle, partNumber); // Получаем данные
@@ -42,13 +40,9 @@ const SimpleReturnComponent = observer(() => {
 				//console.log (e)
 				let inlet = e.currentTarget.classList.contains('inlet')
 				let outlet = e.currentTarget.classList.contains('outlet')				
-				if ( (inlet || outlet) && editorStore.mode === 'inletCanMove') {
-					editorStore.setMode('inletInMoving')
-					console.log ('setSelected and start in mode  ' + editorStore.mode)
-
-					let coord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);  
-					let	nearest = util.findNearestPointOnPath (selectedPath, coord)
-					setPoint(nearest)
+				if ( (inlet || outlet) && editorStore.inletMode === 'move') {
+					editorStore.setInletMode('inletInMoving')
+					console.log ('setSelected and start in mode  ' + editorStore.inlrtMode)
 					
 				}				
 			}
@@ -56,49 +50,31 @@ const SimpleReturnComponent = observer(() => {
 	}
 
 	const detectCanMove =()=>{
-		if (editorStore.mode === 'inletInMoving') {
-			editorStore.setMode('inletCanMove')
+		if (editorStore.inletMode === 'inletInMoving') {
+			editorStore.setInletMode('move')
 		} 
 	}
 
-	const updatePoint = (e) => {
-		if (editorStore.mode === 'inletInMoving') {
-			let coord = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);  
-			let	nearest = util.findNearestPointOnPath (selectedPath, coord)
-			setPoint(nearest)
-		}				
-	}
+ 
 
 	return (
 		<>
-			<g
-				onMouseMove={ updatePoint }
-			>
-				{svgStore.svgData['code'].map((element, i) => (
-					<g
-						key={i}
-						data-cid={element.cid}
-						className={element.class}
-						//onMouseDown={element.class.includes('contour') ? setSelected : ()=>{}}
-						onMouseDown={setSelected}
-						onMouseUp={detectCanMove}
-						fill={element.class.includes("inner") ? "url(#grid)" : ""}
-					>
-						<path d={element.path}></path>
-					</g>
-				))}
-				<circle
-					r={1}
-					strokeWidth={1}
-					fill="pink" stroke="white"
-					cx={ point.x}
-					cy={ point.y}>
-				</circle>
-			</g>
-			
+			{svgStore.svgData['code'].map((element, i) => (
+				<g
+					key={i}
+					data-cid={element.cid}
+					className={element.class}
+					//onMouseDown={element.class.includes('contour') ? setSelected : ()=>{}}
+					onMouseDown={setSelected}
+					onMouseUp={detectCanMove}
+					fill={element.class.includes("inner") ? "url(#grid)" : ""}
+				>
+					<path d={element.path}></path>
+				</g>
+			))}
+		
 		</>
 	);
-	//}         
-});
+ });
 
 export default SimpleReturnComponent;

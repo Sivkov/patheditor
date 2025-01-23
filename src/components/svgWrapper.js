@@ -3,11 +3,16 @@ import { observer } from 'mobx-react-lite';
 //import { toJS } from 'mobx'; 
 import coordsStore from './stores/coordsStore.js'; 
 import editorStore from './stores/editorStore.js'; 
+import svgStore from './stores/svgStore.js'; 
 import SvgComponent from './svg';
 import Util from './../utils/util';
 //import Arc from './../utils/arc.js';
 import Part from '../scripts/part.js';
 //import tch from './../scripts/touches'
+import inlet from './../scripts/inlet.js'
+import util from './../utils/util.js'
+
+
 
 var tch = {}
 tch.evCache = new Array();
@@ -16,6 +21,13 @@ var prevDiff = -1;
   
 
 const  SvgWrapper = observer (() => {
+
+	const {
+		selectedCid,
+		selectedPath,
+		selectedInletPath
+	} = svgStore;
+
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [gmatrix, setGroupMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [offset, setOffset] = useState({x:0,y:0});
@@ -98,7 +110,6 @@ const  SvgWrapper = observer (() => {
         part.group.transform.baseVal.initialize(transform);
         part.updateRect() */
     }
-
  
 	const pointerdown_handler = (ev) => {
 		ev.preventDefault()
@@ -167,10 +178,6 @@ const  SvgWrapper = observer (() => {
 
 	const endDrag =(e) =>{
 		inMoveRef.current = 0;	
-		if ( editorStore.mode === 'inletInMoving') {
-			editorStore.setMode ('inletCanMove')	
-		}	
-		console.log ('endDrag in mode  ' + editorStore.mode)
 		// ('endDrag ' + inMoveRef.current)
 	}
 
@@ -196,8 +203,19 @@ const  SvgWrapper = observer (() => {
 					f: gmatrix.f,
 				})
 			}
-		} else if ( e.buttons === 1  &&   editorStore.mode === 'inletInMoving') {
+		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
 			console.log ( e.buttons+ '  Drag in mode  ' + editorStore.mode)
+			let nearest = util.findNearestPointOnPath (selectedPath, { x: coords.x, y: coords.y })
+			let inletType = inlet.detectInletType (selectedInletPath)
+			let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
+			let contourType = classes.includes('inner') ? 'inner' : 'outer'
+			let resp = inlet.setInletType ( inletType, selectedCid, nearest, 'move', selectedPath, selectedInletPath, contourType) 
+
+			if (resp ) {
+					svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+				} else {
+					console.log ('Invalid PATH')
+			}
 		}		
 	}
  

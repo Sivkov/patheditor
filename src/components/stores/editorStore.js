@@ -3,6 +3,7 @@ import { makeAutoObservable, toJS } from "mobx";
 
 class EditorStore {
     mode = 'resize'
+    inletMode = ''
     constructor() {
         makeAutoObservable(this);
     }
@@ -11,6 +12,9 @@ class EditorStore {
         this.mode = newMode;
     }
 
+    setInletMode(newMode) {
+        this.inletMode = newMode;
+    }
 }
 
 const editorStore = new EditorStore();

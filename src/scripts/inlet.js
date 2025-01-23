@@ -724,9 +724,9 @@ class Inlet {
         return angle >= Math.PI ? 1 : 0;
     }
     
-    setInletType (newInleType, dataCid=false, endPoint=false, action='set', contourPath, oldInletPath,contourType='inner') {
+    setInletType (newInleType, dataCid, endPoint=false, action='set', contourPath, oldInletPath,contourType='inner') {
         //debugger
-        console.log ('setInletType')
+        //console.log (arguments)
         let centers, IL, checkPoint;
         let newInletPath = ''
         let contourCommand  = SVGPathCommander.normalizePath( contourPath )
@@ -746,7 +746,7 @@ class Inlet {
         // тут мы определяем  точку  начала рисования при изменениии типа врезка тут по любому будет первый сегмент
         // при движении вот приходит из moveInlet 
         let nearestSegment =  contourCommand[1]
-        if (action === 'move') nearestSegment=endPoint.command
+        if (action === 'move') nearestSegment= SVGPathCommander.normalizePath( endPoint.command)[0]
         let inletAngle
         
         if ( oldInletPathSegs &&  oldInletPathSegs.length > 1 ){
@@ -781,6 +781,9 @@ class Inlet {
                     }    
                     x1=nearestSegment[1]
                     y1=nearestSegment[2]
+                    if ( endPoint.x===x1 && endPoint.y=== y1) {
+                        return
+                    }
                     let perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, IL)
                     checkPoint =util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1)
                     var pointIn = util.pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
@@ -871,7 +874,6 @@ class Inlet {
           
             if (contourType==='outer') clockwise=Number(!Boolean(clockwise));
             let r = IL*0.5
-
             let detectOldInletType = this.detectInletType(oldInletPath)
             if (detectOldInletType === "Tangent") {
                 oldInletPathSegs.forEach((seg)=>{
@@ -889,6 +891,9 @@ class Inlet {
                     let perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, r*2) 
                     checkPoint=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1) 
                     pointIn = util.pointInSvgPath(contourPath , (checkPoint[0].x), (checkPoint[0].y))
+                    if ( endPoint.x===x1 && endPoint.y=== y1) {
+                        return
+                    }
                     if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                         pointIndex=0
                     } else {
@@ -914,6 +919,8 @@ class Inlet {
                         centers={}
                         perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, r)
                         checkPoint = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1) 
+                        //console.log (checkPoint)
+                        //console.log (perpendicular)
                         pointIn = util.pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             centers.x=perpendicular[0].x
@@ -929,7 +936,7 @@ class Inlet {
                         }
                         let pp = util.calculateEndPoint(centers.x, centers.y, radius, endPoint.x, endPoint.y, arcLength, clockwise);               
                         newInletPath= `M ${pp.x} ${pp.y} A ${radius} ${radius}  0  ${flag2} ${clockwise} ${endPoint.x}, ${endPoint.y}`   
-                    }              
+                    }               
                     break;
 
                 case 'A':
