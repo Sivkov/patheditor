@@ -4,6 +4,7 @@ import { toJS } from "mobx";
 import Part from "../../scripts/part";
 import SVGPathCommander from "svg-path-commander";
 import Util from "../../utils/util";
+import Inlet from "../../scripts/inlet";
 
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
@@ -163,32 +164,34 @@ class SvgStore {
 			angle ={angle: 0, x:0, y:0}
 		}
 
-		const inlet = svgStore.getElementByCidAndClass (cid, 'inlet')
-		const outlet = svgStore.getElementByCidAndClass (cid, 'outlet')
+		const inletC = svgStore.getElementByCidAndClass (cid, 'inlet')
+		const outletC = svgStore.getElementByCidAndClass (cid, 'outlet')
 
 		this.updateElementValue (cid, className, val, newVal)
 		let start =  SVGPathCommander.normalizePath(newVal)[0]
 		let contourStart =  {x: start[start.length-2], y: start[start.length-1]}
+		let contour = this.getElementByCidAndClass (cid, 'contour')
+		let contourType = contour.class.includes ('inner') ? 'inner' : 'outer'
 
-		if (inlet && inlet.path) {
-			let inletPath = SVGPathCommander.normalizePath(inlet.path)
-			let inletLastSeg = inletPath[inletPath.length-1]
-			let inletEnd = {x: inletLastSeg[inletLastSeg.length-2], y:inletLastSeg[inletLastSeg.length-1]}
-			let xDif = contourStart.x- inletEnd.x
-			let yDif = contourStart.y- inletEnd.y
-			let newInletPath = Util.applyTransform(inlet.path, 1, 1, xDif, yDif, angle)
-			this.updateElementValue (cid, 'inlet', val, newInletPath)
+		if (inletC && inletC.path) {
+			let type = Inlet.detectInletType (inletC.path)
+			let resp = Inlet.setInletType ( type, contourStart, 'update', newVal, inletC.path, contourType) 
+			if (resp ) {
+					svgStore.updateElementValue ( cid, 'inlet', 'path', resp.newInletPath )
+				} else {
+					console.log ('Invalid PATH')
+			}
 		}
 
-		if (outlet && outlet.path) {
-			let outletPath = SVGPathCommander.normalizePath(outlet.path)
-			let outletStart = outletPath[0]
-			let outletStartSeg = {x: outletStart[outletStart.length-2], y:outletStart[outletStart.length-1]}
-			let xDif = contourStart.x- outletStartSeg.x
-			let yDif = contourStart.y- outletStartSeg.y
-			let newOutletPath = Util.applyTransform(outlet.path, 1, 1, xDif, yDif, angle)
-			this.updateElementValue (cid, 'outlet', val, newOutletPath)
-		}
+		/* if (outletC && outletC.path) {			
+			let type = Inlet.detectInletType (outletC.path)
+			let resp = Inlet.setOutletType ( type, cid, contourStart, 'update', newVal, outletC.path, contourType) 
+			if (resp ) {
+					svgStore.updateElementValue ( cid, 'outlet', 'path', resp.newOutletPath )
+				} else {
+					console.log ('Invalid PATH')
+			}
+		} */
 	}
 
 	setContourSelected(cid) {

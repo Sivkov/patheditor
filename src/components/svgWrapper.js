@@ -25,7 +25,9 @@ const  SvgWrapper = observer (() => {
 	const {
 		selectedCid,
 		selectedPath,
-		selectedInletPath
+		selectedInletPath,
+		selectedOutletPath
+
 	} = svgStore;
 
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
@@ -209,13 +211,22 @@ const  SvgWrapper = observer (() => {
 			let inletType = inlet.detectInletType (selectedInletPath)
 			let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 			let contourType = classes.includes('inner') ? 'inner' : 'outer'
-			let resp = inlet.setInletType ( inletType, selectedCid, nearest, 'move', selectedPath, selectedInletPath, contourType) 
+			let resp = inlet.setInletType ( inletType, nearest, 'move', selectedPath, selectedInletPath, contourType) 
 
 			if (resp ) {
 					svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
 				} else {
 					console.log ('Invalid PATH')
 			}
+
+			let outletType = inlet.detectInletType (selectedOutletPath)
+			let resp1 = inlet.setOutletType ( outletType, selectedCid, nearest, 'move', selectedPath, selectedOutletPath, contourType) 
+			if (resp1 ) {
+				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp1.newOutletPath )
+			} else {
+				console.log ('Invalid PATH')
+			}
+
 		}		
 	}
  

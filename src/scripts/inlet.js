@@ -724,12 +724,12 @@ class Inlet {
         return angle >= Math.PI ? 1 : 0;
     }
     
-    setInletType (newInleType, dataCid, endPoint=false, action='set', contourPath, oldInletPath,contourType='inner') {
+    setInletType (newInleType, endPoint=false, action='set', contourPath, oldInletPath,contourType='inner') {
         //debugger
-        //console.log (arguments)
-        let centers, IL, checkPoint;
+        let centers, checkPoint;
+        let IL = this.detectInletLength ( oldInletPath )
         let newInletPath = ''
-        let contourCommand  = SVGPathCommander.normalizePath( contourPath )
+        let contourCommand = SVGPathCommander.normalizePath( contourPath )
         var clockwise = Number(SVGPathCommander.getDrawDirection(contourCommand))
         let oldInletPathSegs = SVGPathCommander.normalizePath(oldInletPath)
         if (!endPoint) {
@@ -742,50 +742,26 @@ class Inlet {
                 return
             }
         }
-      
-        // тут мы определяем  точку  начала рисования при изменениии типа врезка тут по любому будет первый сегмент
-        // при движении вот приходит из moveInlet 
         let nearestSegment =  contourCommand[1]
         if (action === 'move') nearestSegment= SVGPathCommander.normalizePath( endPoint.command)[0]
-        let inletAngle
-        
-        if ( oldInletPathSegs &&  oldInletPathSegs.length > 1 ){
-            let M = oldInletPathSegs[0]
-            let L = oldInletPathSegs[1]
-            inletAngle = util.angleBetweenPoints ( M[1], M[2], L[1], L[2] )
-        } 
-
-        IL = this.detectInletLength ( oldInletPath )
-        
         if (newInleType === "Straight") {
             //newInletPath= `M ${endPoint.x} ${endPoint.y} L ${endPoint.x-1} ${endPoint.y-1}  L ${endPoint.x+1} ${endPoint.y-1} L ${endPoint.x} ${endPoint.y}`
             newInletPath =`M ${endPoint.x} ${endPoint.y} `
         } 
         else if (newInleType === "Direct") {
             const commandType = nearestSegment[0]
-            let A, x1, y1;
+            let x1, y1;
             let path =  SVGPathCommander.normalizePath(oldInletPath)
-            /* if (typeof inlet.newAngleInlet === 'number') {
-                this.inletAngle=this.newAngleInlet
-            }    
-            if (typeof inlet.inletAngle === 'number') {
-                // здесь выясняем был ли повернут ранее путь
-                this.newAngleInlet=this.inletAngle
-            } */
-
             switch (commandType) {       
                 
                 case 'L':
-                    if ( typeof inlet.inletAngle !== 'number') {
-                        inlet.inletAngle = util.angleBetwenContourAndInlet (path, contourCommand)
-                    }    
                     x1=nearestSegment[1]
                     y1=nearestSegment[2]
                     if ( endPoint.x===x1 && endPoint.y=== y1) {
                         return
                     }
-                    let perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, IL)
-                    checkPoint =util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1)
+                    let perpendicular = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, IL)
+                    checkPoint = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1)
                     var pointIn = util.pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
 
                     if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
@@ -793,9 +769,7 @@ class Inlet {
                     } else {
                         pointIndex=1
                     }
-                    if (action === 'move') {
-                        perpendicular[pointIndex]=util.rotatePoint (perpendicular[pointIndex].x, perpendicular[pointIndex].y, endPoint.x, endPoint.y, 90, this.inletAngle) 
-                    }
+                    // TODO если был повернут то нужно повернуть мутная хрень -  подвинул повернул на нужный угол
                     newInletPath= `M ${perpendicular[pointIndex].x} ${perpendicular[pointIndex].y} L ${endPoint.x} ${endPoint.y}`
                     break;
 
@@ -832,41 +806,8 @@ class Inlet {
 					}  else {
 						startPoint = perpPoint.point2
 					} 
+                    // TODO если был повернут то нужно повернуть мутная хрень -  подвинул повернул на нужный угол
 					newInletPath= `M ${startPoint.x} ${startPoint.y} L ${endPoint.x} ${endPoint.y}` 
-/* 					if (action === 'move') {
- 						let MX, MY, LX, LY;
-						if (path.length) {
-							path.forEach( seg=>{
-								if ( seg.includes('M')) {
-									MX=seg[1]
-									MY=seg[2]
-								}
-								if ( seg.includes('L')) {
-									LX=seg[1]
-									LY=seg[2]    
-								} else if (seg.includes('V')) {
-									LY=seg[1]
-									LX=MX 
-								} else if (seg.includes('H')) {
-									LY=MY
-									LX=seg[1]
-								}
-							}) 
-						}                
-
-						//let OP = util.rotatePoint(  startPoint.x, startPoint.y,  perpPoint.point1.x, perpPoint.point1.y, 0, 270)
-						if (typeof this.newAngleInlet !== `number`) {
-							let sds = Math.round(util.calculateAngleVector (  endPoint.x, endPoint.y, startPoint.x, startPoint.y, perpPoint.point1.x, perpPoint.point1.y)*100)/100
-							this.newAngleInlet = (Number(sds||0)%180+90)    
-						}
-
-						//let sds = Math.round(util.calculateAngleVector (  endPoint.x, endPoint.y, startPoint.x, startPoint.y, perpPoint.point1.x, perpPoint.point1.y)*100)/100
-						//console.log (Number(sds||0)%180+90)
-						//console.log (Number(sds))
- 
-						this.newEnds=util.rotatePoint (startPoint.x, startPoint.y, endPoint.x, endPoint.y, 90, this.newAngleInlet) 
-						newInletPath= `M ${this.newEnds.x} ${this.newEnds.y} L ${endPoint.x} ${endPoint.y}`     
-                } */
                 break;
             } 
         } 
@@ -875,14 +816,6 @@ class Inlet {
             if (contourType==='outer') clockwise=Number(!Boolean(clockwise));
             let r = IL*0.5
             let detectOldInletType = this.detectInletType(oldInletPath)
-            if (detectOldInletType === "Tangent") {
-                oldInletPathSegs.forEach((seg)=>{
-                    if (seg[0] === "A" ) {
-                        r=seg[1]                        
-                    }
-                })
-            }
-
             const commandType = nearestSegment[0]
             switch (commandType) {                
                 case 'L':
@@ -919,8 +852,6 @@ class Inlet {
                         centers={}
                         perpendicular=util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, r)
                         checkPoint = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1) 
-                        //console.log (checkPoint)
-                        //console.log (perpendicular)
                         pointIn = util.pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
                             centers.x=perpendicular[0].x
@@ -1121,14 +1052,13 @@ class Inlet {
             this.dataCid = +document.querySelector('.selectedContour[data-cid]').getAttribute("data-cid")
             let respInlet, respOutlet;
             try {            
-                respInlet=inlet.setInletType(inlet.inletInMove.type, this.dataCid, {x:nearest.x, y:nearest.y, command: nearest.command.split(' ').map((a,i) => i== 0 ? a : Number(a))}, 'move')
+                respInlet=inlet.setInletType(inlet.inletInMove.type, {x:nearest.x, y:nearest.y, command: nearest.command.split(' ').map((a,i) => i== 0 ? a : Number(a))}, 'move')
                 respOutlet=inlet.setOutletType(inlet.outletInMove.type, this.dataCid, {x:nearest.x, y:nearest.y, command: nearest.command.split(' ').map((a,i) => i== 0 ? a : Number(a))}, 'move')
                 if (respInlet && respOutlet) {
                     inlet.updateInletAndOutlet (respInlet, respOutlet, 'move')
                 }
            } catch (e) { console.log (e+'catch in inletMoving')
            }
-            //console.log ('inletMoving')       
         }  
     }
 

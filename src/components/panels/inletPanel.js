@@ -41,7 +41,7 @@ const InletPanel = observer(() => {
 		if (type === newType) return;
 		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
-		let resp = inlet.setInletType (newType, false, false, 'set', selectedPath, selectedInletPath, contourType)
+		let resp = inlet.setInletType (newType, false, 'set', selectedPath, selectedInletPath, contourType)
 		if (resp && resp.newInletPath && resp.newInletPath.length) {
 			svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
 			addToLog( 'Set inlet type')
@@ -60,7 +60,7 @@ const InletPanel = observer(() => {
 				let inletPath = element.path
 				let contour = svgStore.getElementByCidAndClass ( element.cid, 'contour')
 
-				let resp = inlet.setInletType (inletMode, element.cid, false, 'set', contour.path, inletPath, contourType)
+				let resp = inlet.setInletType (inletMode, false, 'set', contour.path, inletPath, contourType)
 				if (resp && resp.newInletPath && resp.newInletPath.length) {
 					svgStore.updateElementValue ( element.cid, 'inlet', 'path', resp.newInletPath )
 					setInletParams ()
