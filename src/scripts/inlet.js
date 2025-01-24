@@ -937,6 +937,9 @@ class Inlet {
                oldInletPathSegs.forEach((seg)=>{
                     if (seg[0] === "A" ) {
                         r=seg[1]
+                        if (Math.round(r*2) >= Math.round(IL)) {
+                            r = IL*0.25 
+                        }
                     }
                 })
             }
@@ -1098,8 +1101,8 @@ class Inlet {
 
     setOutletType (newOutleType, dataCid=false, endPoint=false, action='set', contourPath, oldOutletPath, contourType='inner'){
         //debugger
-        console.log ('setOutletType')
-        let centers, IL, checkPoint; 
+        let centers, checkPoint; 
+        let IL = this.detectInletLength ( oldOutletPath )
         let newOutletPath = ''
         let contourCommand  = SVGPathCommander.normalizePath( contourPath )
         var clockwise = Number(SVGPathCommander.getDrawDirection(contourCommand))
@@ -1107,36 +1110,20 @@ class Inlet {
         if (!endPoint) {
             endPoint = {x:contourCommand[0][1], y:contourCommand[0][2]}
         }
-        IL = this.detectInletLength ( oldOutletPath ) 
         const oldOutletType = inlet.detectInletType(oldOutletPath)
         if ( action === 'set') {
             if (!oldOutletType || !newOutleType || (newOutleType === oldOutletType)) {
                 return false
             }
         }
-
         let nearestSegment =  contourCommand[1]
-        if (action === 'move') nearestSegment=endPoint.command
-        let outletAngle
-        
-        if ( oldOutletPathSegs.length >1){
-            let M = oldOutletPathSegs[0]
-            let L = oldOutletPathSegs[1]
-            outletAngle = util.angleBetweenPoints (M[1], M[2], L[1], L[2])
-        } 
-        
+        if (action === 'move') nearestSegment= SVGPathCommander.normalizePath( endPoint.command)[0]
         if (newOutleType === "Straight") {
             newOutletPath= `M ${endPoint.x} ${endPoint.y}`
         } else if (newOutleType === "Direct")  {
             const commandType = nearestSegment[0]
-            let A, x1, y1;
+            let x1, y1;
             let path =  SVGPathCommander.normalizePath( oldOutletPath )
-            /* if (typeof inlet.newAngleOutlet === 'number') {
-                this.outletAngle=180-this.newAngleOutlet
-            }
-            if (typeof inlet.outletAngle === 'number') {
-                this.newAngleOutlet=180-this.outletAngle
-            } */
             switch (commandType) {       
                 
                 case 'L':
@@ -1145,6 +1132,9 @@ class Inlet {
                     }    
                     x1=nearestSegment[1]
                     y1=nearestSegment[2]
+                    if ( endPoint.x===x1 && endPoint.y=== y1) {
+                        return
+                    }
                     let perpendicular = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, IL)
                     checkPoint = util.findPerpendicularPoints( endPoint.x,endPoint.y, x1, y1, 1)
                     var pointIn = util.pointInSvgPath(contourPath , checkPoint[0].x, checkPoint[0].y)
@@ -1153,10 +1143,7 @@ class Inlet {
                     } else {
                         pointIndex=1
                     }
-                    // Что бля этот такое ??
-                 /*    if (action === 'move') {
-                        perpendicular[pointIndex]=util.rotatePoint (perpendicular[pointIndex].x, perpendicular[pointIndex].y, endPoint.x, endPoint.y, 90, 180-this.outletAngle) 
-                    } */
+                    // TODO если был повернут то нужно повернуть мутная хрень -  подвинул повернул на нужный угол
                     newOutletPath= `M${endPoint.x} ${endPoint.y} L${perpendicular[pointIndex].x} ${perpendicular[pointIndex].y}`
                     break;
 
@@ -1169,7 +1156,6 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
-                    // Calculate the center of the arc
                     let CX= contourCommand[0][1]
                     let CY= contourCommand[0][2]
                     for (let i = 1; i < contourCommand.length; i++) {
@@ -1185,109 +1171,23 @@ class Inlet {
                         }
                     }          
 
-                    if (rx !== ry) {
-                        let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
-                        let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
-                        let startPoint 
-                        pointIn = util.pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
-                        if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
-                            startPoint = perpPoint.point1
-                        }  else {
-                            startPoint = perpPoint.point2
-                        } 
-                        newOutletPath= `M ${startPoint.x} ${startPoint.y} L ${endPoint.x} ${endPoint.y}` 
-                    /*      if (action === 'move') {
-                            console.log ("Ебааать !")
-                            let MX, MY, LX, LY;
-                            if (path.length) {
-                                path.forEach( seg=>{
-                                    if ( seg.includes('M')) {
-                                        MX=seg[1]
-                                        MY=seg[2]
-                                    }
-                                    if ( seg.includes('L')) {
-                                        LX=seg[1]
-                                        LY=seg[2]    
-                                    } else if (seg.includes('V')) {
-                                        LY=seg[1]
-                                        LX=MX 
-                                    } else if (seg.includes('H')) {
-                                        LY=MY
-                                        LX=seg[1]
-                                    }
-                                }) 
-                            }                
-                            //let OP = util.rotatePoint(  startPoint.x, startPoint.y,  perpPoint.point1.x, perpPoint.point1.y, 0, 270)
-                            if (typeof this.newAngleOutlet !== `number`) {
-                                let sds = Math.round(util.calculateAngleVector (  endPoint.x, endPoint.y, startPoint.x, startPoint.y, perpPoint.point1.x, perpPoint.point1.y)*100)/100
-                                this.newAngleOutlet = (Number(sds||0)%180+90)    
-                            }
-
-                            let sds = Math.round(util.calculateAngleVector (  endPoint.x, endPoint.y, startPoint.x, startPoint.y, perpPoint.point1.x, perpPoint.point1.y)*100)/100
-                            //console.log (Number(sds||0)%180+90)
-                            console.log (Number(sds))
-
-                            this.newEnds=util.rotatePoint (startPoint.x, startPoint.y, endPoint.x, endPoint.y, 90, this.newAngleOutlet) 
-                            newOutletPath= `M${endPoint.x} ${endPoint.y} L${this.newEnds.x} ${this.newEnds.y}`       
-                        }  */
-
-
-                    } else {
-                        centers = util.svgArcToCenterParam (CX, CY, rx, ry, flag1, flag2, flag3, EX, EY, true) 
-                        let inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, 1)
-                        var pointIn = util.pointInSvgPath(contourPath , (inletPoint.x), (inletPoint.y))                    
-                        if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
-                            inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, centers.x, centers.y, IL)
-                        } else {
-                            inletPoint= util.findPointWithSameDirection(  centers.x, centers.y, endPoint.x, endPoint.y, IL+rx)
-                        } 
-                        newOutletPath= `M${endPoint.x} ${endPoint.y} L${inletPoint.x} ${inletPoint.y}` 
-
-                        /* if (action === 'move' && A !==90) {
-                            //console.log ("Ебааать !")
-                            let MX, MY, LX, LY;
-                            if (path.length) {
-                                path.forEach( seg=>{
-                                    if ( seg.includes('M')) {
-                                        MX=seg[1]
-                                        MY=seg[2]
-                                    }
-                                    if ( seg.includes('L')) {
-                                        LX=seg[1]
-                                        LY=seg[2]    
-                                    } else if (seg.includes('V')) {
-                                        LY=seg[1]
-                                        LX=MX 
-                                    } else if (seg.includes('H')) {
-                                        LY=MY
-                                        LX=seg[1]
-                                    }
-                                }) 
-                            }               
-
-                            let OP = util.rotatePoint(  centers.x, centers.y,  LX, LY, 0, 270)
-                            if (typeof this.newAngleOutlet !== `number`) {
-                                this.newAngleOutlet = Math.round(util.calculateAngleVector ( LX, LY, MX, MY, OP.x, OP.y)*100)/100
-                            }
-                            this.newEnds=util.rotatePoint (inletPoint.x, inletPoint.y, endPoint.x, endPoint.y, 90, this.newAngleOutlet) 
-                            newOutletPath= `M${endPoint.x} ${endPoint.y} L${this.newEnds.x} ${this.newEnds.y}`       
-                        }  */
-                    }
-                    break;
+                    let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
+                    let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
+                    let startPoint 
+                    pointIn = util.pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
+                    if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
+                        startPoint = perpPoint.point1
+                    }  else {
+                        startPoint = perpPoint.point2
+                    } 
+                    // TODO если был повернут то нужно повернуть мутная хрень -  подвинул повернул на нужный угол
+                    newOutletPath= `M ${startPoint.x} ${startPoint.y} L ${endPoint.x} ${endPoint.y}` 
+                break;
              } 
         } else if (newOutleType === "Tangent")  {
 
 			if (contourType === 'outer') clockwise = Number(!Boolean(clockwise));
 			let r = IL * 0.5
-
-			if (oldOutletType === "Tangent") {
-				oldOutletPathSegs.forEach((seg) => {
-					if (seg[0] === "A") {
-						r = seg[1]
-					}
-				})
-			}
-
 			const commandType = nearestSegment[0]
 			switch (commandType) {
 				case 'L':
@@ -1296,7 +1196,10 @@ class Inlet {
 					let perpendicular = util.findPerpendicularPoints(endPoint.x, endPoint.y, x1, y1, IL)
 					checkPoint = util.findPerpendicularPoints(endPoint.x, endPoint.y, x1, y1, 1)
 					pointIn = util.pointInSvgPath(contourPath, (checkPoint[0].x), (checkPoint[0].y))
-					if ((pointIn && contourType === 'inner') || (!pointIn && contourType === 'outer')) {
+                    if ( endPoint.x===x1 && endPoint.y=== y1) {
+                        return
+                    }
+                    if ((pointIn && contourType === 'inner') || (!pointIn && contourType === 'outer')) {
 						newOutletPath = `M ${endPoint.x} ${endPoint.y} A ${r} ${r} 0 0 ${clockwise} ${perpendicular[0].x} ${perpendicular[0].y}`
 					} else {
 						newOutletPath = `M ${endPoint.x} ${endPoint.y} A ${r} ${r} 0 0 ${clockwise} ${perpendicular[1].x} ${perpendicular[1].y}`
@@ -1335,7 +1238,6 @@ class Inlet {
 						}
 						let pp = util.calculateEndPoint(centers.x, centers.y, radius, endPoint.x, endPoint.y, arcLength, clockwise === 0 ? 1 : 0);
 						newOutletPath = `M ${endPoint.x}, ${endPoint.y} A ${radius} ${radius}  0  ${flag2} ${clockwise} ${pp.x} ${pp.y} `
-						//pointIn = util.pointInSvgPath(contourPath , pp.x, pp.y)                        
 					}
 					break;
 				case 'A':

@@ -183,7 +183,7 @@ class SvgStore {
 			}
 		}
 
-		/* if (outletC && outletC.path) {			
+		if (outletC && outletC.path) {			
 			let type = Inlet.detectInletType (outletC.path)
 			let resp = Inlet.setOutletType ( type, cid, contourStart, 'update', newVal, outletC.path, contourType) 
 			if (resp ) {
@@ -191,7 +191,7 @@ class SvgStore {
 				} else {
 					console.log ('Invalid PATH')
 			}
-		} */
+		} 
 	}
 
 	setContourSelected(cid) {
