@@ -920,7 +920,7 @@ class Inlet {
             let respInlet, respOutlet;
             try {            
                 respInlet=inlet.setInletType(inlet.inletInMove.type, {x:nearest.x, y:nearest.y, command: nearest.command.split(' ').map((a,i) => i== 0 ? a : Number(a))}, 'move')
-                respOutlet=inlet.setOutletType(inlet.outletInMove.type, this.dataCid, {x:nearest.x, y:nearest.y, command: nearest.command.split(' ').map((a,i) => i== 0 ? a : Number(a))}, 'move')
+                respOutlet=inlet.setOutletType(inlet.outletInMove.type, {x:nearest.x, y:nearest.y, command: nearest.command.split(' ').map((a,i) => i== 0 ? a : Number(a))}, 'move')
                 if (respInlet && respOutlet) {
                     inlet.updateInletAndOutlet (respInlet, respOutlet, 'move')
                 }
@@ -963,7 +963,7 @@ class Inlet {
         return true
     }
 
-    setOutletType (newOutleType, dataCid=false, endPoint=false, action='set', contourPath, oldOutletPath, contourType='inner'){
+    setOutletType (newOutleType, endPoint=false, action='set', contourPath, oldOutletPath, contourType='inner'){
         //debugger
         let centers, checkPoint; 
         let IL = this.detectInletLength ( oldOutletPath )

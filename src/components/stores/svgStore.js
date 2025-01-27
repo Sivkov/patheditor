@@ -185,7 +185,7 @@ class SvgStore {
 
 		if (outletC && outletC.path) {			
 			let type = Inlet.detectInletType (outletC.path)
-			let resp = Inlet.setOutletType ( type, cid, contourStart, 'update', newVal, outletC.path, contourType) 
+			let resp = Inlet.setOutletType ( type, contourStart, 'update', newVal, outletC.path, contourType) 
 			if ( resp ) {
 					svgStore.updateElementValue ( cid, 'outlet', 'path', resp.newOutletPath )
 				} else {

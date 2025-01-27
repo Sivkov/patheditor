@@ -226,7 +226,7 @@ const  SvgWrapper = observer (() => {
 	
 
 			let outletType = inlet.detectInletType (selectedOutletPath)
-			let resp1 = inlet.setOutletType ( outletType, selectedCid, nearest, 'move', selectedPath, selectedOutletPath, contourType) 
+			let resp1 = inlet.setOutletType ( outletType, nearest, 'move', selectedPath, selectedOutletPath, contourType) 
 			
 
 			if (resp  && resp1) {
