@@ -340,14 +340,13 @@ class Part {
     }   
     
     static detectContourModeType (classes) {
-        console.log ('detectContourModeType' + classes)
+        //console.log ('detectContourModeType' + classes)
         for (let t in CONSTANTS.operatingModes) {
             if (classes.includes(CONSTANTS.operatingModes[t])){
                 return t
             } 
         }
-        return -1
-        
+        return -1        
     }
     
     static partDetectCollision ( data ) {

@@ -105,7 +105,8 @@ class ArcConverting {
         var ryx1_ = ry * x1_;
         var sum_of_sq = rxy1_ * rxy1_ + ryx1_ * ryx1_; // sum of square
         if (!sum_of_sq) {
-            throw Error('start point can not be same as end point');
+            return false
+            //throw Error('start point can not be same as end point');
         }
         var coe = Math.sqrt(Math.abs((rxry * rxry - sum_of_sq) / sum_of_sq));
         if (fA === fS) { coe = -coe; }

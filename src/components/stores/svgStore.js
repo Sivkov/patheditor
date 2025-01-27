@@ -176,7 +176,7 @@ class SvgStore {
 		if (inletC && inletC.path) {
 			let type = Inlet.detectInletType (inletC.path)
 			let resp = Inlet.setInletType ( type, contourStart, 'update', newVal, inletC.path, contourType) 
-			if (resp ) {
+			if ( resp ) {
 					svgStore.updateElementValue ( cid, 'inlet', 'path', resp.newInletPath )
 				} else {
 					console.log ('Invalid PATH')
@@ -186,7 +186,7 @@ class SvgStore {
 		if (outletC && outletC.path) {			
 			let type = Inlet.detectInletType (outletC.path)
 			let resp = Inlet.setOutletType ( type, cid, contourStart, 'update', newVal, outletC.path, contourType) 
-			if (resp ) {
+			if ( resp ) {
 					svgStore.updateElementValue ( cid, 'outlet', 'path', resp.newOutletPath )
 				} else {
 					console.log ('Invalid PATH')

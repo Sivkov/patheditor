@@ -61,7 +61,7 @@ class Inlet {
             let end = {x: lastSeg[lastSeg.length-2], y: lastSeg[lastSeg.length-1]}
             IL =  util.distance (start, end)
         }
-        console.log ('Detected length ' + IL)
+        //console.log ('Detected length ' + IL)
         return Math.round(IL*1000)/1000
     }
 
@@ -410,123 +410,6 @@ class Inlet {
         return resp
     }
 
-    detectCommandContainingPoint(pathString, point, threshold) {
-        const pathCommands = SVGPathCommander.normalizePath (pathString)
-        
-        let currentX = 0;
-        let currentY = 0;
-        let index = 0
-        
-        for (const command of pathCommands) {
-            const commandType = command[0]
-            //console.log (commandType)
-            
-            switch (commandType) {
-                case 'M':
-                    const mx = parseFloat(command[1]);
-                    const my = parseFloat(command[2]);
-                    if ( util.distance (point.x, point.y, mx, my) <= threshold ) {
-                        return {command, index, pathCommands};
-                    }
-                    currentX = mx;
-                    currentY = my;
-                    break;
-                case 'L':
-                    const x = parseFloat(command[1]);
-                    const y = parseFloat(command[2]);
-                    if (  util.distancePointToSection(point.x, point.y, x, y, currentX, currentY) <= threshold ) {
-                        return {command, index, pathCommands};
-                    }
-                    currentX = x;
-                    currentY = y;
-                    break;
-                case 'H':
-                    const hx = parseFloat(command[1]);
-                    if ( util.distancePointToSection(point.x, point.y, hx, currentY, currentX, currentY) <= threshold) {
-                        return {command, index, pathCommands};
-                    }
-                     currentX = hx;
-                    break;
-                case 'V':
-                    const vy = parseFloat(command[1]);
-                    if ( util.distancePointToSection(point.x, point.y, currentX, vy, currentX, currentY) <= threshold) {
-                        return {command, index, pathCommands};
-                    }
-                     currentY = vy;
-                    break;
-                case 'A':
-                    // Extract command for arc command
-                    let rx = parseFloat(command[1]);
-                    let ry = parseFloat(command[2]);
-                    let flag1 = parseFloat(command[3]);
-                    const flag2 = parseFloat(command[4]);
-                    const flag3 = parseFloat(command[5]);
-                    const sweepFlag = parseFloat(command[5]);
-                    const EX = parseFloat(command[6]);
-                    const EY = parseFloat(command[7]);
-                    // Calculate the center of the arc
-                    if (flag1 === 90 && rx !== ry)  {
-						flag1 = 0
- 						rx = parseFloat(command[2]);
-						ry = parseFloat(command[1]);
-					}
-                    const x1 = currentX;
-                    const y1 = currentY;
-                    const x2 = EX;
-                    const y2 = EY;
-                    let centers = util.svgArcToCenterParam (x1, y1, rx, ry, flag1, flag2, flag3, EX, EY, true) 
-                    let startAngleRad =  Math.atan2(y1 - centers.y, x1 - centers.x);
-                    let endAngleRad = Math.atan2(y2 - centers.y, x2 - centers.x);
-                    let angleRad = Math.atan2(point.y - centers.y, point.x - centers.x);
-
-                    let startAngleDeg = (util.radianToDegree( startAngleRad ) +360 ) % 360
-                    let endAngleDeg = (util.radianToDegree( endAngleRad ) +360 ) % 360
-                    let angleDeg = (util.radianToDegree( angleRad ) +360) % 360
-               
-                    let between=false;
-                    // стрелки
-                    if (sweepFlag === 0 ) {
-                        if ( startAngleDeg > endAngleDeg) {
-                            if (startAngleDeg > angleDeg && angleDeg > endAngleDeg) {
-                                between=true;
-                            }
-                        } else {
-                            if (startAngleDeg > angleDeg || angleDeg > endAngleDeg){
-                                between=true;
-                            }
-                        }
-                    } else {
-                        if ( endAngleDeg > startAngleDeg) {
-                            if (endAngleDeg> angleDeg && angleDeg > startAngleDeg) {
-                                between=true;
-                            }
-                        } else {
-                            if (endAngleDeg> angleDeg || angleDeg > startAngleDeg){
-                                between=true;
-                            }
-                        }
-                    }
-                   // const distance = Math.sqrt((centers.x - point.x) ** 2 + (centers.y - point.y) ** 2);
-                    /*if (Math.abs(distance - rx) <= threshold  && between) {
-                        return {command, index, pathCommands};
-                    }*/
-                    const distance = Math.sqrt(((centers.x - point.x) / rx) ** 2 + ((centers.y - point.y) / ry) ** 2);
-                    // Проверяем, находится ли точка на расстоянии, равном радиусу дуги, с допустимой погрешностью и лежит ли она между углами
-                    if (Math.abs(distance - 1) <= threshold / rx && between) {
-                        return { command, index, pathCommands }; // Возвращаем команду дуги, если точка удовлетворяет условиям
-                    }
-                    
-                    currentX = EX;
-                    currentY = EY;
-                    break;
-                // Handle other command types (e.g., 'C', 'Q', etc.) similarly
-                // Add cases as needed based on the SVG path commands you're using
-            }
-            index+=1
-        }
-        return null; 
-    }
-
     detectPreviousPoint(segments, currentIndex) {
 		let currentX = 0;
 		let currentY = 0;
@@ -563,17 +446,19 @@ class Inlet {
 		}
 	}
 
-    updateInletPath () {
-        if (!Number.isInteger(inlet.dataCid)) return;
-        let p = document.querySelector(`.contour[data-cid="${inlet.dataCid}"] path`)
-        let inletElement= document.querySelector(`.inlet[data-cid="${inlet.dataCid}"] path`)
-        if (!inletElement || !p) return;
-        this.inletPath = inletElement.getAttribute('d')
-        let pp= p.getAttribute('d')
-        let point = util.getLastPointOfPath( this.inletPath)
-        let threshold =0.05
+    updateContourPathInMove (pp, point, nearest) {
+        //console.log ('updateContourPathInMove')
         let lastString;
-        let res = inlet.detectCommandContainingPoint(pp, point, threshold);
+        let res = {}
+        res.pathCommands = SVGPathCommander.normalizePath(pp)
+        res.command = SVGPathCommander.normalizePath( nearest.command )[0]
+        for (let i=0;i<res.pathCommands.length;i++) {
+            if ( util.arraysAreEqual(res.pathCommands[i], res.command)) {
+                //console.log ("New Index " + i)
+                res.index=i
+            }
+        }
+
         let segments= []
 		if (!res) return;
         let till = res.pathCommands.length-1;
@@ -630,12 +515,6 @@ class Inlet {
             case 'L':
                 lastString=['L', point.x, point.y]              
                 break;
-            case 'H':
-                lastString=['H',point.x]              
-                break;
-            case 'V':
-                lastString=['V',point.y]              
-                break;
             case 'A':
                 const rx = parseFloat(res.command[1]);
                 const ry = parseFloat(res.command[2]);
@@ -683,22 +562,7 @@ class Inlet {
 				}
 			}
 		})
-
-        //console.log (JSON.stringify(segments))
-        //segments = util.divideArcs(segments)
-        segments = segments.map( a => a.join(" ")).join(" ")
-        document.querySelector(`.contour[data-cid="${inlet.dataCid}"] path`).setAttribute('d',  segments )
-		inlet.dataCid = false
-        inlet.inletPath = false
-        //inlet.inletInMove = false
-        inlet.initialCommand = false
-        try {
-            inlet.dataCid = +document.querySelector('.selectedContour[data-cid]').getAttribute("data-cid")
-            inlet.inlet = document.querySelector(`.inlet[data-cid="${inlet.dataCid}"] path`)
-            inlet.inletPath =  inlet.inlet.getAttribute("d")
-        } catch(e) {
-            console.log("this.inletPath not defined!!" )
-        }
+        return segments.join('').replaceAll(',', ' ')
     } 
 
     calculateAngle(centerX, centerY, x1, y1, x2, y2, clockwise) {
@@ -1034,7 +898,7 @@ class Inlet {
         return resp     
     }
 
-    inletMoving (e) {
+   /*  inletMoving (e) {
         let contour = document.querySelector(`.contour[data-cid="${inlet.inletInMove.dataCid}"] path`).getAttribute('d')
         inlet.inletPath = document.querySelector(`.inlet[data-cid="${inlet.inletInMove.dataCid}"] path`).getAttribute('d')
         if (!contour || !inlet.inletPath) return; 
@@ -1064,7 +928,7 @@ class Inlet {
            }
         }  
     }
-
+ */
     checkInletPosition (path, type, inletType, inletOutlet,seg=1) {
         const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		pathElement.setAttribute("d", path);
@@ -1855,7 +1719,7 @@ class Inlet {
             }
 
             if ((inl && inl.action === 'move') || (outlet && outlet.action === 'move')) {
-                this.updateInletPath()
+               // this.updateContourPathInMove()
             }
             return true
         } else {

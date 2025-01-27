@@ -6,11 +6,11 @@ import editorStore from './stores/editorStore.js';
 import svgStore from './stores/svgStore.js'; 
 import SvgComponent from './svg';
 import Util from './../utils/util';
-//import Arc from './../utils/arc.js';
 import Part from '../scripts/part.js';
 //import tch from './../scripts/touches'
 import inlet from './../scripts/inlet.js'
 import util from './../utils/util.js'
+import SVGPathCommander from 'svg-path-commander';
 
 
 
@@ -179,8 +179,18 @@ const  SvgWrapper = observer (() => {
 	}
 
 	const endDrag =(e) =>{
+		//console.log ('End *** drag ' + editorStore.inletMode)
 		inMoveRef.current = 0;	
-		// ('endDrag ' + inMoveRef.current)
+		//TODO update contour by mouseUp
+		/* let inletC = SVGPathCommander.normalizePath(selectedInletPath)
+		let lastSeg = inletC[inletC.length-1]
+		let start = {x: lastSeg[lastSeg.length-2], y: lastSeg[lastSeg.length-1]}
+		if (editorStore.inletMode === 'move') {
+			let nearest = util.findNearestPointOnPath (selectedPath, start)
+			let newPath = inlet.updateContourPathInMove(selectedPath, start, nearest)
+			console.log (newPath)
+			svgStore.updateElementValue ( selectedCid, 'contour', 'path', newPath )
+		}	 */
 	}
 
 	const leave =(e)=>{	
@@ -189,7 +199,7 @@ const  SvgWrapper = observer (() => {
 
 	const drag =(e) =>{
  		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
-		coordsStore.setCoords({ x: Math.round( coords.y*100) / 100, y: Math.round( coords.y*100) / 100 });
+		coordsStore.setCoords({ x: Math.round( coords.x*100) / 100, y: Math.round( coords.y*100) / 100 });
 		if (e.target && ((e.buttons === 4 ) || editorStore.mode== 'drag')) {
 			if (!inMoveRef.current) return;
 			var coord = Util.getMousePosition(e);
@@ -206,27 +216,34 @@ const  SvgWrapper = observer (() => {
 				})
 			}
 		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
-			console.log ( e.buttons+ '  Drag in mode  ' + editorStore.mode)
+			editorStore.setInletMode('inletInMoving')
+			//console.log ( e.buttons+ '  Drag in mode  ' + editorStore.mode)
 			let nearest = util.findNearestPointOnPath (selectedPath, { x: coords.x, y: coords.y })
 			let inletType = inlet.detectInletType (selectedInletPath)
 			let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 			let contourType = classes.includes('inner') ? 'inner' : 'outer'
 			let resp = inlet.setInletType ( inletType, nearest, 'move', selectedPath, selectedInletPath, contourType) 
-
-			if (resp ) {
-					svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-				} else {
-					console.log ('Invalid PATH')
-			}
+	
 
 			let outletType = inlet.detectInletType (selectedOutletPath)
 			let resp1 = inlet.setOutletType ( outletType, selectedCid, nearest, 'move', selectedPath, selectedOutletPath, contourType) 
-			if (resp1 ) {
-				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp1.newOutletPath )
+			
+
+			if (resp  && resp1) {
+				
+				if (typeof nearest.x  === 'number' &&  typeof nearest.y  === 'number') {
+					let start = {x:nearest.x, y:nearest.y}
+					let newPath = inlet.updateContourPathInMove(selectedPath, start, nearest)
+					if (SVGPathCommander.isValidPath(newPath)) {
+						svgStore.updateElementValue ( selectedCid, 'contour', 'path', newPath )
+						svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp1.newOutletPath )
+						svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+					}
+				}
 			} else {
 				console.log ('Invalid PATH')
-			}
 
+			}
 		}		
 	}
  

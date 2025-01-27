@@ -15,6 +15,10 @@ class Util {
 		return rad;
 	}
 
+	static radianToDegree(rad) {
+		return rad * (180 / Math.PI);
+	}
+
 	static distance(arg1, arg2, arg3 = null, arg4 = null) {
         let x1, y1, x2, y2;
 
@@ -364,7 +368,7 @@ class Util {
 		return point;
 	}
 
-	static 	getPerpendicularCoordinates(arcParams, length) {
+	static getPerpendicularCoordinates(arcParams, length) {
 		const { clockwise, cx, cy, deltaAngle, endAngle, phi, rx, ry, startAngle } = arcParams;
 	
 		// Calculate coordinates of the point on the ellipse at startAngle
@@ -398,7 +402,7 @@ class Util {
 		};
 	}
 
-	static 	arraysAreEqual(arr1, arr2) {
+	static arraysAreEqual(arr1, arr2) {
 		if (arr1.length !== arr2.length) {
 		   return false;
 	   }
@@ -507,100 +511,7 @@ class Util {
 		return outputObj;
 	}
 
-	static leBetwenContourAndInlet ( path, contourPath, inlet=true) {
-		let  A, MX, MY, LX, LY,  PX, PY;
-		if(inlet){
-			if (path.length) {
-				path.forEach( seg=>{
-					if ( seg.includes('M')) {
-						MX=seg[1]
-						MY=seg[2]
-					}
-					if ( seg.includes('L')) {
-						LX=seg[1]
-						LY=seg[2]    
-					} else if (seg.includes('V')) {
-						LY=seg[1]
-						LX=MX 
-					} else if (seg.includes('H')) {
-						LY=MY
-						LX=seg[1]
-					}
-				}) 
-			}
-		
-			contourPath.forEach((seg, i, arr)=>{
-				if (i < 2){
-					if (seg.includes('M')) {
-						PX=seg[1]
-						PY=seg[2]
-					} else if ( seg.includes('L')) {
-						PX=seg[1]
-						PY=seg[2]    
-					} else if (seg.includes('V')) {
-						PY=seg[1]//-1
-					 } else if (seg.includes('H')) {
-						PX=seg[1]//-1
-					} else if (seg.includes('A')) {
-						PX=seg[6]
-						PY=seg[7]
-					}
-				}
-			})
-			
-			A = this.calculateAngleVector ( LX, LY, MX, MY, PX, PY)
-			return A
-		} else {
-			if(!path.hasOwnProperty('segments')){
-				path =  SVGPathCommander.normalizePath(path)
-			}
-            if (path.length) {
-                path.forEach((seg,i)=>{
-                    if ( seg.includes('M')) {
-                        MX=seg[1]
-                        MY=seg[2]
-                    }
-                    if ( seg.includes('L')) {
-                        LX=seg[1]
-                        LY=seg[2]    
-                    } else if (seg.includes('V')) {
-                        LY=seg[1]
-                        LX=MX 
-                    } else if (seg.includes('H')) {
-                        LY=MY
-                        LX=seg[1]
-                    }
-                }) 
-            }
-
-			if(!contourPath.hasOwnProperty('segments')){
-				contourPath =  SVGPathCommander.normalizePath(contourPath)
-			}
-
-            contourPath.forEach((seg, i)=>{
-                if (i < contourPath.length-1){
-                    if (seg.includes('M')) {
-                        PX=seg[1]
-                        PY=seg[2]
-                    } else if ( seg.includes('L')) {
-                        PX=seg[1]
-                        PY=seg[2]    
-                    } else if (seg.includes('V')) {
-                        PY=seg[1]
-                     } else if (seg.includes('H')) {
-                        PX=seg[1]
-                    } else if (seg.includes('A')) {
-                        PX=seg[6]
-                        PY=seg[7]
-                    }
-                }
-            })
-            A = this.calculateAngleVector ( MX, MY,  LX, LY, PX, PY)
-			return A			
-		}
-	}
-
-	static 	calculateAngleVector(x, y, x1, y1, x2, y2) {
+	static calculateAngleVector(x, y, x1, y1, x2, y2) {
 		// Calculate vectors
 		const vector1 = { x: x1 - x, y: y1 - y };
 		const vector2 = { x: x2 - x, y: y2 - y };
@@ -658,7 +569,7 @@ class Util {
 		return angle_degrees_AB
 	}
 
-	static 	findTangentPoints(circleCenterX, circleCenterY, radius, pointX, pointY) {
+	static findTangentPoints(circleCenterX, circleCenterY, radius, pointX, pointY) {
 		// Расчет расстояния между центром окружности и точкой
 		var distance = Math.sqrt(Math.pow(pointX - circleCenterX, 2) + Math.pow(pointY - circleCenterY, 2));
 		
@@ -899,7 +810,7 @@ class Util {
 	}
 
 	static pointInSvgPath(path, x, y) {
-		console.log(arguments)
+		//console.log(arguments)
 		let polyline = this.pathToPolyline(path)
 		let polygon = this.transformCoordinates(polyline)
 		let pointIn = inside([x, y], polygon)
@@ -987,10 +898,11 @@ class Util {
 		         
         for (const command of pathCommands) {
             const commandType = command[0]
+			
             switch (commandType) {
                 case 'M':
-                    currentX = parseFloat(command[1]);;
-                    currentY = parseFloat(command[2]);;				
+                    currentX = parseFloat(command[1]);
+                    currentY = parseFloat(command[2]);				
                     break;
                 case 'L':
                     const x = parseFloat(command[1]);

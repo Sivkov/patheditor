@@ -3,7 +3,7 @@ import svgStore from "./stores/svgStore.js";
 import editorStore from "./stores/editorStore.js";
 import Part from "./../scripts/part";
 import React, { useEffect, useState } from 'react';
-import util from "../utils/util.js";
+//import util from "../utils/util.js";
 
 const SimpleReturnComponent = observer(() => {
 
@@ -12,8 +12,8 @@ const SimpleReturnComponent = observer(() => {
 
 	const {
 		selectedCid,
-		selectedPath,
-		selectedInletPath
+		//selectedPath,
+		//selectedInletPath
 	} = svgStore;
 
 	useEffect(() => {
@@ -53,9 +53,7 @@ const SimpleReturnComponent = observer(() => {
 		if (editorStore.inletMode === 'inletInMoving') {
 			editorStore.setInletMode('move')
 		} 
-	}
-
- 
+	} 
 
 	return (
 		<>
