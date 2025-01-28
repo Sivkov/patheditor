@@ -255,6 +255,7 @@ const InletPanel = observer(() => {
 		let inletMode = inlet.detectInletType ( selectedInletPath )
 		setInletParams(inletMode)
 		editorStore.setInletMode(mode)
+		console.log ("Set mode" + mode)
 	}, [ selectedCid, mode])
 
 	const panelInfo = [
@@ -318,6 +319,7 @@ const InletPanel = observer(() => {
 											name="inletMode"
 											id="inletModeSet"
 											onMouseDown={() => { setMode('set') }}
+											checked={mode === 'set'}										
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletModeSet">
 											Set
@@ -330,6 +332,7 @@ const InletPanel = observer(() => {
 											name="inletMode"
 											id="inletModeEdit"
 											onMouseDown={() => { setMode('edit') }}
+											checked={mode === 'edit'}										
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletModeEdit">
 											Edit
@@ -342,6 +345,7 @@ const InletPanel = observer(() => {
 											name="inletMode"
 											id="inletModeMove"
 											onMouseDown={() => { setMode('move') }}
+											checked={mode === 'move'}											
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletModeMove">
 											Move

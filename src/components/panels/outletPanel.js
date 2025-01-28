@@ -298,6 +298,7 @@ const OutletPanel = observer(() => {
 											name="outletMode"
 											id="outletModeSet"
 											onMouseDown={() => { setMode('set') }}
+											checked={mode === 'set'}
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletModeSet">
 											Set
@@ -310,6 +311,8 @@ const OutletPanel = observer(() => {
 											name="outletMode"
 											id="outletModeEdit"
 											onMouseDown={() => { setMode('edit') }}
+											checked={mode === 'edit'}
+
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletModeEdit">
 											Edit

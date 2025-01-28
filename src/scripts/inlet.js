@@ -609,7 +609,7 @@ class Inlet {
             }
         }
         let nearestSegment =  contourCommand[1]
-        const commandType = nearestSegment[0]
+        //const commandType = nearestSegment[0]
         //console.log ( 'Inlet  ' + commandType)
         if (action === 'move') nearestSegment= SVGPathCommander.normalizePath( endPoint.command)[0]
         if (newInleType === "Straight") {
@@ -617,7 +617,7 @@ class Inlet {
             newInletPath =`M ${endPoint.x} ${endPoint.y} `
         } 
         else if (newInleType === "Direct") {
-            //const commandType = nearestSegment[0]
+            const commandType = nearestSegment[0]
             let x1, y1;
             let path =  SVGPathCommander.normalizePath(oldInletPath)
             switch (commandType) {       
@@ -684,7 +684,7 @@ class Inlet {
             if (contourType==='outer') clockwise=Number(!Boolean(clockwise));
             let r = IL*0.5
             let detectOldInletType = this.detectInletType(oldInletPath)
-            //const commandType = nearestSegment[0]
+            const commandType = nearestSegment[0]
             switch (commandType) {                
                 case 'L':
                     let x1=nearestSegment[1]
@@ -746,53 +746,52 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
-                    if (rx !== ry || true) {
-                        let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
-                        let perpPoint = util.getPerpendicularCoordinates(arcParams, r);
-                        let startPoint 
-                        pointIn = util.pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
+                    let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
+                    let perpPoint = util.getPerpendicularCoordinates(arcParams, r);
+                    let startPoint 
+                    pointIn = util.pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
+                    if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
+                        startPoint = perpPoint.point1
+                    }  else {
+                        startPoint = perpPoint.point2
+                    }  
+                    let inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, IL)
+                    newInletPath= `M ${inletPoint.x} ${inletPoint.y} A ${r} ${r} 0 0 ${clockwise} ${endPoint.x} ${endPoint.y}`                   
+        
+                    if (detectOldInletType === "Tangent") {
+                        let arcLength =  util.arcLength(oldInletPath)
+                        let radius, flag2, flag3;
+                        if (oldInletPathSegs.length) {
+                            oldInletPathSegs.forEach( seg=>{
+                                if ( seg.includes('A')) {
+                                    flag2=seg[4]
+                                    flag3=seg[5]
+                                    radius=seg[1]                             
+                                }                                
+                            }) 
+                        }
+                        if (radius <= 0 || arcLength <= 0 || arcLength > 2*Math.PI*radius ) {
+                            newInletPath= oldInletPath
+                        }
+
+                        inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, radius)
+                        checkPoint = util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, 1)
+                        var pointIn = util.pointInSvgPath(contourPath , checkPoint.x, checkPoint.y)
+                        if (Math.abs(arcLength) > Math.PI*radius) {
+                            flag2=1
+                        } else {
+                            flag2=0
+                        } 
+                        
                         if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
-                            startPoint = perpPoint.point1
-                        }  else {
-                            startPoint = perpPoint.point2
-                        }  
-                        let inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, IL)
-                        newInletPath= `M ${inletPoint.x} ${inletPoint.y} A ${r} ${r} 0 0 ${clockwise} ${endPoint.x} ${endPoint.y}`                   
-            
-                       if (detectOldInletType === "Tangent") {
-                            let arcLength =  util.arcLength(oldInletPath)
-                            let radius, flag2, flag3;
-                            if (oldInletPathSegs.length) {
-                                oldInletPathSegs.forEach( seg=>{
-                                    if ( seg.includes('A')) {
-                                        flag2=seg[4]
-                                        flag3=seg[5]
-                                        radius=seg[1]                             
-                                    }                                
-                                }) 
-                            }
-                            if (radius <= 0 || arcLength <= 0 || arcLength > 2*Math.PI*radius ) {
-                                newInletPath= oldInletPath
-                            }
-    
-                            inletPoint= util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, radius)
-                            checkPoint = util.findPointWithSameDirection( endPoint.x, endPoint.y, startPoint.x, startPoint.y, 1)
-                            var pointIn = util.pointInSvgPath(contourPath , checkPoint.x, checkPoint.y)
-                            if (Math.abs(arcLength) > Math.PI*radius) {
-                                flag2=1
-                            } else {
-                                flag2=0
-                            } 
-                            
-                            if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
-                                let pp = util.calculateEndPoint(inletPoint.x, inletPoint.y, radius, endPoint.x, endPoint.y, arcLength, clockwise);               
-                                newInletPath= `M ${pp.x} ${pp.y} A ${r} ${r} 0 ${flag2} ${clockwise} ${endPoint.x} ${endPoint.y}`   
-                            } else {
-                                inletPoint= util.findPointWithSameDirection( arcParams.cx, arcParams.cy, endPoint.x, endPoint.y, radius+rx)
-                                let pp = util.calculateEndPoint(inletPoint.x, inletPoint.y, radius, endPoint.x, endPoint.y, arcLength, clockwise);               
-                                newInletPath= `M ${pp.x} ${pp.y} A ${r} ${r} 0 ${flag2} ${clockwise} ${endPoint.x} ${endPoint.y}`  
-                            }
-                        }       
+                            let pp = util.calculateEndPoint(inletPoint.x, inletPoint.y, radius, endPoint.x, endPoint.y, arcLength, clockwise);               
+                            newInletPath= `M ${pp.x} ${pp.y} A ${r} ${r} 0 ${flag2} ${clockwise} ${endPoint.x} ${endPoint.y}`   
+                        } else {
+                            inletPoint= util.findPointWithSameDirection( arcParams.cx, arcParams.cy, endPoint.x, endPoint.y, radius+rx)
+                            let pp = util.calculateEndPoint(inletPoint.x, inletPoint.y, radius, endPoint.x, endPoint.y, arcLength, clockwise);               
+                            newInletPath= `M ${pp.x} ${pp.y} A ${r} ${r} 0 ${flag2} ${clockwise} ${endPoint.x} ${endPoint.y}`  
+                        }
+                               
     
                 } 
                 break;
@@ -810,14 +809,15 @@ class Inlet {
                         }
                     }
                 })
-            }
+            } 
 
             var pointIndex, directionIndex;
             var midPoint;
             var pointOn, pointIn, perpendicular, direction;
             var fakePath, fakePoint
 
-            //const commandType = nearestSegment[0]
+            const commandType = nearestSegment[0]
+            //console.log ( 'commandType ' +commandType )
              switch (commandType) {                
                 case 'L':
                     let x1=nearestSegment[1]
