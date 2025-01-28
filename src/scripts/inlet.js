@@ -590,6 +590,8 @@ class Inlet {
     
     setInletType (newInleType, endPoint=false, action='set', contourPath, oldInletPath,contourType='inner') {
         //debugger
+        if ('move' === action && !endPoint.hasOwnProperty('x')) return false;
+        //console.log (arguments)
         let centers, checkPoint;
         let IL = this.detectInletLength ( oldInletPath )
         let newInletPath = ''
@@ -607,13 +609,15 @@ class Inlet {
             }
         }
         let nearestSegment =  contourCommand[1]
+        const commandType = nearestSegment[0]
+        //console.log ( 'Inlet  ' + commandType)
         if (action === 'move') nearestSegment= SVGPathCommander.normalizePath( endPoint.command)[0]
         if (newInleType === "Straight") {
             //newInletPath= `M ${endPoint.x} ${endPoint.y} L ${endPoint.x-1} ${endPoint.y-1}  L ${endPoint.x+1} ${endPoint.y-1} L ${endPoint.x} ${endPoint.y}`
             newInletPath =`M ${endPoint.x} ${endPoint.y} `
         } 
         else if (newInleType === "Direct") {
-            const commandType = nearestSegment[0]
+            //const commandType = nearestSegment[0]
             let x1, y1;
             let path =  SVGPathCommander.normalizePath(oldInletPath)
             switch (commandType) {       
@@ -680,7 +684,7 @@ class Inlet {
             if (contourType==='outer') clockwise=Number(!Boolean(clockwise));
             let r = IL*0.5
             let detectOldInletType = this.detectInletType(oldInletPath)
-            const commandType = nearestSegment[0]
+            //const commandType = nearestSegment[0]
             switch (commandType) {                
                 case 'L':
                     let x1=nearestSegment[1]
@@ -784,7 +788,7 @@ class Inlet {
                                 let pp = util.calculateEndPoint(inletPoint.x, inletPoint.y, radius, endPoint.x, endPoint.y, arcLength, clockwise);               
                                 newInletPath= `M ${pp.x} ${pp.y} A ${r} ${r} 0 ${flag2} ${clockwise} ${endPoint.x} ${endPoint.y}`   
                             } else {
-                                inletPoint= util.findPointWithSameDirection( centers.x, centers.y, endPoint.x, endPoint.y, radius+rx)
+                                inletPoint= util.findPointWithSameDirection( arcParams.cx, arcParams.cy, endPoint.x, endPoint.y, radius+rx)
                                 let pp = util.calculateEndPoint(inletPoint.x, inletPoint.y, radius, endPoint.x, endPoint.y, arcLength, clockwise);               
                                 newInletPath= `M ${pp.x} ${pp.y} A ${r} ${r} 0 ${flag2} ${clockwise} ${endPoint.x} ${endPoint.y}`  
                             }
@@ -813,7 +817,7 @@ class Inlet {
             var pointOn, pointIn, perpendicular, direction;
             var fakePath, fakePoint
 
-            const commandType = nearestSegment[0]
+            //const commandType = nearestSegment[0]
              switch (commandType) {                
                 case 'L':
                     let x1=nearestSegment[1]
@@ -878,7 +882,11 @@ class Inlet {
 					pointOn = util.findPointWithSameDirection( startPoint.x,startPoint.y, endPoint.x, endPoint.y, IL-r) 
 					midPoint= util.findTangentPoints(pointOn.x, pointOn.y, r, startPoint.x, startPoint.y,)
 					fakePath =  document.createElementNS("http://www.w3.org/2000/svg", "path");
-					fakePath.setAttribute('d',  `M ${startPoint.x} ${startPoint.y}  A ${IL*0.5} ${IL*0.5} 0 0 ${clockwise} ${endPoint.x} ${endPoint.y}`)
+                    
+                    let fuckPath = `M ${startPoint.x} ${startPoint.y}  A ${IL*0.5} ${IL*0.5} 0 0 ${clockwise} ${endPoint.x} ${endPoint.y}`
+                    if (fuckPath.includes('NaN')) return false;
+					
+                    fakePath.setAttribute('d',  `M ${startPoint.x} ${startPoint.y}  A ${IL*0.5} ${IL*0.5} 0 0 ${clockwise} ${endPoint.x} ${endPoint.y}`)
 					fakePoint  = fakePath.getPointAtLength( fakePath.getTotalLength()*.5 );
 					pointIndex = this.pointIndex (midPoint[0].x, midPoint[0].y, midPoint[1].x, midPoint[1].y,fakePoint.x,fakePoint.y )
 					newInletPath= `M ${startPoint.x} ${startPoint.y} L ${ midPoint[pointIndex].x } ${ midPoint[pointIndex].y } A ${r} ${r} 0 0 ${clockwise} ${endPoint.x} ${endPoint.y}`  
@@ -887,7 +895,8 @@ class Inlet {
                
             } 
         }
-
+        //console.log (newInletPath)
+        if (newInletPath.includes('NaN') ) return false;
         let resp={}
         resp.newInleType = newInleType
 		resp.oldInletType = oldInletType
@@ -898,37 +907,6 @@ class Inlet {
         return resp     
     }
 
-   /*  inletMoving (e) {
-        let contour = document.querySelector(`.contour[data-cid="${inlet.inletInMove.dataCid}"] path`).getAttribute('d')
-        inlet.inletPath = document.querySelector(`.inlet[data-cid="${inlet.inletInMove.dataCid}"] path`).getAttribute('d')
-        if (!contour || !inlet.inletPath) return; 
-        let svg = document.querySelector('svg')         
-        var pt = svg.createSVGPoint();
-
-        if (e.type === 'mousemove') {
-            pt.x = e.pageX;
-            pt.y = e.pageY;
-        } else if (e.type === 'touchmove') {
-            pt.x = e.touches[0].pageX;
-            pt.y = e.touches[0].pageY;
-        }
-
-        pt = pt.matrixTransform(document.querySelector('#group').getScreenCTM().inverse());
-        let nearest = util.findNearestPointOnPath (contour, { x: pt.x, y: pt.y })
-        if (inlet.inletInMove.type) {
-            this.dataCid = +document.querySelector('.selectedContour[data-cid]').getAttribute("data-cid")
-            let respInlet, respOutlet;
-            try {            
-                respInlet=inlet.setInletType(inlet.inletInMove.type, {x:nearest.x, y:nearest.y, command: nearest.command.split(' ').map((a,i) => i== 0 ? a : Number(a))}, 'move')
-                respOutlet=inlet.setOutletType(inlet.outletInMove.type, {x:nearest.x, y:nearest.y, command: nearest.command.split(' ').map((a,i) => i== 0 ? a : Number(a))}, 'move')
-                if (respInlet && respOutlet) {
-                    inlet.updateInletAndOutlet (respInlet, respOutlet, 'move')
-                }
-           } catch (e) { console.log (e+'catch in inletMoving')
-           }
-        }  
-    }
- */
     checkInletPosition (path, type, inletType, inletOutlet,seg=1) {
         const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		pathElement.setAttribute("d", path);
@@ -965,6 +943,9 @@ class Inlet {
 
     setOutletType (newOutleType, endPoint=false, action='set', contourPath, oldOutletPath, contourType='inner'){
         //debugger
+        //console.log (arguments)
+        if ('move' === action && !endPoint.hasOwnProperty('x')) return false;
+
         let centers, checkPoint; 
         let IL = this.detectInletLength ( oldOutletPath )
         let newOutletPath = ''
@@ -1154,7 +1135,7 @@ class Inlet {
 							let pp = util.calculateEndPoint(outletPoint.x, outletPoint.y, radius, endPoint.x, endPoint.y, arcLength, clockwise === 0 ? 1 : 0);
 							newOutletPath = `M ${endPoint.x} ${endPoint.y} A ${r} ${r} 0 ${flag2} ${clockwise} ${pp.x} ${pp.y}`
 						} else {
-							outletPoint = util.findPointWithSameDirection(centers.x, centers.y, endPoint.x, endPoint.y, radius + rx)
+							outletPoint = util.findPointWithSameDirection(arcParams.cx, arcParams.cy, endPoint.x, endPoint.y, radius + rx)
 							let pp = util.calculateEndPoint(outletPoint.x, outletPoint.y, radius, endPoint.x, endPoint.y, arcLength, clockwise === 0 ? 1 : 0);
 							newOutletPath = `M ${endPoint.x} ${endPoint.y} A ${r} ${r} 0 ${flag2} ${clockwise} ${pp.x} ${pp.y}`
 						}
@@ -1199,6 +1180,10 @@ class Inlet {
                     pointOn =  util.findPointWithSameDirection( perpendicular[directionIndex].x, perpendicular[directionIndex].y, endPoint.x, endPoint.y, IL-r)
                     midPoint= util.findTangentPoints(pointOn.x, pointOn.y, r, perpendicular[directionIndex].x, perpendicular[directionIndex].y)
                     fakePath =  document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    
+                    let fuckPath = `M ${endPoint.x} ${endPoint.y}   A ${IL*0.5} ${IL*0.5} 0 0 ${clockwise} ${perpendicular[directionIndex].x} ${perpendicular[directionIndex].y}`
+                    if (fuckPath.includes('NaN')) return false;
+                    
                     fakePath.setAttribute('d',  `M ${endPoint.x} ${endPoint.y}   A ${IL*0.5} ${IL*0.5} 0 0 ${clockwise} ${perpendicular[directionIndex].x} ${perpendicular[directionIndex].y}`)
                     fakePoint  = fakePath.getPointAtLength( fakePath.getTotalLength()*.5 );
                     pointIndex = this.pointIndex (midPoint[0].x, midPoint[0].y, midPoint[1].x, midPoint[1].y,fakePoint.x,fakePoint.y )
@@ -1252,7 +1237,7 @@ class Inlet {
                 break;
             } 
         }
-
+        if (newOutletPath.includes('NaN') ) return false;
         let resp={}
         resp.newOutleType =  newOutleType
 		resp.oldOutletType = oldOutletType
@@ -1444,7 +1429,6 @@ class Inlet {
 		resp.oldOutletType = "Hook"
  		resp.newOutletPath = path
  		resp.action = 'change'
-        console.log( "outletHookR")
         return resp
     }
 
@@ -1575,7 +1559,7 @@ class Inlet {
 
         let oldAxis  = util.calculateAngleVector( MX, MY,LX, LY, PX, PY )
          if (contour[1][0] === 'A') {
-            console.log('Arc position detected')
+            //console.log('Arc position detected')
             let nearestSegment = contour[1]
             const rx = parseFloat(nearestSegment[1]);
             const ry = parseFloat(nearestSegment[2]);
@@ -1653,7 +1637,7 @@ class Inlet {
         if (inl) {
             if ( inl.newInletPath.includes('NaN')) {
                 //log.add(__("Error outlet editing"), 'error')
-                console.log (inl.newInletPath)
+                //console.log (inl.newInletPath)
                 return
             }
             inletIscorrect = true//this.checkInletPosition (inl.newInletPath,  inl.contourType, inl.newInleType, 'inlet')
@@ -1669,7 +1653,7 @@ class Inlet {
         if (outlet) {
             if ( outlet.newOutletPath.includes('NaN')) {
                 //log.add(__("Error outlet editing"), 'error')
-                console.log (outlet.newOutletPath)
+                //console.log (outlet.newOutletPath)
                 return
             }
             outletIscorrect = this.checkInletPosition (outlet.newOutletPath, outlet.contourType, outlet.newOutleType, 'outlet')             
