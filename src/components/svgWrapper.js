@@ -171,7 +171,7 @@ const  SvgWrapper = observer (() => {
 		inMoveRef.current = 1;	
 		if (e.target && (e.buttons === 4  || editorStore.mode== 'drag')) {            
 			let off = Util.getMousePosition(e);
-			let transforms = document.getElementById("group1").transform.baseVal.consolidate().matrix
+			let transforms = gmatrix //document.getElementById("group1").transform.baseVal.consolidate().matrix
             off.x -= transforms.e;
             off.y -= transforms.f;
 			setOffset({x:off.x,y:off.y})
@@ -179,18 +179,7 @@ const  SvgWrapper = observer (() => {
 	}
 
 	const endDrag =(e) =>{
-		//console.log ('End *** drag ' + editorStore.inletMode)
 		inMoveRef.current = 0;	
-		//TODO update contour by mouseUp
-		/* let inletC = SVGPathCommander.normalizePath(selectedInletPath)
-		let lastSeg = inletC[inletC.length-1]
-		let start = {x: lastSeg[lastSeg.length-2], y: lastSeg[lastSeg.length-1]}
-		if (editorStore.inletMode === 'move') {
-			let nearest = util.findNearestPointOnPath (selectedPath, start)
-			let newPath = inlet.updateContourPathInMove(selectedPath, start, nearest)
-			console.log (newPath)
-			svgStore.updateElementValue ( selectedCid, 'contour', 'path', newPath )
-		}	 */
 	}
 
 	const leave =(e)=>{	
@@ -216,34 +205,7 @@ const  SvgWrapper = observer (() => {
 				})
 			}
 		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
-			editorStore.setInletMode('inletInMoving')
-			//console.log ( e.buttons+ '  Drag in mode  ' + editorStore.mode)
-			let nearest = util.findNearestPointOnPath (selectedPath, { x: coords.x, y: coords.y })
-			let inletType = inlet.detectInletType (selectedInletPath)
-			let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
-			let contourType = classes.includes('inner') ? 'inner' : 'outer'
-			let resp = inlet.setInletType ( inletType, nearest, 'move', selectedPath, selectedInletPath, contourType) 
-	
-
-			let outletType = inlet.detectInletType (selectedOutletPath)
-			let resp1 = inlet.setOutletType ( outletType, nearest, 'move', selectedPath, selectedOutletPath, contourType) 
-			
-
-			if (resp  && resp1) {
-				
-				if (typeof nearest.x  === 'number' &&  typeof nearest.y  === 'number') {
-					let start = {x:nearest.x, y:nearest.y}
-					let newPath = inlet.updateContourPathInMove(selectedPath, start, nearest)
-					if (SVGPathCommander.isValidPath(newPath)) {
-						svgStore.updateElementValue ( selectedCid, 'contour', 'path', newPath )
-						svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp1.newOutletPath )
-						svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-					}
-				}
-			} else {
-				console.log ('Invalid PATH')
-
-			}
+			updateElement(coords, true, true, true)			
 		}		
 	}
  
@@ -354,24 +316,33 @@ const  SvgWrapper = observer (() => {
 			setRectParams( calculateRectAttributes())
 	},[matrix, gmatrix, offset])  
 
-/*     const updateRect =()=> {
-		var svg = document.getElementById("svg")
-        var rect = document.querySelector('#wrapper_svg').getBoundingClientRect();        
-        var point = svg.createSVGPoint();
-        point.y = rect.top;
-        point.x = rect.left;
-        let top = point.matrixTransform(document.querySelector('#group').getScreenCTM().inverse());
+	const updateElement = (coords, inletUpd, outletUpd, contourUpd) => {
 
-        var point1 = svg.createSVGPoint();
-        point1.y = rect.bottom;
-        point1.x = rect.right;
-        let bottom = point1.matrixTransform(document.querySelector('#group').getScreenCTM().inverse());
- 
-        let width =  bottom.x  - top.x
-        let height =  bottom.y - top.y    
-        setRectParams({x:top.x, y:top.y, width: width, height: height})
+		editorStore.setInletMode('inletInMoving')
+		let nearest = util.findNearestPointOnPath (selectedPath, { x: coords.x, y: coords.y })
+		let inletType = inlet.detectInletType (selectedInletPath)
+		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
+		let contourType = classes.includes('inner') ? 'inner' : 'outer'
+		let resp = inlet.setInletType ( inletType, nearest, 'move', selectedPath, selectedInletPath, contourType) 
 
-    }  */
+		let outletType = inlet.detectInletType (selectedOutletPath)
+		let resp1 = inlet.setOutletType ( outletType, nearest, 'move', selectedPath, selectedOutletPath, contourType) 
+		
+
+		if (resp  && resp1) {
+			
+			if (typeof nearest.x  === 'number' &&  typeof nearest.y  === 'number') {
+				let newPath = inlet.updateContourPathInMove(selectedPath, nearest)
+				if (SVGPathCommander.isValidPath(newPath)) {
+					if ( outletUpd) svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp1.newOutletPath );
+					if ( inletUpd ) svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath );
+					if ( contourUpd) svgStore.updateElementValue ( selectedCid, 'contour', 'path', newPath );
+				}
+			}
+		} else {
+			console.log ('Invalid PATH')
+		}
+	}
 
 	const calculateRectAttributes = () => {
 		const widthSVG = svgParams.width

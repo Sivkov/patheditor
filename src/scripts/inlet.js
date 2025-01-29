@@ -446,10 +446,11 @@ class Inlet {
 		}
 	}
 
-    updateContourPathInMove (pp, point, nearest) {
+    updateContourPathInMove (pp, nearest) {
         //console.log ('updateContourPathInMove')
         let lastString;
         let res = {}
+        let point = {x: nearest.x,y: nearest.y}
         res.pathCommands = SVGPathCommander.normalizePath(pp)
         res.command = SVGPathCommander.normalizePath( nearest.command )[0]
         for (let i=0;i<res.pathCommands.length;i++) {
