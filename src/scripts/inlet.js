@@ -2,14 +2,11 @@ import util from '../utils/util';
 import SVGPathCommander from 'svg-path-commander';
 import part from "./part";
 import arc from './arc';
+import svgStore from '../components/stores/svgStore';
+import editorStore from '../components/stores/editorStore';
+
 
 class Inlet {
-    constructor () {
-        this.inletInMove = false
-        this.inletType = false
-        this.inletAngle = false
-    }
-
     pointIndex (x, y, x1, y1, fx, fy) {
         let pointIndex
         let d1 = util.distance( {x:x, y: y}, {x:fx, y:fy})
@@ -61,7 +58,7 @@ class Inlet {
             let end = {x: lastSeg[lastSeg.length-2], y: lastSeg[lastSeg.length-1]}
             IL =  util.distance (start, end)
         }
-        //console.log ('Detected length ' + IL)
+        console.log ('Detected length ' + IL)
         return Math.round(IL*1000)/1000
     }
 
@@ -566,6 +563,32 @@ class Inlet {
         return segments.join('').replaceAll(',', ' ')
     } 
 
+    splitLargeArc(segment, segments, i) {
+        if (segment[0] !== 'A') return [segment]; // Если не дуга, возвращаем как есть
+    
+        let [_, rx, ry, xAxisRotation, largeArcFlag, sweepFlag, x2, y2] = segment.map(Number);
+        
+        if (largeArcFlag === 0) return [segment]; // Если уже меньше 180°, оставляем
+    
+        // Найти центр и углы начальной и конечной точки
+        let prevPoint = this.detectPreviousPoint(segments, i-1)
+        let { cx, cy, startAngle, endAngle, deltaAngle } = arc.svgArcToCenterParam(prevPoint.currentX, prevPoint.currentY, rx, ry, xAxisRotation, largeArcFlag, sweepFlag, x2, y2);
+    
+        // Вычисляем средний угол
+        let midAngle =  startAngle + deltaAngle / 2;
+        
+        // Вычисляем координаты средней точки дуги
+        let midX = cx + rx * Math.cos(midAngle);
+        let midY = cy + ry * Math.sin(midAngle);
+    
+        // Создаем две дуги по 180° или меньше
+        let arc1 = ['A', rx, ry, xAxisRotation, 0, sweepFlag, midX, midY];
+        let arc2 = ['A', rx, ry, xAxisRotation, 0, sweepFlag, x2, y2];
+    
+        return [arc1, arc2];
+    }
+    
+
     calculateAngle(centerX, centerY, x1, y1, x2, y2, clockwise) {
         // Вычисляем векторы между центром и точками
         const vector1X = x1 - centerX;
@@ -587,6 +610,16 @@ class Inlet {
 
         //console.log (util.radianToDegree(angle)+ " "+ `${angle > Math.PI ? 1 : 0}`)    
         return angle >= Math.PI ? 1 : 0;
+    }
+
+    getPrevEndPoint (path, segment) {
+        for (let i=0; i< path.length ;i++) {
+            let curr = path[i]
+            if ( util.arraysAreEqual(curr, segment)) {
+                curr=path[ i-1 < 0 ? 0 : i-1]
+                return {x: curr[curr.length-2], y: curr[curr.length-1]}
+            }
+        }
     }
     
     setInletType (newInleType, endPoint=false, action='set', contourPath, oldInletPath,contourType='inner') {
@@ -613,6 +646,7 @@ class Inlet {
         //const commandType = nearestSegment[0]
         //console.log ( 'Inlet  ' + commandType)
         if (action === 'move') nearestSegment= SVGPathCommander.normalizePath( endPoint.command)[0]
+        let prev = this.getPrevEndPoint (contourCommand, nearestSegment )
         if (newInleType === "Straight") {
             //newInletPath= `M ${endPoint.x} ${endPoint.y} L ${endPoint.x-1} ${endPoint.y-1}  L ${endPoint.x+1} ${endPoint.y-1} L ${endPoint.x} ${endPoint.y}`
             newInletPath =`M ${endPoint.x} ${endPoint.y} `
@@ -620,9 +654,7 @@ class Inlet {
         else if (newInleType === "Direct") {
             const commandType = nearestSegment[0]
             let x1, y1;
-            let path =  SVGPathCommander.normalizePath(oldInletPath)
             switch (commandType) {       
-                
                 case 'L':
                     x1=nearestSegment[1]
                     y1=nearestSegment[2]
@@ -641,7 +673,6 @@ class Inlet {
                     // TODO если был повернут то нужно повернуть мутная хрень -  подвинул повернул на нужный угол
                     newInletPath= `M ${perpendicular[pointIndex].x} ${perpendicular[pointIndex].y} L ${endPoint.x} ${endPoint.y}`
                     break;
-
                 case 'A':
                     const rx = parseFloat(nearestSegment[1]);
                     const ry = parseFloat(nearestSegment[2]);
@@ -650,21 +681,7 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
-                    let CX= contourCommand[0][1]
-                    let CY= contourCommand[0][2]
-                    for (let i = 1; i < contourCommand.length; i++) {
-                        let seg = contourCommand[i];
-                        if ( util.arraysAreEqual(seg, nearestSegment)) {
-                            if (contourCommand[i - 1] && contourCommand[i - 1][0] === 'A') {
-                                CX = contourCommand[i - 1][6];
-                                CY = contourCommand[i - 1][7];
-                            } else if (contourCommand[i - 1] && contourCommand[i - 1][0] === 'L') {
-                                CX = contourCommand[i - 1][1];
-                                CY = contourCommand[i - 1][2];
-                            }
-                        }
-                    }          
-
+ 
 					let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
 					let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
 					let startPoint 
@@ -801,7 +818,7 @@ class Inlet {
         else if (newInleType === "Hook") {
             if (contourType==='outer') clockwise=Number(!Boolean(clockwise));
             let r = IL*0.25
-            if (oldInletType == newInleType)  {
+            if (oldInletType === newInleType)  {
                oldInletPathSegs.forEach((seg)=>{
                     if (seg[0] === "A" ) {
                         r=seg[1]
@@ -856,21 +873,7 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
-                    let CX= contourCommand[0][1]
-                    let CY= contourCommand[0][2]
-                    for (let i = 1; i < contourCommand.length; i++) {
-                        let seg = contourCommand[i];
-                        if ( util.arraysAreEqual(seg, nearestSegment)) {
-                            if (contourCommand[i - 1] && contourCommand[i - 1][0] === 'A') {
-                                CX = contourCommand[i - 1][6];
-                                CY = contourCommand[i - 1][7];
-                            } else if (contourCommand[i - 1] && contourCommand[i - 1][0] === 'L') {
-                                CX = contourCommand[i - 1][1];
-                                CY = contourCommand[i - 1][2];
-                            }
-                        }
-                    }          
-
+     
 					let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
 					let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
 					let startPoint 
@@ -991,7 +994,6 @@ class Inlet {
                     }
                     // TODO если был повернут то нужно повернуть мутная хрень -  подвинул повернул на нужный угол
                     newOutletPath= `M${endPoint.x} ${endPoint.y} L${perpendicular[pointIndex].x} ${perpendicular[pointIndex].y}`
-                    break;
 
                 break;
                 case 'A':
@@ -1157,7 +1159,7 @@ class Inlet {
     
             var pointIndex, directionIndex;
             var midPoint;
-            var pointOn, pointIn, perpendicular, direction;
+            var pointOn, pointIn, perpendicular;
             var fakePath, fakePoint
     
             const commandType = nearestSegment[0]
@@ -1248,7 +1250,7 @@ class Inlet {
 		resp.action = action
         return resp     
         
-     }
+    }
 
     outletTangentR (radius,  arcLength, path) {
         console.log ("outletTangentR")
@@ -1613,8 +1615,6 @@ class Inlet {
                 element.classList.add('collisionInlet')
                 contour.classList.add('collisionInlet')
             }
-            inlet.inletInMove = false
-            inlet.inletAngle = false
             inlet.contourEdges =''
             inlet.contourEdges1 =''
         })
@@ -1988,6 +1988,42 @@ class Inlet {
                 } catch(e){}
             }
             return nesIntesect
+		}
+	}
+
+    updateElement  (coords, inletUpd, outletUpd, contourUpd) {
+        const {
+            selectedCid,
+            selectedPath,
+            selectedInletPath,
+            selectedOutletPath
+    
+        } = svgStore;
+    
+		editorStore.setInletMode('inletInMoving')
+		let nearest = util.findNearestPointOnPath (selectedPath, { x: coords.x, y: coords.y })
+		let inletType = this.detectInletType (selectedInletPath)
+		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
+		let contourType = classes.includes('inner') ? 'inner' : 'outer'
+		let resp = this.setInletType ( inletType, nearest, 'move', selectedPath, selectedInletPath, contourType) 
+
+		let outletType = this.detectInletType (selectedOutletPath)
+		let resp1 = this.setOutletType ( outletType, nearest, 'move', selectedPath, selectedOutletPath, contourType) 
+		
+
+		if (resp  && resp1) {
+			
+			if (typeof nearest.x  === 'number' &&  typeof nearest.y  === 'number') {
+				let newPath = this.updateContourPathInMove(selectedPath, nearest)
+                console.log ( newPath )
+				if (SVGPathCommander.isValidPath(newPath)) {
+					if ( outletUpd) svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp1.newOutletPath );
+					if ( inletUpd ) svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath );
+					if ( contourUpd) svgStore.updateElementValue ( selectedCid, 'contour', 'path', newPath );
+				}
+			}
+		} else {
+			console.log ('Invalid PATH')
 		}
 	}
 }

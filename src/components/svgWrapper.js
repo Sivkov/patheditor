@@ -3,15 +3,11 @@ import { observer } from 'mobx-react-lite';
 //import { toJS } from 'mobx'; 
 import coordsStore from './stores/coordsStore.js'; 
 import editorStore from './stores/editorStore.js'; 
-import svgStore from './stores/svgStore.js'; 
 import SvgComponent from './svg';
 import Util from './../utils/util';
 import Part from '../scripts/part.js';
 //import tch from './../scripts/touches'
 import inlet from './../scripts/inlet.js'
-import util from './../utils/util.js'
-import SVGPathCommander from 'svg-path-commander';
-
 
 
 var tch = {}
@@ -22,18 +18,11 @@ var prevDiff = -1;
 
 const  SvgWrapper = observer (() => {
 
-	const {
-		selectedCid,
-		selectedPath,
-		selectedInletPath,
-		selectedOutletPath
-
-	} = svgStore;
-
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [gmatrix, setGroupMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [offset, setOffset] = useState({x:0,y:0});
 	const [rectParams, setRectParams] = useState({x:0, y:0, width:0, heigh:0});
+	//const [ updContor, setUpdContour] = useState(false);
 
 	const [gridState, setGridState] = useState({
 		xsGrid: {
@@ -180,6 +169,11 @@ const  SvgWrapper = observer (() => {
 
 	const endDrag =(e) =>{
 		inMoveRef.current = 0;	
+		/* let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
+		if (updContor) {
+			inlet.updateElement(coords, true, true, true)			
+			setUpdContour(false)
+		} */
 	}
 
 	const leave =(e)=>{	
@@ -205,7 +199,8 @@ const  SvgWrapper = observer (() => {
 				})
 			}
 		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
-			updateElement(coords, true, true, true)			
+			inlet.updateElement(coords, true, true, true)	
+			//setUpdContour( true );
 		}		
 	}
  
@@ -315,34 +310,6 @@ const  SvgWrapper = observer (() => {
   	useEffect(()=>{
 			setRectParams( calculateRectAttributes())
 	},[matrix, gmatrix, offset])  
-
-	const updateElement = (coords, inletUpd, outletUpd, contourUpd) => {
-
-		editorStore.setInletMode('inletInMoving')
-		let nearest = util.findNearestPointOnPath (selectedPath, { x: coords.x, y: coords.y })
-		let inletType = inlet.detectInletType (selectedInletPath)
-		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
-		let contourType = classes.includes('inner') ? 'inner' : 'outer'
-		let resp = inlet.setInletType ( inletType, nearest, 'move', selectedPath, selectedInletPath, contourType) 
-
-		let outletType = inlet.detectInletType (selectedOutletPath)
-		let resp1 = inlet.setOutletType ( outletType, nearest, 'move', selectedPath, selectedOutletPath, contourType) 
-		
-
-		if (resp  && resp1) {
-			
-			if (typeof nearest.x  === 'number' &&  typeof nearest.y  === 'number') {
-				let newPath = inlet.updateContourPathInMove(selectedPath, nearest)
-				if (SVGPathCommander.isValidPath(newPath)) {
-					if ( outletUpd) svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp1.newOutletPath );
-					if ( inletUpd ) svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath );
-					if ( contourUpd) svgStore.updateElementValue ( selectedCid, 'contour', 'path', newPath );
-				}
-			}
-		} else {
-			console.log ('Invalid PATH')
-		}
-	}
 
 	const calculateRectAttributes = () => {
 		const widthSVG = svgParams.width
