@@ -3,6 +3,7 @@ import SVGPathCommander from "svg-path-commander";
 import inlet from "../scripts/inlet";
 import arc from "../scripts/arc";
 import inside from 'point-in-polygon-hao'
+import ClipperLib from 'clipper-lib'
 
 class Util {
 	static radian(ux, uy, vx, vy) {
@@ -992,6 +993,79 @@ class Util {
 		//createSVG ([nearestPoint.x, nearestPoint.y])
  		return nearestPoint
 	}
+
+	static parsePointsString(pointsArray, openPolygon=false, ind=0, int=2) {
+		var scale = 100;
+		let intend = ind > 0 ? int*=-1 : int;
+
+		var res = []
+		pointsArray = pointsArray.split(';');
+ 		const polygon = [pointsArray.map(point => {
+			const [x, y] = point.split(',').map(Number);
+			return { X: x, Y: y };
+		})];
+
+		var subj = new ClipperLib.Paths();
+ 		var solution = new ClipperLib.Paths();
+		subj = polygon
+ 		ClipperLib.JS.ScaleUpPaths(subj, scale);
+ 		var co = new ClipperLib.ClipperOffset(2, 0.25);
+
+ 		if (openPolygon ) {
+			co.AddPaths(subj, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etOpenRound);
+		} else {
+			co.AddPaths(subj, ClipperLib.JoinType.jtMiter, ClipperLib.EndType.etClosedPolygon);
+		}
+		
+		co.Execute(solution, intend);
+		ClipperLib.JS.ScaleDownPaths(solution, scale);
+
+		try {
+ 			solution = solution.sort((a, b) => b.length - a.length)
+			solution[0].map(a => res.push([a.X, a.Y]))
+ 			return res
+		} catch (e) {
+			return []
+		}
+	}
+
+	static findParallelLine(x, y, x1, y1, x3, y3, L) {
+		// Находим угловой коэффициент прямой через точки (x, y) и (x1, y1)
+		let slope;
+		if (x1 !== x) {
+			slope = (y1 - y) / (x1 - x);
+		} else {
+			slope = Infinity; // Вертикальная прямая
+		}
+	
+		// Находим уравнение прямой, параллельной исходной, проходящей через точку (x3, y3)
+		let newIntercept;
+		if (slope !== Infinity) {
+			newIntercept = y3 - slope * x3;
+		} else {
+			newIntercept = null; // Вертикальная прямая
+		}
+	
+		// Находим координаты концов отрезка, параллельного исходному и проходящего через (x3, y3)
+		let dx, dy;
+		if (slope !== Infinity) {
+			dx = Math.sqrt((L ** 2) / (1 + slope ** 2));
+			dy = slope * dx;
+		} else {
+			dx = 0;
+			dy = L / 2;
+		}
+		const x4 = x3 + dx;
+		const y4 = y3 + dy;
+		const x5 = x3 - dx;
+		const y5 = y3 - dy;
+	
+		return [
+			{ x: x4, y: y4 }, // Конец отрезка справа от точки (x3, y3)
+			{ x: x5, y: y5 }  // Конец отрезка слева от точки (x3, y3)
+		];
+	}
+
 
 }
 

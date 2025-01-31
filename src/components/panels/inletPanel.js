@@ -14,6 +14,7 @@ import Tangent from './../../img/Tangent.jpg';
 import SVGPathCommander from 'svg-path-commander';
 import inlet from '../../scripts/inlet.js';
 import util from '../../utils/util.js';
+import CONSTANTS from '../../constants/constants.js';
 
 
 
@@ -33,7 +34,9 @@ const InletPanel = observer(() => {
 	const [HookR, setHookR] = useState(0);
 	const [DirectA, setDirectA] = useState(90);
 	const [DirectL, setDirectL] = useState(0);
-	const [safemode, setSafeMode] = useState(false)
+	const [safeMode, setSafeMode] = useState(false)
+	const [inletIntend, setInletIntend] = useState( CONSTANTS.defaultInletIntend)
+
 
 
 	const setNewInlet = (newType) =>{
@@ -48,6 +51,12 @@ const InletPanel = observer(() => {
 			setInletParams ()
 		}
 	}
+
+	useEffect(()=>{
+		svgStore.setInletSafeMode({mode:safeMode, intend: inletIntend})
+		inlet.findDangerInlets()
+
+	},[safeMode, inletIntend])
 
 	const setInletForAll = () =>{
 		console.log ('setInletForAll')
@@ -298,12 +307,19 @@ const InletPanel = observer(() => {
 												min={1}
 												max={5}
 												step={1}
-												defaultValue={2}
+												value={inletIntend} 
+												onChange={(e) => {
+													const value = Number(e.target.value);
+													setInletIntend(Math.min(5, Math.max(1, value)));
+												}}
 											/>
 											<div>mm</div>
 										</div>
 										<div className="ms-2">
-											<button className="btn btn-sm btn-primary btn_ShowDangerInlets">
+											<button 
+												className="btn btn-sm btn-primary btn_ShowDangerInlets"
+												onMouseDown={ ()=>{ inlet.findDangerInlets() }}
+												>
 												Show danger inlets
 											</button>
 										</div>

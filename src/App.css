@@ -1783,3 +1783,13 @@ top:var(--hEdge);
 .popup_input_label  {
     font-family: 'GOST Type A', serif; /* Заголовки с использованием нового шрифта */
 }
+
+.collisionInlet {
+  animation: blink 0.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  stroke: yellow !important;
+  stroke-dasharray: 1;
+}
+
+@keyframes blink {
+  to { opacity:1; stroke-dashoffset: 40;}
+}

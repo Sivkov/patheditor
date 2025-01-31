@@ -3,12 +3,13 @@ import { makeAutoObservable, computed } from "mobx";
 import { toJS } from "mobx";
 import Part from "../../scripts/part";
 import SVGPathCommander from "svg-path-commander";
-import Util from "../../utils/util";
 import Inlet from "../../scripts/inlet";
+import CONSTANTS from "../../constants/constants";
 
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
 	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
+	inletSafeMode = {mode: false, intend: CONSTANTS.defaultInletIntend}
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -117,6 +118,11 @@ class SvgStore {
 		return '';
 	}
 
+	setInletSafeMode (mode) {
+		console.log(mode)
+		this.inletSafeMode = mode
+	}
+
 	setSvgData(newData) {
 		console.log(newData)
 		this.svgData = newData; // Устанавливаем новые данные SVG
@@ -155,7 +161,17 @@ class SvgStore {
 			(el) => el.cid === cid && el.class.includes(className)
 		);
 		if (element && val in element) {
-			element[val] = newVal; // Обновляем значение указанного ключа
+			if (val === 'path') {
+				if (this.inletSafeMode.mode) {
+					console.log ("Need check inlet")
+					element[val] = newVal; 					
+				} else {
+					console.log ("NO need  to check inlet")
+					element[val] = newVal; 					
+				}
+			} else {
+				element[val] = newVal; 
+			}
 		}
 	}
 
