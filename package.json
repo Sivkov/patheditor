@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.2",
+    "clipper-lib": "^6.4.2",
     "font-awesome": "^4.7.0",
     "mobx-react-lite": "^4.0.7",
     "point-in-polygon-hao": "^1.2.4",
