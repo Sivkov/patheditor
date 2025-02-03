@@ -1579,20 +1579,35 @@ class Inlet {
         } 
     }
 
-    updateInletAndOutlet (inl, outlet, action='set') {
-        //console.log (inl)
+    /* updateInletOutletContour (inlet=false, outlet=false, contour=false, cid, action='set' ) {        //console.log (inl)
         let inletIscorrect 
         let outletIscorrect 
-        if (inl) {
-            if ( inl.newInletPath.includes('NaN')) {
-                //log.add(__("Error outlet editing"), 'error')
-                //console.log (inl.newInletPath)
+
+        if (!contour) {
+            contour= svgStore.getElementByCidAndClass( cid , 'contour', )
+        } 
+
+        if (!inlet) inlet = svgStore.getElementByCidAndClass( cid , 'inlet', 'path')
+        if (!outlet) inlet = svgStore.getElementByCidAndClass( cid , 'outlet', 'path')
+       
+
+        if (contour) {
+            if ( contour.path.includes('NaN')) {
+                console.log ('Invalid contour path')
                 return
             }
-            inletIscorrect = true//this.checkInletPosition (inl.newInletPath,  inl.contourType, inl.newInleType, 'inlet')
-            //console.log ("!!!  "+ JSON.stringify(inl))
-            if (inletIscorrect) {
-                inletIscorrect = this.checkInletIntend (inl)
+        }
+
+        
+        if (inlet) {
+            if ( inlet.newInletPath.includes('NaN')) {
+                //log.add(__("Error outlet editing"), 'error')
+                console.log (inlet.newInletPath)
+                return
+            }
+            inletIscorrect = this.checkInletPosition (inlet.newInletPath,  inlet.contourType, inlet.newInleType, 'inlet')
+             if (inletIscorrect) {
+                inletIscorrect = this.checkInletIntend (inlet)
             } 
             //console.log ("!!!  "+ inletIscorrect)
         } else {
@@ -1602,7 +1617,7 @@ class Inlet {
         if (outlet) {
             if ( outlet.newOutletPath.includes('NaN')) {
                 //log.add(__("Error outlet editing"), 'error')
-                //console.log (outlet.newOutletPath)
+                console.log (outlet.newOutletPath)
                 return
             }
             outletIscorrect = this.checkInletPosition (outlet.newOutletPath, outlet.contourType, outlet.newOutleType, 'outlet')             
@@ -1612,28 +1627,15 @@ class Inlet {
 
         if (outletIscorrect && inletIscorrect) {
 
-            if (inl) {                
-
-                inl.newInletPath= inl.newInletPath.replace(/[\s\n]{2,}/gm, ' ')
-                this.inletPath = inl.newInletPath
-                inl.element.setAttribute('d', this.inletPath)
-                this.inlet = document.querySelector(`.inlet[data-cid="${this.dataCid}"] path`)
-                if (inl.action ==='set') {
-                    this.updateInletPanel( inl.newInleType )
-                }        
+            if (inlet) {                
+ 
             }
 
             if (outlet) {
-                outlet.newOutletPath= outlet.newOutletPath.replace(/[\s\n]{2,}/gm, ' ')
-                this.outletPath = outlet.newOutletPath
-                outlet.element.setAttribute('d', this.outletPath)
-                this.outlet = document.querySelector(`.outlet[data-cid="${this.dataCid}"] path`)
-                if (outlet.action ==='set') {
-                    this.updateOutletPanel( outlet.newOutleType )
-                }
+              
             }
 
-            if (inl && inl.action ==='set') {
+            if (inlet && inlet.action ==='set') {
                 //log.add( __("New inlet set"))
             }
 
@@ -1641,30 +1643,29 @@ class Inlet {
                 //log.add( __("New outlet set"))
             } 
             //здесь в панели уст значение макроИнлет на равное макро
-            if (inl && inl.action ==='set' && inl.oldInletType === 'Straight' && inl.newInleType !== 'Straight'){
-                part.macroInlet = part.macro
-                part.setCoord() 
+            if (inlet && inlet.action ==='set' && inlet.oldInletType === 'Straight' && inlet.newInleType !== 'Straight'){
+               // part.macroInlet = part.macro
+                
             }
             //здесь в панели уст значение макроИнлет равное -1 так врезки нет
-            if (inl && inl.action ==='set' && inl.newInleType === 'Straight' && inl.oldInletType !== 'Straight'){
-                part.macroInlet = -1
-                part.setCoord() 
+            if (inlet && inlet.action ==='set' && inlet.newInleType === 'Straight' && inlet.oldInletType !== 'Straight'){
+                part.macroInlet = -1                
             }
 
-            if ((inl && inl.action === 'move') || (outlet && outlet.action === 'move')) {
+            if ((inlet && inlet.action === 'move') || (outlet && outlet.action === 'move')) {
                // this.updateContourPathInMove()
             }
             return true
         } else {
             if (action === 'reverse' || action === 'set'){
                 //util.messaging(__("Danger inlet position"), true, false)
-                this.updateInletPanel( inl.oldInletType )
-                this.updateOutletPanel( outlet.oldOutletType)
+                //this.updateInletPanel( inl.oldInletType )
+                //this.updateOutletPanel( outlet.oldOutletType)
                 return false
             }
         }
     }
-
+ */
     checkInletIntend (inl) {
        
         let needCheck = svgStore.inletSafeMode.mode
@@ -1689,8 +1690,8 @@ class Inlet {
 			this.contourEdges1 = util.parsePointsString(contourPoints, false, contourInner, intend*100+100 )
 			this.contourEdges1.push(this.contourEdges1[0])
  		}
-        //inlet.createSVG(this.contourEdges, 'blue',  'contInt')
-        //inlet.createSVG(this.contourEdges1, 'pink',  'contInt1')
+        inlet.createSVG(this.contourEdges, 'blue',  'contInt')
+        inlet.createSVG(this.contourEdges1, 'pink',  'contInt1')
 		let MX,MY,EX,EY,distance,radius,cuttedInlet,inletPoint,inletPoints,CX,CY,flag1,flag2,flag3,intersection, nesIntesect;
         if (inl.newInleType === "Hook" ) {
 			cuttedInlet = SVGPathCommander.normalizePath( inl.newInletPath)
@@ -1715,6 +1716,8 @@ class Inlet {
 			let PP = util.findParallelLine(EX, EY, CX, CY,  inletPoint.x, inletPoint.y, 1000)
  			inletPoints = util.pathToPolyline(cuttedInlet, 1).split(';').map ( a => a.split(',').map( aa => Number(aa)))
  			let intersection;
+            let intersections=0;
+
 
 			// в этом цикле ообрезаем inlet до чтоки пресечения
 			for (let ind = 0; ind < inletPoints.length-1; ind++) {
@@ -1725,6 +1728,7 @@ class Inlet {
 
 				intersection = util.intersects (PP,[{x:x,y:y},{x:xx,y:yy}])
 				if (intersection) {
+                    intersections++
 					inletPoints.splice(ind+1);
 					let IL = util.distance ({x:MX,y:MY},{x:intersection.x,y:intersection})
 					let lastPoint = util.findPointWithSameDirection(MX,MY,intersection.x, intersection.y, IL )
@@ -1733,12 +1737,14 @@ class Inlet {
 					} else {
 						inletPoints.push([lastPoint.x, lastPoint.y])
 					}
-					break;
+					//break;
 				}	
 				intersection=false
 			}
 
-            //inlet.createSVG( inletPoints, 'pink',  'inletPoints')
+            if (intersections > 1) return false
+
+            inlet.createSVG( inletPoints, 'white',  'inletPoints')
  			// в этом цикле ищем столкновение 
 			for (let ind = 0; ind < inletPoints.length-1; ind++) {
 				let x = inletPoints[ind][0]
@@ -1812,7 +1818,7 @@ class Inlet {
                 
     
                 inletPoints = util.pathToPolyline(cuttedInlet, 1).split(';').map ( a => a.split(',').map( aa => Number(aa)))
-    
+                let intersections =0
                 // в этом цикле ообрезаем inlet до чтоки пресечения
                 for (let ind = 0; ind < inletPoints.length-1; ind++) {
                     let x = inletPoints[ind][0]
@@ -1822,13 +1828,17 @@ class Inlet {
     
                     intersection = util.intersects (PP,[{x:x,y:y},{x:xx,y:yy}])
                     if (intersection) {
+                        
+                        intersection++
                         inletPoints.splice(ind);
                         inletPoints.push([intersection.x, intersection.y])
-                        break;
+                        //break;
                     }	
                     intersection=false
                 }
-                //inlet.createSVG( inletPoints, 'yellow',  'inletPoints')
+
+                if (intersections > 1) return false
+                inlet.createSVG( inletPoints, 'yellow',  'inletPoints')
                 // в этом цикле ищем столкновение 
                 for (let ind = 0; ind < inletPoints.length-1; ind++) {
                     let x = inletPoints[ind][0]
@@ -1887,7 +1897,9 @@ class Inlet {
             let cutted = false
              
             // здесь обрезаем по место столкновения(!)
-            let inletPoint
+            let inletPoint;
+            let intersections=0;
+
             for (let ind = 0; ind < this.contourEdges.length-1; ind++) {
                 let cx =  this.contourEdges[ind][0]
                 let cxx = this.contourEdges[ind+1][0]
@@ -1895,15 +1907,18 @@ class Inlet {
                 let cyy = this.contourEdges[ind+1][1]
                 let intersection = util.intersects ([{x:cx,y:cy},{x:cxx,y:cyy}],[{x:MX,y:MY},{x:EX,y:EY}])
                 if (intersection) {
+                    intersections++
                     cutted = true
                     distance = util.distance({x:MX,y:MY},{x:intersection.x,y:intersection.y})
                     inletPoint= util.findPointWithSameDirection( MX, MY, intersection.x,intersection.y, distance-.5)   
-                    //inlet.createSVG( [[MX,MY],[inletPoint.x,inletPoint.y]], 'yellow',  'inletPoints')               
+                    inlet.createSVG( [[MX,MY],[inletPoint.x,inletPoint.y]], 'yellow',  'inletPoints')               
                 }	
             }
+            // если пересекает контур несоколько раззз... ну если пользователь идиот!!!
+            if (intersections > 1) return false
             // на случай если нечем обрезать inlet... значит он не там стоит
             if (!cutted) {
-                console.log (' // на случай если нечем обрезать inlet... значит он не там стоит')
+                //console.log (' // на случай если нечем обрезать inlet... значит он не там стоит')
                 return false
             } 
 
@@ -2005,6 +2020,12 @@ class Inlet {
 
 
     createSVG(coords, color="green", id="idz") {
+        return
+        try {
+            let element = document.getElementById(id)
+            if (element) element.remove();
+        } catch (e) {
+        }
         var svg = document.querySelector('#group')
         var polygon = document.createElementNS("http://www.w3.org/2000/svg", "path");
         polygon.setAttribute("d", 'M'+coords.join(' '));

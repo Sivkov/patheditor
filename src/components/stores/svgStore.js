@@ -161,17 +161,7 @@ class SvgStore {
 			(el) => el.cid === cid && el.class.includes(className)
 		);
 		if (element && val in element) {
-			if (val === 'path') {
-				if (this.inletSafeMode.mode) {
-					console.log ("Need check inlet")
-					element[val] = newVal; 					
-				} else {
-					console.log ("NO need  to check inlet")
-					element[val] = newVal; 					
-				}
-			} else {
-				element[val] = newVal; 
-			}
+			element[val] = newVal; 
 		}
 	}
 
@@ -182,7 +172,6 @@ class SvgStore {
 
 		const inletC = svgStore.getElementByCidAndClass (cid, 'inlet')
 		const outletC = svgStore.getElementByCidAndClass (cid, 'outlet')
-
 		this.updateElementValue (cid, className, val, newVal)
 		let start =  SVGPathCommander.normalizePath(newVal)[0]
 		let contourStart =  {x: start[start.length-2], y: start[start.length-1]}
