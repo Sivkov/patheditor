@@ -2,11 +2,9 @@ import { Icon } from '@iconify/react';
 import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
-import logStore from '../stores/logStore.js';
 import svgStore from "../stores/svgStore.js";
 import editorStore from "../stores/editorStore.js";
 import { useEffect, useState } from 'react';
-import log from './../../scripts/log.js'
 import Hook from './../../img/Hook.jpg';
 import Direct from './../../img/Direct.jpg';
 import Straight from './../../img/Straight.jpg';
@@ -15,6 +13,7 @@ import SVGPathCommander from 'svg-path-commander';
 import inlet from '../../scripts/inlet.js';
 import util from '../../utils/util.js';
 import CONSTANTS from '../../constants/constants.js';
+import { addToLog } from './../../scripts/addToLog.js';
 
 
 
@@ -45,9 +44,12 @@ const InletPanel = observer(() => {
 		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
 		let resp = inlet.setInletType (newType, false, 'set', selectedPath, selectedInletPath, contourType)
-		if (resp && resp.newInletPath && resp.newInletPath.length) {
-			svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-			addToLog( 'Set inlet type')
+		if ( resp ) {
+			let paths = {}
+			paths.cid = selectedCid
+			paths.inlet = resp.newInletPath		
+			paths.log = 'Set inlet type'
+			inlet.applyNewPaths(paths)
 			setInletParams ()
 		}
 	}
@@ -68,25 +70,16 @@ const InletPanel = observer(() => {
 				let contourType = element.class.includes('inner') ? 'inner' : 'outer'	
 				let inletPath = element.path
 				let contour = svgStore.getElementByCidAndClass ( element.cid, 'contour')
-
 				let resp = inlet.setInletType (inletMode, false, 'set', contour.path, inletPath, contourType)
-				if (resp && resp.newInletPath && resp.newInletPath.length) {
-					svgStore.updateElementValue ( element.cid, 'inlet', 'path', resp.newInletPath )
-					setInletParams ()
+				if ( resp ) {
+					let paths = {}
+					paths.cid = element.cid
+					paths.inlet = resp.newInletPath		
+					inlet.applyNewPaths(paths)
 				}
-			}
+						}
 			addToLog(`Set inlet type ${inletMode} for all`)
 		}
-	}
-
-	const addToLog =(mess)=> {
-		let now = new Date().getTime()
-		logStore.add ({time: now ,action: mess})
-		let data = {
-			id: now,
-			svg: JSON.stringify(svgStore.svgData)
-		}
-		log.save(data)	
 	}
 
 	const setInletParams = (inletMode) => {
@@ -187,10 +180,11 @@ const InletPanel = observer(() => {
 		let resp;
 		if (HookR &&  HookL && selectedInletPath) {
 			resp = inlet.inletHookR (HookR, HookL, selectedInletPath)
-			if (resp && SVGPathCommander.isValidPath( resp.newInletPath ) ) {
-					svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-				} else {
-					console.log ('Invalid PATH')
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.inlet = resp.newInletPath		
+				inlet.applyNewPaths(paths)
 			}	
 		}		
 	},[HookR])
@@ -199,11 +193,12 @@ const InletPanel = observer(() => {
 		let resp;
 		if (HookR &&  HookL && selectedInletPath) {
 			resp = inlet.inletHookL (HookL, HookR, selectedInletPath)
-			if ( resp &&  SVGPathCommander.isValidPath( resp.newInletPath ) ) {
-					svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-				} else {
-					console.log ('Invalid PATH')
-			}				
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.inlet = resp.newInletPath		
+				inlet.applyNewPaths(paths)
+			}
 		}		
 	},[HookL])
 
@@ -211,10 +206,11 @@ const InletPanel = observer(() => {
 		let resp;
 		if (TangentR && TangentL  && selectedInletPath) {
 			resp = inlet.inletTangentR (TangentR, TangentL, selectedInletPath)
-			if ( resp && SVGPathCommander.isValidPath( resp.newInletPath ) ) {
-				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-			} else {
-				console.log ('Invalid PATH')
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.inlet = resp.newInletPath		
+				inlet.applyNewPaths(paths)
 			}
 		}		
 	},[TangentR])
@@ -223,10 +219,11 @@ const InletPanel = observer(() => {
 		let resp;
 		if (TangentR && TangentL  && selectedInletPath) {
 			resp = inlet.inletTangentL (TangentL, selectedInletPath)
-			if ( resp && SVGPathCommander.isValidPath( resp.newInletPath ) ) {
-				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-			} else {
-				console.log ('Invalid PATH')
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.inlet = resp.newInletPath		
+				inlet.applyNewPaths(paths)
 			}
 		}		
 	},[TangentL])
@@ -235,10 +232,11 @@ const InletPanel = observer(() => {
 		let resp;
 		if (DirectL && selectedInletPath) {
 			resp = inlet.inletDirectL (DirectL, selectedInletPath)
-			if ( resp && SVGPathCommander.isValidPath( resp.newInletPath ) ) {
-				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
-			} else {
-				console.log ('Invalid PATH')
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.inlet = resp.newInletPath		
+				inlet.applyNewPaths(paths)
 			}
 		}		
 	},[DirectL])
@@ -249,8 +247,11 @@ const InletPanel = observer(() => {
 			let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 			let contourType = classes.includes('inner') ? 'inner' : 'outer'
 			resp = inlet.inletDirectA (DirectA, selectedInletPath, selectedPath, contourType)
-			if ( resp && SVGPathCommander.isValidPath( resp.newInletPath ) ) {
-				svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath )
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.inlet = resp.newInletPath		
+				inlet.applyNewPaths(paths)
 			}
 		}		
 	},[DirectA])

@@ -2,10 +2,8 @@ import { Icon } from '@iconify/react';
 import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
-import logStore from '../stores/logStore.js';
 import svgStore from "../stores/svgStore.js";
 import { useEffect, useState } from 'react';
-import log from './../../scripts/log.js'
 import Hook from './../../img/Hook.jpg';
 import Direct from './../../img/Direct.jpg';
 import Straight from './../../img/Straight.jpg';
@@ -13,6 +11,7 @@ import Tangent from './../../img/Tangent.jpg';
 import SVGPathCommander from 'svg-path-commander';
 import inlet from '../../scripts/inlet.js';
 import util from '../../utils/util.js';
+import { addToLog } from './../../scripts/addToLog.js';
 
 
 const OutletPanel = observer(() => {
@@ -46,11 +45,13 @@ const OutletPanel = observer(() => {
 		let resp;
 		if (DirectL && selectedOutletPath) {
 			resp = inlet.outletDirectL (DirectL, selectedOutletPath)
-			if ( resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
-				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
-			} else {
-				console.log ('Invalid PATH')
-			}
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.outlet = resp.newOutletPath		
+ 				inlet.applyNewPaths(paths)
+				setOutletParams ()
+			}	
 		}		
 	},[DirectL])
 
@@ -61,9 +62,13 @@ const OutletPanel = observer(() => {
 			let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 			let contourType = classes.includes('inner') ? 'inner' : 'outer'
 			resp = inlet.outletDirectA (DirectA, selectedOutletPath, selectedPath, contourType)
-			if ( resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
-				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
-			}
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.outlet = resp.newOutletPath		
+ 				inlet.applyNewPaths(paths)
+				setOutletParams ()
+			}	
 		}		
 	},[DirectA])
 
@@ -71,11 +76,13 @@ const OutletPanel = observer(() => {
 		let resp;
 		if (TangentR && TangentL  && selectedOutletPath) {
 			resp = inlet.outletTangentR (TangentR, TangentL, selectedOutletPath)
-			if ( resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
-				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
-			} else {
-				console.log ('Invalid PATH')
-			}
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.outlet = resp.newOutletPath		
+ 				inlet.applyNewPaths(paths)
+				setOutletParams ()
+			}	
 		}		
 	},[TangentR])
 
@@ -83,11 +90,13 @@ const OutletPanel = observer(() => {
 		let resp;
 		if (TangentR && TangentL  && selectedOutletPath) {
 			resp = inlet.outletTangentL (TangentL, selectedOutletPath)
-			if ( resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
-				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
-			} else {
-				console.log ('Invalid PATH')
-			}
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.outlet = resp.newOutletPath		
+ 				inlet.applyNewPaths(paths)
+				setOutletParams ()
+			}	
 		}		
 	},[TangentL])
 	
@@ -95,11 +104,13 @@ const OutletPanel = observer(() => {
 		let resp;
 		if (HookR &&  HookL && selectedOutletPath) {
 			resp = inlet.outletHookR (HookR, HookL, selectedOutletPath)
-			if (resp && SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
-					svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
-				} else {
-					console.log ('Invalid PATH')
-			}				
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.outlet = resp.newOutletPath		
+ 				inlet.applyNewPaths(paths)
+				setOutletParams ()
+			}					
 		}		
 	},[HookR])
 
@@ -107,12 +118,13 @@ const OutletPanel = observer(() => {
 		let resp;
 		if (HookR &&  HookL && selectedOutletPath) {
 			resp = inlet.outletHookL (HookL, HookR, selectedOutletPath)
-			if ( resp &&  SVGPathCommander.isValidPath( resp.newOutletPath ) ) {
-				svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
-			} else {
-				console.log ('Invalid PATH')
-			}				
-			
+			if ( resp ) {
+				let paths = {}
+				paths.cid = selectedCid
+				paths.outlet = resp.newOutletPath		
+ 				inlet.applyNewPaths(paths)
+				setOutletParams ()
+			}			
 		}		
 	},[HookL])
 
@@ -123,9 +135,12 @@ const OutletPanel = observer(() => {
 		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
 		let resp = inlet.setOutletType (newType, false, 'set', selectedPath, selectedOutletPath, contourType)
-		if (resp && resp.newOutletPath && resp.newOutletPath.length) {
-			svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp.newOutletPath )
-			addToLog( 'Set outlet type')
+		if ( resp ) {
+			let paths = {}
+			paths.cid = selectedCid
+			paths.outlet = resp.newOutletPath		
+			paths.log = 'Set outlet type'
+			inlet.applyNewPaths(paths)
 			setOutletParams ()
 		}
 	}
@@ -142,24 +157,17 @@ const OutletPanel = observer(() => {
 				let contour = svgStore.getElementByCidAndClass ( element.cid, 'contour')
 
 				let resp = inlet.setOutletType (mode, false, 'set', contour.path, outletPath, contourType)
-				if (resp && resp.newOutletPath && resp.newOutletPath.length) {
-					svgStore.updateElementValue ( element.cid, 'outlet', 'path', resp.newOutletPath )
+				if (resp ) {
+					let paths = {}
+					paths.cid = element.cid
+					paths.outlet = resp.newOutletPath		
+					inlet.applyNewPaths(paths)
 					setOutletParams ()
 				}
 			}
 			addToLog(`Set outlet type ${mode} for all`)
 		}
 	}
-
-	const addToLog =(mess)=> {
-		let now = new Date().getTime()
-		logStore.add ({time: now ,action: mess})
-		let data = {
-			id: now,
-			svg: JSON.stringify(svgStore.svgData)
-		}
-		log.save(data)	
-	}	
 
 	const setOutletParams = (mode) => {
 		if (mode === 'Tangent') {

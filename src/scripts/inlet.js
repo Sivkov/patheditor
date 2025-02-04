@@ -1,10 +1,9 @@
 import util from '../utils/util';
 import SVGPathCommander from 'svg-path-commander';
-import part from "./part";
 import arc from './arc';
 import svgStore from '../components/stores/svgStore';
 import editorStore from '../components/stores/editorStore';
-//import { toJS } from 'mobx'; 
+import { addToLog } from './../scripts/addToLog';
 
 
 class Inlet {
@@ -97,7 +96,6 @@ class Inlet {
 				 	x2=seg[6]
 					y2=seg[7]
                     rO=seg[1]
-
 				}
 				if ( seg.includes('M')) {
 					x1=seg[1]
@@ -499,7 +497,6 @@ class Inlet {
 	}
 
     updateContourPathInMove (pp, nearest) {
-        //console.log ('updateContourPathInMove')
         let lastString;
         let res = {}
         let point = {x: nearest.x,y: nearest.y}
@@ -2132,10 +2129,11 @@ class Inlet {
 	}
 
     applyNewPaths (paths) {
-        let {contour, inlet, outlet, cid} = paths
+        let {contour, inlet, outlet, cid, log} = paths
         if ( paths.hasOwnProperty('outlet')) svgStore.updateElementValue ( cid, 'outlet', 'path', outlet );
 		if ( paths.hasOwnProperty('inlet')) svgStore.updateElementValue ( cid, 'inlet', 'path', inlet );
         if ( paths.hasOwnProperty('contour')) svgStore.updateElementValue ( cid, 'contour', 'path', contour );
+        if ( paths.hasOwnProperty('log')) addToLog(log)
     }   
 }
 

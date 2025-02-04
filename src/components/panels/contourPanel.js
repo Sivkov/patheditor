@@ -2,14 +2,13 @@ import { Icon } from '@iconify/react';
 import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
-import logStore from '../stores/logStore.js';
-import log from '../../scripts/log.js'
 import svgStore from "../stores/svgStore.js";
 import { useEffect, useState, useRef } from 'react';
 import SVGPathCommander from 'svg-path-commander';
 import Util from '../../utils/util.js';
-import { toJS } from "mobx";
+//import { toJS } from "mobx";
 import inlet from '../../scripts/inlet.js';
+import { addToLog } from './../../scripts/addToLog.js';
 
 const ContourPanel = observer(() => {
 
@@ -29,7 +28,6 @@ const ContourPanel = observer(() => {
 			let newClass =  selected.class.replace(/macro\d/gm, '')+' '+newMode
 			svgStore.updateElementValue(selected.cid, 'contour', 'class', newClass)
 			addToLog ('Contour type changed')
-
 		}		
 	}
 
@@ -57,16 +55,6 @@ const ContourPanel = observer(() => {
 			addToLog ('Piercing type changed')
 		}
 
-	}
-
-	const addToLog =(mess)=> {
-		let now = new Date().getTime()
-		logStore.add ({time: now ,action: mess})
-		let data = {
-			id: now,
-			svg: JSON.stringify(svgStore.svgData)
-		}
-		log.save(data)	
 	}
 
 	const [activePoint, setActive] = useState('topYtopX')

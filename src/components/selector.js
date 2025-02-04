@@ -1,12 +1,11 @@
 import { observer } from "mobx-react-lite";
 import svgStore from "./stores/svgStore.js";
 import editorStore from "./stores/editorStore.js";
-import logStore from './stores/logStore.js';
-import log from './../scripts/log.js'
 import SVGPathCommander from 'svg-path-commander';
 import Util from "../utils/util.js";
 import inlet from "../scripts/inlet.js";
 import { useEffect, useState } from "react";
+import { addToLog } from './../scripts/addToLog.js';
 
 const Selector = observer(() => {
 
@@ -176,16 +175,6 @@ const Selector = observer(() => {
 		part.initialRectLeft = newCoords.x
         part.initialRectTop = newCoords.y
 	};
-
-	const addToLog =(mess)=> {
-		let now = new Date().getTime()
-		logStore.add ({time: now ,action: mess})
-		let data = {
-			id: now,
-			svg: JSON.stringify(svgStore.svgData)
-		}
-		log.save(data)	
-	}
 
 	const handleMouseUp = (e) => {
 		part = {};
