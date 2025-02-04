@@ -199,7 +199,7 @@ const  SvgWrapper = observer (() => {
 				})
 			}
 		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
-			inlet.updateAllElements (true, true, true, coords)				
+			inlet.getNewPathsInMove (coords)				
 		}		
 	}
  

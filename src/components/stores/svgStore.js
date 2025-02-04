@@ -2,8 +2,6 @@
 import { makeAutoObservable, computed } from "mobx";
 import { toJS } from "mobx";
 import Part from "../../scripts/part";
-import SVGPathCommander from "svg-path-commander";
-import Inlet from "../../scripts/inlet";
 import CONSTANTS from "../../constants/constants";
 
 class SvgStore {
@@ -163,40 +161,6 @@ class SvgStore {
 		if (element && val in element) {
 			element[val] = newVal; 
 		}
-	}
-
-	updateContourPath (cid, className, val, newVal, angle=false) {
-		if (!angle) {
-			angle ={angle: 0, x:0, y:0}
-		}
-
-		const inletC = svgStore.getElementByCidAndClass (cid, 'inlet')
-		const outletC = svgStore.getElementByCidAndClass (cid, 'outlet')
-		this.updateElementValue (cid, className, val, newVal)
-		let start =  SVGPathCommander.normalizePath(newVal)[0]
-		let contourStart =  {x: start[start.length-2], y: start[start.length-1]}
-		let contour = this.getElementByCidAndClass (cid, 'contour')
-		let contourType = contour.class.includes ('inner') ? 'inner' : 'outer'
-
-		if (inletC && inletC.path) {
-			let type = Inlet.detectInletType (inletC.path)
-			let resp = Inlet.setInletType ( type, contourStart, 'update', newVal, inletC.path, contourType) 
-			if ( resp ) {
-					svgStore.updateElementValue ( cid, 'inlet', 'path', resp.newInletPath )
-				} else {
-					console.log ('Invalid PATH')
-			}
-		}
-
-		if (outletC && outletC.path) {			
-			let type = Inlet.detectInletType (outletC.path)
-			let resp = Inlet.setOutletType ( type, contourStart, 'update', newVal, outletC.path, contourType) 
-			if ( resp ) {
-					svgStore.updateElementValue ( cid, 'outlet', 'path', resp.newOutletPath )
-				} else {
-					console.log ('Invalid PATH')
-			}
-		} 
 	}
 
 	setContourSelected(cid) {

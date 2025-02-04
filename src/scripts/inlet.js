@@ -20,6 +20,22 @@ class Inlet {
         return pointIndex               
     }
 
+    createSVG(coords, color="green", id="idz") {
+        return
+        try {
+            let element = document.getElementById(id)
+            if (element) element.remove();
+        } catch (e) {
+        }
+        var svg = document.querySelector('#group')
+        var polygon = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        polygon.setAttribute("d", 'M'+coords.join(' '));
+        polygon.setAttribute("fill", "none");
+        polygon.setAttribute("stroke", color);
+        polygon.setAttribute("stroke-width", "0.2");
+        svg.appendChild(polygon);       
+    }
+
     detectInletType (selectedInletPath) {
         let inletMode = 'Straight'
 		if (selectedInletPath) {
@@ -442,6 +458,44 @@ class Inlet {
 			}
 			index += 1
 		}
+	}
+
+
+    getNewInletOutlet(cid, className, val, newVal, angle=false) {
+		if (!angle) {
+			angle ={angle: 0, x:0, y:0}
+		}
+
+		const inletC = svgStore.getElementByCidAndClass (cid, 'inlet')
+		const outletC = svgStore.getElementByCidAndClass (cid, 'outlet')
+		let start =  SVGPathCommander.normalizePath(newVal)[0]
+		let contourStart =  {x: start[start.length-2], y: start[start.length-1]}
+		let contour = svgStore.getElementByCidAndClass (cid, 'contour')
+		let contourType = contour.class.includes ('inner') ? 'inner' : 'outer'
+        let newVals = {}
+        newVals.cid = cid
+        newVals.contour = newVal
+
+		if (inletC && inletC.path) {
+			let type = this.detectInletType (inletC.path)
+			let resp = this.setInletType ( type, contourStart, 'update', newVal, inletC.path, contourType) 
+			if ( resp ) {
+                    newVals.inlet = resp.newInletPath
+				} else {
+					console.log ('Invalid PATH')
+			}
+		}
+
+		if (outletC && outletC.path) {			
+			let type = this.detectInletType (outletC.path)
+			let resp = this.setOutletType ( type, contourStart, 'update', newVal, outletC.path, contourType) 
+			if ( resp ) {
+                    newVals.outlet = resp.newOutletPath 
+				} else {
+					console.log ('Invalid PATH')
+			}
+		} 
+        return newVals
 	}
 
     updateContourPathInMove (pp, nearest) {
@@ -2043,7 +2097,7 @@ class Inlet {
         return true
     }
 
-    updateAllElements  (inletUpd, outletUpd, contourUpd, coords) {
+    getNewPathsInMove  ( coords ) {
         const {
             selectedCid,
             selectedPath,
@@ -2064,34 +2118,25 @@ class Inlet {
 		if (resp  && resp1) {
 			
 			if (typeof nearest.x  === 'number' &&  typeof nearest.y  === 'number') {
-				let newPath = this.updateContourPathInMove(selectedPath, nearest)
-				if (SVGPathCommander.isValidPath(newPath)) {
-					if ( outletUpd) svgStore.updateElementValue ( selectedCid, 'outlet', 'path', resp1.newOutletPath );
-					if ( inletUpd ) svgStore.updateElementValue ( selectedCid, 'inlet', 'path', resp.newInletPath );
-					if ( contourUpd) svgStore.updateElementValue ( selectedCid, 'contour', 'path', newPath );
-				}
+                let newContour = this.updateContourPathInMove(selectedPath, nearest)
+                let newPaths ={}
+                newPaths.cid = selectedCid
+                newPaths.contour = newContour
+                newPaths.inlet = resp.newInletPath
+                newPaths.outlet = resp1.newOutletPath
+                this.applyNewPaths (newPaths)
 			}
 		} else {
 			console.log ('Invalid PATH')
 		}
 	}
 
-
-    createSVG(coords, color="green", id="idz") {
-        return
-        try {
-            let element = document.getElementById(id)
-            if (element) element.remove();
-        } catch (e) {
-        }
-        var svg = document.querySelector('#group')
-        var polygon = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        polygon.setAttribute("d", 'M'+coords.join(' '));
-        polygon.setAttribute("fill", "none");
-        polygon.setAttribute("stroke", color);
-        polygon.setAttribute("stroke-width", "0.2");
-        svg.appendChild(polygon);       
-    }
+    applyNewPaths (paths) {
+        let {contour, inlet, outlet, cid} = paths
+        if ( paths.hasOwnProperty('outlet')) svgStore.updateElementValue ( cid, 'outlet', 'path', outlet );
+		if ( paths.hasOwnProperty('inlet')) svgStore.updateElementValue ( cid, 'inlet', 'path', inlet );
+        if ( paths.hasOwnProperty('contour')) svgStore.updateElementValue ( cid, 'contour', 'path', contour );
+    }   
 }
 
 const inlet = new Inlet()

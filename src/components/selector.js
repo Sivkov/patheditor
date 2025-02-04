@@ -5,6 +5,7 @@ import logStore from './stores/logStore.js';
 import log from './../scripts/log.js'
 import SVGPathCommander from 'svg-path-commander';
 import Util from "../utils/util.js";
+import inlet from "../scripts/inlet.js";
 import { useEffect, useState } from "react";
 
 const Selector = observer(() => {
@@ -162,8 +163,8 @@ const Selector = observer(() => {
 
 		let newPath = Util.applyTransform (svgStore.selectedPath, scaleX, scaleY, translateX, translateY)
 		let cid =  svgStore.getSelectedElement('cid') 
-		//svgStore.updateElementValue (cid, 'contour', 'path', newPath )	
-		svgStore.updateContourPath (cid, 'contour', 'path', newPath )	
+		let resp = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath )	
+		inlet.applyNewPaths (resp )
 		let classes = svgStore.getElementByCidAndClass ( cid, 'contour', 'class')
 
 		//console.log ('classes' + classes)

@@ -9,6 +9,7 @@ import { useEffect, useState, useRef } from 'react';
 import SVGPathCommander from 'svg-path-commander';
 import Util from '../../utils/util.js';
 import { toJS } from "mobx";
+import inlet from '../../scripts/inlet.js';
 
 const ContourPanel = observer(() => {
 
@@ -182,12 +183,12 @@ const ContourPanel = observer(() => {
 			let newPath = Util.transformContour(path, id, val, params)
 			newPath = SVGPathCommander.normalizePath( newPath ).toString().replaceAll(',', ' ')
 			if(id === 'contourRotateValue') {
-				svgStore.updateContourPath (cid, 'contour', 'path', newPath, {angle: angle, x:activeCooord.x, y:activeCooord.y} )
+				let res = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath, {angle: angle, x:activeCooord.x, y:activeCooord.y} )
+				inlet.applyNewPaths( res )			
 			} else {
-				svgStore.updateContourPath (cid, 'contour', 'path', newPath )
+				let res = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath )
+				inlet.applyNewPaths( res )			
 			};
-			svgStore.updateContourPath (cid, 'contour', 'path', newPath )
-			addToLog ('Contour changed ' + val )
 		}	
 	}
 
@@ -218,8 +219,8 @@ const ContourPanel = observer(() => {
 		} 
 		console.log (xDif, yDif)
 		newPath = Util.applyTransform(path, 1, 1, xDif, yDif, {angle: angle, x:0, y:0})
-		//svgStore.updateElementValue (cid, 'contour', 'path', newPath )
-		svgStore.updateContourPath (cid, 'contour', 'path', newPath )
+		let resp = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath )
+		inlet.applyNewPaths ( resp )
 
 	} 
 
