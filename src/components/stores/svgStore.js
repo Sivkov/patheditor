@@ -9,7 +9,7 @@ import CONSTANTS from "../../constants/constants";
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
 	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
-	inletSafeMode = {mode: false, intend: CONSTANTS.defaultInletIntend}
+	safeMode = {mode: false, intend: CONSTANTS.defaultInletIntend}
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -118,9 +118,9 @@ class SvgStore {
 		return '';
 	}
 
-	setInletSafeMode (mode) {
+	setsafeMode (mode) {
 		console.log(mode)
-		this.inletSafeMode = mode
+		this.safeMode = mode
 	}
 
 	setSvgData(newData) {

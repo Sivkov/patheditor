@@ -199,8 +199,7 @@ const  SvgWrapper = observer (() => {
 				})
 			}
 		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
-			inlet.updateElement(coords, true, true, true)	
-			//setUpdContour( true );
+			inlet.updateAllElements (true, true, true, coords)				
 		}		
 	}
  

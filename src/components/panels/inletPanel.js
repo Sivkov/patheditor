@@ -53,8 +53,8 @@ const InletPanel = observer(() => {
 	}
 
 	useEffect(()=>{
-		svgStore.setInletSafeMode({mode:safeMode, intend: inletIntend})
-		inlet.findDangerInlets()
+		svgStore.setsafeMode({mode:safeMode, intend: inletIntend})
+		inlet.findDangerInletsOutlets() 
 
 	},[safeMode, inletIntend])
 
@@ -318,9 +318,9 @@ const InletPanel = observer(() => {
 										<div className="ms-2">
 											<button 
 												className="btn btn-sm btn-primary btn_ShowDangerInlets"
-												onMouseDown={ ()=>{ inlet.findDangerInlets() }}
+												onMouseDown={ ()=>{ inlet.findDangerInletsOutlets() }}
 												>
-												Show danger inlets
+												Show danger inlets outlets
 											</button>
 										</div>
 									</div>
