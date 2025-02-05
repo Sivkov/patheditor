@@ -150,7 +150,7 @@ const Selector = observer(() => {
 		}
 
 		if (newCoords.height <= 0 || newCoords.width <= 0 ) return;
-		svgStore.setSelectorCoords(newCoords);
+		//svgStore.setSelectorCoords(newCoords);
 
  		let scaleX = newCoords.width / part.initialWidth
         let scaleY = newCoords.height / part.initialHeight
@@ -163,17 +163,19 @@ const Selector = observer(() => {
 		let newPath = Util.applyTransform (svgStore.selectedPath, scaleX, scaleY, translateX, translateY)
 		let cid =  svgStore.getSelectedElement('cid') 
 		let resp = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath )	
-		inlet.applyNewPaths (resp )
-		let classes = svgStore.getElementByCidAndClass ( cid, 'contour', 'class')
-
-		//console.log ('classes' + classes)
-		if (classes.includes('outer')) {
-			svgStore.setNewPartSize(newCoords.width, newCoords.height)
+		let result = inlet.applyNewPaths (resp )
+		if ((svgStore.safeMode.mode && result) || !svgStore.safeMode.mode) {
+ 				let classes = svgStore.getElementByCidAndClass ( cid, 'contour', 'class')
+				svgStore.setSelectorCoords(newCoords);
+				//console.log ('classes' + classes)
+				if (classes.includes('outer')) {
+					svgStore.setNewPartSize(newCoords.width, newCoords.height)
+				}
+				part.initialHeight = newCoords.height
+				part.initialWidth = newCoords.width 
+				part.initialRectLeft = newCoords.x
+				part.initialRectTop = newCoords.y	
 		}
- 	 	part.initialHeight = newCoords.height
-		part.initialWidth = newCoords.width 
-		part.initialRectLeft = newCoords.x
-        part.initialRectTop = newCoords.y
 	};
 
 	const handleMouseUp = (e) => {

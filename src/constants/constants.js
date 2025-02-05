@@ -194,136 +194,206 @@ const CONSTANTS = {
 	'(</Contour part_id="8" contour_id="6" c_contour_id="6" >)',
 	'(</Part id="8" part_id="8">)'],
 	code2:
-	[
-		`(<Part id="6" offsetx="0.000" offsety="0.000" rotation="0.000" color="#5ec641" part_id="6" originx="189.000000" originy="200.000000">)`
-		,`(<Part_attr code="22___10__1">)`
-		,`(<Part_attr uuid="n6-2490d6d3-c0ff-4508-948e-3cc3a822512c">)`
-		,`(<slow>)`
-		,`(<Contour mode="engraving" contour_id="0" c_contour_id="0" pard_id="6" macro="2" closed="0" overcut="0.000,0.000" >)`
-		,"G0 x22.379605 y186.433064"
-		,`(<laser_on>)`
-		,"G2 x28.808176 y192.861635 i6.428571 j0"
-		,"G1 x35.236748"
-		,"G2 x41.665319 y186.433064 i0 j-6.428571"
-		,"G1 y184.290207"
-		,"G2 x39.434502 y179.422392 i-6.429153 j.00127"
-		,"G1 x22.379605 y162.861635"
-		,"G1 x41.665319"
-		,`(<laser_off>)`
-		,`(</Contour part_id="6" contour_id="0" c_contour_id="0" >)`
-		,`(<slow>)`
-		,`(<Contour mode="engraving" contour_id="1" c_contour_id="1" pard_id="6" macro="2" closed="0" overcut="0.000,0.000" >)`
-		,"G0 x45.951033 y186.433064"
-		,`(<laser_on>)`
-		,"G2 x52.379605 y192.861635 i6.428571 j0"
-		,"G1 x58.808176"
-		,"G2 x65.236748 y186.433064 i.000001 j-6.428571"
-		,"G1 y184.290207"
-		,"G2 x63.005931 y179.422392 i-6.429154 j.00127"
-		,"G1 x45.951033 y162.861635"
-		,"G1 x65.236748"
-		,`(<laser_off>)`
-		,`(</Contour part_id="6" contour_id="1" c_contour_id="1" >)`
-		,`(<slow>)`
-		,`(<Inlet mode="inner" contour_id="2" c_contour_id="2" pard_id="6" macro="1" pulse="0">)`
-		,"G0 x77 y62.714"
-		,`(<laser_on>)`
-		,"G1 x73.333333 y61.417638"
-		,"G2 x71.5 y62.714 i-.458333 j1.296362"
-		,`(<Contour mode="inner" contour_id="2" c_contour_id="2" pard_id="6" macro="0" closed="1" overcut="77.400,68.214" >)`
-		,"G1 x71.5 y62.714"
-		,"G2 x77 y68.214 i5.5 j0"
-		,"G1 x81"
-		,"G2 y57.214 i0 j-5.5"
-		,"G1 x77"
-		,"G2 x71.5 y62.714 i0 j5.5"
-		,`(<laser_off>)`
-		,`(</Contour part_id="6" contour_id="2" c_contour_id="2" >)`
-		,`(<slow>)`
-		,`(<Inlet mode="inner" contour_id="3" c_contour_id="3" pard_id="6" macro="1" pulse="0">)`
-		,"G0 x77 y12.714"
-		,`(<laser_on>)`
-		,"G1 x73.333333 y14.010362"
-		,"G3 x71.5 y12.714 i-.458333 j-1.296362"
-		,`(<Contour mode="inner" contour_id="3" c_contour_id="3" pard_id="6" macro="0" closed="1" overcut="77.400,7.214" >)`
-		,"G1 x71.5 y12.714"
-		,"G3 x77 y7.214 i5.5 j0"
-		,"G1 x81"
-		,"G3 y18.214 i0 j5.5"
-		,"G1 x77"
-		,"G3 x71.5 y12.714 i0 j-5.5"
-		,`(<laser_off>)`
-		,`(</Contour part_id="6" contour_id="3" c_contour_id="3" >)`
-		,`(<slow>)`
-		,`(<Inlet mode="inner" contour_id="4" c_contour_id="4" pard_id="6" macro="1" pulse="0">)`
-		,"G0 x27 y12.714"
-		,`(<laser_on>)`
-		,"G1 x23.333333 y11.417638"
-		,"G2 x21.5 y12.714 i-.458333 j1.296362"
-		,`(<Contour mode="inner" contour_id="4" c_contour_id="4" pard_id="6" macro="0" closed="1" overcut="27.400,18.214" >)`
-		,"G1 x21.5 y12.714"
-		,"G2 x27 y18.214 i5.5 j0"
-		,"G1 x31"
-		,"G2 y7.214 i0 j-5.5"
-		,"G1 x27"
-		,"G2 x21.5 y12.714 i0 j5.5"
-		,`(<laser_off>)`
-		,`(</Contour part_id="6" contour_id="4" c_contour_id="4" >)`
-		,`(<slow>)`
-		,`(<Inlet mode="inner" contour_id="5" c_contour_id="5" pard_id="6" macro="1" pulse="0">)`
-		,"G0 x27 y62.714"
-		,`(<laser_on>)`
-		,"G1 x23.333333 y61.417638"
-		,"G2 x21.5 y62.714 i-.458333 j1.296362"
-		,`(<Contour mode="inner" contour_id="5" c_contour_id="5" pard_id="6" macro="0" closed="1" overcut="27.400,68.214" >)`
-		,"G1 x21.5 y62.714"
-		,"G2 x27 y68.214 i5.5 j0"
-		,"G1 x31"
-		,"G2 y57.214 i0 j-5.5"
-		,"G1 x27"
-		,"G2 x21.5 y62.714 i0 j5.5"
-		,`(<laser_off>)`
-		,`(</Contour part_id="6" contour_id="5" c_contour_id="5" >)`
-		,`(<slow>)`
-		,`(<Inlet mode="outer" contour_id="6" c_contour_id="6" pard_id="6" macro="1" pulse="0">)`
-		,"G0 x6 y133.644"
-		,`(<laser_on>)`
-		,"G1 x7.885618 y128.310667"
-		,"G2 x6 y125.644 i-1.885618 j-.666667"
-		,`(<Contour mode="outer" contour_id="6" c_contour_id="6" pard_id="6" macro="0" closed="1" overcut="0.000,125.244" >)`
-		,"G1 x6 y125.644"
-		,"G1 x0"
-		,"G1 y74.311"
-		,"G1 x12"
-		,"G1 y49.714"
-		,"G1 x0"
-		,"G1 y12.714"
-		,"G1 x12"
-		,"G1 y0"
-		,"G1 x177"
-		,"G1 y12.714"
-		,"G1 x189"
-		,"G1 y49.714"
-		,"G1 x177"
-		,"G1 y74.311"
-		,"G1 x189"
-		,"G1 y125.644"
-		,"G1 x177"
-		,"G1 y145.322"
-		,"G1 x189"
-		,"G1 y180.322"
-		,"G1 x177"
-		,"G1 y200"
-		,"G1 x12"
-		,"G1 y180.322"
-		,"G1 x0"
-		,"G1 y145.322"
-		,"G1 x12"
-		,"G1 y125.644"
-		,"G1 x6"
-		,`(<laser_off>)`
-		,`(</Contour part_id="6" contour_id="6" c_contour_id="6" >)`
-		,`(</Part id="6" part_id="6">)`],
+	['(<Part id="14" offsetx="0.000" offsety="0.000" rot…="14" originx="400.296000" originy="356.294000">)',
+ '(<Part_attr code="107___10__1">)',
+ '(<Part_attr uuid="n14-a39c5d5f-ed73-497e-954b-693e4a73df71">)',
+ '(<slow>)',
+ '(<Contour mode="engraving" contour_id="0" c_contou…14" macro="2" closed="0" overcut="0.000,0.000" >)',
+ 'G0 x292.551548 y287.005687',
+ '(<laser_on>)',
+ 'G1 x282.551548',
+ 'G1 y291.648544',
+ 'G2 x287.551548 i2.5 j0',
+ 'G1 y287.005687',
+ '(<laser_off>)',
+ '(</Contour part_id="14" contour_id="0" c_contour_id="0" >)',
+ '(<slow>)',
+ '(<Contour mode="engraving" contour_id="1" c_contou…14" macro="2" closed="0" overcut="0.000,0.000" >)',
+ 'G0 x286.837262 y297.005687',
+ '(<laser_on>)',
+ 'G1 x282.551548 y299.86283',
+ 'G1 x292.551548',
+ '(<laser_off>)',
+ '(</Contour part_id="14" contour_id="1" c_contour_id="1" >)',
+ '(<slow>)',
+ '(<Contour mode="engraving" contour_id="2" c_contou…14" macro="2" closed="0" overcut="0.000,0.000" >)',
+ 'G0 x289.694405 y303.434259',
+ '(<laser_on>)',
+ 'G1 x285.40869',
+ 'G2 y309.86283 i.128876 j3.214286',
+ 'G1 x289.694405',
+ 'G2 x292.551548 y307.005687 i0 j-2.857143',
+ 'G2 x289.694405 y303.434259 i-3.214286 j-.357142',
+ '(<laser_off>)',
+ '(</Contour part_id="14" contour_id="2" c_contour_id="2" >)',
+ '(<slow>)',
+ '(<Contour mode="engraving" contour_id="3" c_contou…14" macro="2" closed="0" overcut="0.000,0.000" >)',
+ 'G0 x282.551548 y311.291402',
+ '(<laser_on>)',
+ 'G1 y317.719973',
+ 'G1 x292.551548 y313.434259',
+ '(<laser_off>)',
+ '(</Contour part_id="14" contour_id="3" c_contour_id="3" >)',
+ '(<slow>)',
+ '(<Inlet mode="inner" contour_id="4" c_contour_id="4" pard_id="14" macro="1" pulse="0">)',
+ 'G0 x159.275539 y69.509392',
+ '(<laser_on>)',
+ 'G1 x156.275789 y71.241876',
+ 'G2 x156.276288 y74.705977 i1.000249 j1.731906',
+ '(<Contour mode="inner" contour_id="4" c_contour_id… macro="0" closed="1" overcut="197.226,98.338" >)',
+ 'G1 x156.276288 y74.705977',
+ 'G1 x197.052 y98.24',
+ 'G2 x207.089 y98.217 i4.998679 j-8.661233',
+ 'G1 x259.367 y67.727',
+ 'G2 x264.329 y59.089 i-5.037866 j-8.638126',
+ 'G2 x254.357 y49.833 i-9.972239 j.743951',
+ 'G1 x149.171',
+ 'G2 x139.171 y59.833 i-.000007 j9.999993',
+ 'G2 x144.141 y67.702 i9.969279 j-.792513',
+ 'G1 x156.276288 y74.705977',
+ '(<laser_off>)',
+ '(</Contour part_id="14" contour_id="4" c_contour_id="4" >)',
+ '(<slow>)',
+ '(<Inlet mode="inner" contour_id="5" c_contour_id="5" pard_id="14" macro="1" pulse="0">)',
+ 'G0 x159.275386 y286.784613',
+ '(<laser_on>)',
+ 'G1 x159.275891 y283.320511',
+ 'G2 x156.276144 y281.588023 i-2 j-.000292',
+ '(<Contour mode="inner" contour_id="5" c_contour_id…macro="0" closed="1" overcut="144.000,288.676" >)',
+ 'G1 x156.276144 y281.588023',
+ 'G1 x144.172 y288.574',
+ 'G2 x139.171 y297.235 i4.998892 j8.660769',
+ 'G2 x149.141 y306.461 i9.970239 j-.774257',
+ 'G1 x254.329',
+ 'G2 x264.329 y296.461 i.000007 j-9.999993',
+ 'G2 x259.396 y288.584 i-9.97099 j.761214',
+ 'G1 x207.089 y258.077',
+ 'G2 x197.052 y258.054 i-5.038321 j8.638233',
+ 'G1 x156.276144 y281.588023',
+ '(<laser_off>)',
+ '(</Contour part_id="14" contour_id="5" c_contour_id="5" >)',
+ '(<slow>)',
+ '(<Inlet mode="inner" contour_id="6" c_contour_id="6" pard_id="14" macro="1" pulse="0">)',
+ 'G0 x126.316433 y178.147',
+ '(<laser_on>)',
+ 'G1 x123.316433 y176.414949',
+ 'G2 x120.316433 y178.147 i-1 j1.732051',
+ '(<Contour mode="inner" contour_id="6" c_contour_id…macro="0" closed="1" overcut="114.843,187.073" >)',
+ 'G1 x120.316433 y178.147',
+ 'G3 x115.192 y186.878 i-10.000147 j0',
+ 'G1 x54.045 y221.025',
+ 'G3 x49.17 y222.294 i-4.875073 j-8.729699',
+ 'G1 x33.296',
+ 'G2 x23.296 y232.294 i-.000007 j9.999993',
+ 'G1 y336.294',
+ 'G2 x25.296 y342.294 i9.99998 j.000007',
+ 'G1 x95.296',
+ 'G2 x97.296 y336.294 i-7.99998 j-5.999993',
+ 'G1 y277.889',
+ 'G3 x102.42 y269.158 i9.999926 j-.000372',
+ 'G1 x195.42 y217.224',
+ 'G3 x205.172 i4.876 j8.731543',
+ 'G1 x298.172 y269.158',
+ 'G3 x303.296 y277.889 i-4.875926 j8.730628',
+ 'G1 y336.294',
+ 'G2 x305.296 y342.294 i9.99998 j.000007',
+ 'G1 x375.296',
+ 'G2 x377.296 y336.294 i-7.99998 j-5.999993',
+ 'G1 y232.294',
+ 'G2 x367.296 y222.294 i-9.999993 j-.000007',
+ 'G1 x351.422',
+ 'G3 x346.547 y221.025 i.000073 j-9.998699',
+ 'G1 x285.4 y186.878',
+ 'G3 y169.416 i4.875714 j-8.731',
+ 'G1 x346.547 y135.269',
+ 'G3 x351.422 y134 i4.875073 j8.729699',
+ 'G1 x367.296',
+ 'G2 x377.296 y124 i.000007 j-9.999993',
+ 'G1 y20',
+ 'G2 x375.296 y14 i-9.99998 j-.000007',
+ 'G1 x305.296',
+ 'G2 x303.296 y20 i7.99998 j5.999993',
+ 'G1 y78.405',
+ 'G3 x298.172 y87.136 i-9.999926 j.000372',
+ 'G1 x205.172 y139.07',
+ 'G3 x195.42 i-4.876 j-8.731543',
+ 'G1 x127.729 y101.269',
+ 'G2 x122.854 y100 i-4.875073 j8.729699',
+ 'G1 x97.296',
+ 'G1 y87.156',
+ 'G1 x107.296',
+ 'G1 y46.156',
+ 'G1 x97.296',
+ 'G1 y20',
+ 'G2 x95.296 y14 i-9.99998 j-.000007',
+ 'G1 x25.296',
+ 'G2 x23.296 y20 i7.99998 j5.999993',
+ 'G1 y124',
+ 'G2 x33.296 y134 i9.999993 j.000007',
+ 'G1 x49.17',
+ 'G3 x54.045 y135.269 i-.000073 j9.998699',
+ 'G1 x115.192 y169.416',
+ 'G3 x120.316433 y178.147 i-4.875714 j8.731',
+ '(<laser_off>)',
+ '(</Contour part_id="14" contour_id="6" c_contour_id="6" >)',
+ '(<slow>)',
+ '(<Inlet mode="outer" contour_id="7" c_contour_id="7" pard_id="14" macro="1" pulse="0">)',
+ 'G0 x7.296 y178.147',
+ '(<laser_on>)',
+ 'G1 x10.296 y179.879051',
+ 'G2 x13.296 y178.147 i1 j-1.732051',
+ '(<Contour mode="outer" contour_id="7" c_contour_id…4" macro="0" closed="1" overcut="13.696,0.000" >)',
+ 'G1 x13.296 y178.147',
+ 'G1 y0',
+ 'G1 x110.577',
+ 'G1 y10',
+ 'G1 x130.068',
+ 'G1 y0',
+ 'G1 x148.089',
+ 'G1 y10',
+ 'G1 x202.077',
+ 'G1 y0',
+ 'G1 x214.868',
+ 'G1 y10',
+ 'G1 x250.685',
+ 'G1 y0',
+ 'G1 x265.033',
+ 'G1 y10',
+ 'G1 x293.577',
+ 'G1 y0',
+ 'G1 x390.296',
+ 'G1 y25.668',
+ 'G1 x400.296',
+ 'G1 y71.668',
+ 'G1 x390.296',
+ 'G1 y152.284',
+ 'G1 x400.296',
+ 'G1 y204.284',
+ 'G1 x390.296',
+ 'G1 y266.713',
+ 'G1 x400.296',
+ 'G1 y326.713',
+ 'G1 x390.296',
+ 'G1 y346.294',
+ 'G1 x381.43',
+ 'G1 y356.294',
+ 'G1 x294.43',
+ 'G1 y346.294',
+ 'G1 x103.607',
+ 'G1 y356.294',
+ 'G1 x16.607',
+ 'G1 y346.294',
+ 'G1 x10.296',
+ 'G1 y326.413',
+ 'G1 x0',
+ 'G1 y265.413',
+ 'G1 x10.296',
+ 'G1 y204.08',
+ 'G1 x13.296',
+ 'G1 y178.147',
+ '(<laser_off>)',
+ '(</Contour part_id="14" contour_id="7" c_contour_id="7" >)',
+ '(</Part id="14" part_id="14">)'],
 	code3 : [ ' (<Part id="6" offsetx="0.000" offsety="0.000" rotation="0.000" color="#5ec641" part_id="6" originx="189.000000" originy="200.000000">)',
 	' (<Part_attr code="22___10__1">)',
 	' (<Part_attr uuid="n6-2490d6d3-c0ff-4508-948e-3cc3a822512c">)',

@@ -21,7 +21,7 @@ class Inlet {
 
     createSVG(coords, color="green", id="idz") {
         return
-        try {
+        /* try {
             let element = document.getElementById(id)
             if (element) element.remove();
         } catch (e) {
@@ -32,7 +32,7 @@ class Inlet {
         polygon.setAttribute("fill", "none");
         polygon.setAttribute("stroke", color);
         polygon.setAttribute("stroke-width", "0.2");
-        svg.appendChild(polygon);       
+        svg.appendChild(polygon);        */
     }
 
     detectInletType (selectedInletPath) {
@@ -1589,7 +1589,7 @@ class Inlet {
 
         inlets.forEach( element =>{
 
-            console.log (element)
+            //console.log (element)
            
             let oldInletPath = element.path
             let resp={}
@@ -1604,6 +1604,7 @@ class Inlet {
             //resp.element=element
             let check = this.checkInletIntend (resp)
             if (!check) {
+                //console.log ('findDangerInletsOutlets InletCheck is...  ' + check)
                 collInl.push(element.cid)
             }
             inlet.contourEdges = ''
@@ -1778,7 +1779,6 @@ class Inlet {
     }
 
     checkInletIntend (inl, contourPath =false) {
-       
         let needCheck = svgStore.safeMode.mode
         let intend = svgStore.safeMode.intend
         let contourInner = inl.contourType
@@ -2082,8 +2082,8 @@ class Inlet {
             }
 
         } else {
-            for (let i = 1; i < totalLength; i++) {
-                let point = SVGPathCommander.getPointAtLength( path, i* seg)
+            for (let i = 0; i < totalLength-1; i++) {
+                let point = SVGPathCommander.getPointAtLength( path, totalLength-i* seg)
                 let fill = util.pointInSvgPath( contour, point.x, point.y) 
                 if ((type === 'inner' && !fill) || (type === 'outer' && fill)) {
                     console.log ('shit')
@@ -2129,11 +2129,58 @@ class Inlet {
 	}
 
     applyNewPaths (paths) {
+        //console.log ("+++ NOW WE APPLY NEW PATHS +++")
         let {contour, inlet, outlet, cid, log} = paths
-        if ( paths.hasOwnProperty('outlet')) svgStore.updateElementValue ( cid, 'outlet', 'path', outlet );
-		if ( paths.hasOwnProperty('inlet')) svgStore.updateElementValue ( cid, 'inlet', 'path', inlet );
-        if ( paths.hasOwnProperty('contour')) svgStore.updateElementValue ( cid, 'contour', 'path', contour );
-        if ( paths.hasOwnProperty('log')) addToLog(log)
+        if (svgStore.safeMode.mode) {
+           
+            if (!paths.hasOwnProperty('contour')) {
+                contour = svgStore.getElementByCidAndClass (cid, 'contour', 'path')
+            }
+            if (! paths.hasOwnProperty('inlet')) {
+                inlet = svgStore.getElementByCidAndClass (cid, 'inlet', 'path')
+            }
+            if (! paths.hasOwnProperty('outlet')) {
+                outlet = svgStore.getElementByCidAndClass (cid, 'outlet', 'path')
+            }
+            // safeMode ON
+            this.contourEdges = ''
+            this.contourEdges1 = '' 
+            let resp={}
+            let oldInlet =  svgStore.getElementByCidAndClass (cid, 'inlet', 'path')
+            let oldContour =  svgStore.getElementByCidAndClass (cid, 'contour')
+            resp.newInleType =  this.detectInletType(  inlet )
+            resp.oldInletType = this.detectInletType(  oldInlet.path )
+            resp.oldInletPath = oldInlet.path
+            resp.newInletPath = inlet
+            resp.cid = cid            
+            resp.action = 'check'
+            resp.contourType = oldContour.class.includes('inner') ? 1 : 0
+
+            let outletType = this.detectInletType(  outlet )              
+            let outletCheck = true
+            try {
+                outletCheck = this.checkInletPosition ( contour, outlet, resp.contourType === 1 ? "inner" : "outer", outletType, 'outlet')             
+                console.log ('outlet check result is...  ' + outletCheck )
+            } catch (e) {
+                console.log ('Catch in checkInletPosition')
+            }
+            let inletCheck =  this.checkInletIntend (resp, contour ) 
+
+            if (outletCheck && inletCheck) {
+                if ( paths.hasOwnProperty('contour')) svgStore.updateElementValue ( cid, 'contour', 'path', contour );
+                if ( paths.hasOwnProperty('outlet')) svgStore.updateElementValue ( cid, 'outlet', 'path', outlet );
+                if ( paths.hasOwnProperty('inlet')) svgStore.updateElementValue ( cid, 'inlet', 'path', inlet );
+                if ( paths.hasOwnProperty('log')) addToLog(log)
+                return true
+            } else {
+                return false;
+            }
+        } else {
+            if ( paths.hasOwnProperty('contour')) svgStore.updateElementValue ( cid, 'contour', 'path', contour );
+            if ( paths.hasOwnProperty('outlet')) svgStore.updateElementValue ( cid, 'outlet', 'path', outlet );
+		    if ( paths.hasOwnProperty('inlet')) svgStore.updateElementValue ( cid, 'inlet', 'path', inlet );
+            if ( paths.hasOwnProperty('log')) addToLog(log)
+        }
     }   
 }
 
