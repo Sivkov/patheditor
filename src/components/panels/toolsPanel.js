@@ -5,7 +5,8 @@ import { observer } from 'mobx-react-lite';
 import logStore from '../stores/logStore.js'; 
 import svgStore from "../stores/svgStore.js";
 import editorStore from "../stores/editorStore.js";
-import log from './../../scripts/log.js'
+import log from './../../scripts/log.js';
+import inlet from './../../scripts/inlet.js'
  
 
 const ToolsPanel = observer(() => {
@@ -28,6 +29,22 @@ const ToolsPanel = observer(() => {
 
 	const setDrag =()=>{
 		editorStore.setMode('drag')
+	}
+
+	const copyContour =()=>{
+		console.log  ( svgStore.selectedCid )
+		if (typeof svgStore.selectedCid === 'number') {
+			svgStore.setCopiedCid ( svgStore.selectedCid )
+		}		
+	}
+
+	const pasteContour =()=>{
+		svgStore.addElementWithCid ( svgStore.copiedCid )
+		svgStore.setCopiedCid ( false )
+	}
+
+	const reverse =()=>{
+		inlet.reversePath ()
 	}
 
 	const panelInfo = [
@@ -61,7 +78,8 @@ const ToolsPanel = observer(() => {
 				  </button>
 				  <button
 					type="button"
-					className="btn text-white mt-1 ms-2 btn_copy btn_tool"
+					className="btn text-white mt-1 ms-2 btn_copy btn_tool" 
+					onMouseDown={copyContour}
 				  >
 					<i className="fa-solid fa-copy"></i>
 				  </button>
@@ -79,13 +97,15 @@ const ToolsPanel = observer(() => {
 				  </button>
 				  <button
 					type="button"
-					className="btn text-white mt-1 ms-2 btn_paste btn_tool"
+					className="btn text-white mt-1 ms-2 btn_paste btn_tool" 
+					onMouseDown={pasteContour}
 				  >
 					<i className="fa-solid fa-file-import"></i>
 				  </button>
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_reverse_path btn_tool"
+					onMouseDown={reverse}
 				  >
 					<i className="fa-solid fa-rotate"></i>
 				  </button>

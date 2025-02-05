@@ -1774,9 +1774,6 @@ class Inlet {
         }
     }
  */
-    checkOutletIntend () {
-        return true
-    }
 
     checkInletIntend (inl, contourPath =false) {
         let needCheck = svgStore.safeMode.mode
@@ -2128,6 +2125,18 @@ class Inlet {
 		}
 	}
 
+    reversePath ()  {
+        console.log ('reverse')
+        const {
+             selectedPath,
+             selectedCid
+         } = svgStore;
+
+        let reversePath =  SVGPathCommander.reversePath( selectedPath ).join(' ').replaceAll(',', ' ')
+        let res = inlet.getNewInletOutlet( selectedCid, 'contour', 'path', reversePath)
+        inlet.applyNewPaths( res )
+    }
+
     applyNewPaths (paths) {
         //console.log ("+++ NOW WE APPLY NEW PATHS +++")
         let {contour, inlet, outlet, cid, log} = paths
@@ -2160,7 +2169,7 @@ class Inlet {
             let outletCheck = true
             try {
                 outletCheck = this.checkInletPosition ( contour, outlet, resp.contourType === 1 ? "inner" : "outer", outletType, 'outlet')             
-                console.log ('outlet check result is...  ' + outletCheck )
+                //console.log ('outlet check result is...  ' + outletCheck )
             } catch (e) {
                 console.log ('Catch in checkInletPosition')
             }

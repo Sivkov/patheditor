@@ -8,6 +8,7 @@ class SvgStore {
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
 	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
 	safeMode = {mode: false, intend: CONSTANTS.defaultInletIntend}
+	copiedCid =  false
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -20,7 +21,7 @@ class SvgStore {
 			selectedContourModeType: computed,
 			tecnology: computed,
 			selectedInletPath: computed,
-			selectedOutletPath: computed,
+			selectedOutletPath: computed,			
         });
     }
 
@@ -154,6 +155,37 @@ class SvgStore {
 		);
 	}
 
+
+	addElementWithCid(cid) {
+ 		const elementsToCopy = this.svgData.code.filter(el => el.cid === cid);
+		
+		if (elementsToCopy.length === 0) {
+			console.warn(`No elements found with cid: ${cid}`);
+			return;
+		}
+	
+ 		const maxCid = this.svgData.code.length > 0 
+			? Math.max(...this.svgData.code.map(el => el.cid)) 
+			: 0;
+	
+ 		const newElements = elementsToCopy.map(el => {
+			// TODO надо решить что делать если копируется внешний контур ?? 
+			// технически контур скопировать пока можно , но что делать с двумя внешними контурами не очень понятно ??
+			/* let newClass = el.class.includes('outer') 
+				? el.class.replace('outer', 'inner') 
+				: el.class; */
+			
+			return {
+				...el, 
+				cid: maxCid + 1,
+				//class: newClass
+			};
+		});	
+		console.log("Adding elements with new cid:", newElements);
+ 		this.svgData.code.push(...newElements);
+	}
+	
+
 	updateElementValue(cid, className, val, newVal) {
 		const element = this.svgData.code.find(
 			(el) => el.cid === cid && el.class.includes(className)
@@ -217,6 +249,10 @@ class SvgStore {
 
 	setSelectorCoords (val) {
 		this.selectorCoords =  val
+	}
+
+	setCopiedCid (val) {
+		this.copiedCid = val
 	}
 }
 
