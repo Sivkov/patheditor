@@ -22,41 +22,90 @@ const viewSwitcher = observer(() => {
 
 
 	return (
-		<>
-		<div className="nav-item dropdown" id="viewsDropDown">
+	<>
+		<div className="d-flex">
 			<a
 				className="nav-link dropdown-toggle"
 				href="#"
+ 				role="button"
+			>
+				Part
+			</a>
+			<a
+				className="nav-link"
+				href="#"
+				role="button"
+				onClick={(e) => {
+					e.preventDefault(); 
+					window.location.reload();
+				}}
+			>
+				Reload
+			</a>	
+			<a
+				className="nav-link"
+				href="#"
+ 				role="button"
+ 			>
+				Tasks
+			</a>			
+			<a
+				className="nav-link"
+				href="#"
+ 				role="button"
+  			>
+				Plan editor
+			</a>
+			<a
+				className="nav-link dropdown-toggle"
+				href="#"
+				role="button"
+			>
+				Language
+			</a>
+			<div className="nav-item dropdown" id="viewsDropDown">
+				<a
+					className="nav-link dropdown-toggle"
+					href="#"
+					id="viewsDropdown"
+					role="button"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+				>
+					View
+				</a>
+				<ul className="dropdown-menu" aria-labelledby="viewsDropdown">
+					<li>
+						<a className="dropdown-item" 
+							href="#" 
+							id="fit_to_page"
+							onClick={ fit }					
+							>
+							<Icon icon="fluent:scale-fit-24-filled" width="18" height="30" className="me-2" />
+							Fit to page
+						</a>
+					</li> 
+					<li>
+						<a  className="dropdown-item"
+							href="#"
+							onClick={ minimize_all_panels }
+						>
+							<i className="fa-solid fa-align-justify me-2" />
+							Minimize all panels
+						</a>
+					</li>
+				</ul>
+			</div>
+			<a
+				className="nav-link"
+				href="#"
 				id="viewsDropdown"
 				role="button"
-				data-bs-toggle="dropdown"
-				aria-expanded="false"
-			>
-				View
-			</a>
-			<ul className="dropdown-menu" aria-labelledby="viewsDropdown">
-				<li>
-					<a className="dropdown-item" 
-						href="#" 
-						id="fit_to_page"
-						onClick={ fit }					
-						>
-						<Icon icon="fluent:scale-fit-24-filled" width="18" height="30" className="me-2" />
-						Fit to page
-					</a>
-				</li> 
-				<li>
-					<a  className="dropdown-item"
-						href="#"
-						onClick={ minimize_all_panels }
-					>
-						<i className="fa-solid fa-align-justify me-2" />
-						Minimize all panels
-					</a>
-				</li>
-			</ul>
-			</div>
-		</>
+ 			>
+				Exit
+			</a>			
+		</div>
+	</>
 	);
 });
 
