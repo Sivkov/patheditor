@@ -12,7 +12,7 @@ const viewSwitcher = observer(() => {
 		for (let key in CONSTANTS.panelPostions) {
 			panelStore.setPosition(key, CONSTANTS.panelPostions[key])
 		}	 
-		localStorage.removeItem("pp");
+		localStorage.removeItem("ppp");
 	}
 
 	const fit = () => {

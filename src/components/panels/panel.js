@@ -134,13 +134,13 @@ const Panel = observer (({ element, index }) => {
 
 	const  savePanelPosition =(id)=>{
 		console.log("SavePositions")
-		let pp = localStorage.getItem('pp')
-		if (!pp) {
-            let pp = {}
-            pp.positions = panelStore.positions
-            localStorage.setItem('pp', JSON.stringify(panelStore.positions))
+		let ppp = localStorage.getItem('ppp')
+		if (!ppp) {
+            let ppp = {}
+            ppp.positions = panelStore.positions
+            localStorage.setItem('ppp', JSON.stringify(panelStore.positions))
         } else {
- 			localStorage.setItem('pp', JSON.stringify(panelStore.positions))
+ 			localStorage.setItem('ppp', JSON.stringify(panelStore.positions))
         }
 	}   
 

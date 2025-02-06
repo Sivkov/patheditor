@@ -78,9 +78,13 @@ class Part {
     
     static ncpToSvg(ncpCode, number) {
         let svg = []
-        //const ncpLines = ncpCode.code
-
-        const ncpLines = CONSTANTS.code2
+        let ncpLines;
+        console.log ('ncp to svg') 
+        if ( window.location.href.includes('parteditor')) {   
+            ncpLines = ncpCode.code
+        } else {
+            ncpLines = CONSTANTS.code1
+        }
      
         let currentX, currentY
         let path = 'closed'

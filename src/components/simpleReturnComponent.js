@@ -7,8 +7,13 @@ import React, { useEffect, useState } from 'react';
 
 const SimpleReturnComponent = observer(() => {
 
-	const handle = 0;
-	const partNumber = 6;
+	//const handle = 0;
+	//const partNumber = 6;
+	//var url = new URL(location.href);
+	var url = new URL(window.location.href);
+	var searchParams = new URLSearchParams(url.search);
+	var handle = searchParams.get('handle') || 0;
+	var partNumber = searchParams.get('part') || 0;
 
 	const {
 		selectedCid,

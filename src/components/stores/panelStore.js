@@ -10,11 +10,11 @@ class PanelStore {
 	}
 
 	getInitialPositions() {
-		const pp = JSON.parse(localStorage.getItem('pp'));
-		if (pp) {
-			for (let key in pp) {
-				if (pp.hasOwnProperty(key)) {
-					this.positions[key] = pp[key];
+		const ppp = JSON.parse(localStorage.getItem('ppp'));
+		if (ppp) {
+			for (let key in ppp) {
+				if (ppp.hasOwnProperty(key)) {
+					this.positions[key] = ppp[key];
 				}
 			}
 		}
