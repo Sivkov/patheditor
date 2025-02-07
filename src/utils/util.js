@@ -403,6 +403,41 @@ class Util {
 		};
 	}
 
+	static getPerpendicularCoordinatesToPoint (arcParams, point, length) {
+		const { cx, cy, rx, ry, phi } = arcParams;
+		const { x, y } = point; // Точка на дуге
+	
+		// 1. Приводим точку (x, y) в локальную систему координат эллипса
+		const cosPhi = Math.cos(phi);
+		const sinPhi = Math.sin(phi);
+	
+		const localX = (x - cx) * cosPhi + (y - cy) * sinPhi;
+		const localY = (y - cy) * cosPhi - (x - cx) * sinPhi;
+	
+		// 2. Вычисляем угол θ этой точки относительно центра эллипса
+		const theta = Math.atan2(localY / ry, localX / rx);
+	
+		// 3. Касательный вектор (производная по θ)
+		const dx_tangent = -rx * Math.sin(theta) * cosPhi - ry * Math.cos(theta) * sinPhi;
+		const dy_tangent = -rx * Math.sin(theta) * sinPhi + ry * Math.cos(theta) * cosPhi;
+	
+		// 4. Нормальный вектор (перпендикуляр к касательной)
+		const length_tangent = Math.sqrt(dx_tangent * dx_tangent + dy_tangent * dy_tangent);
+		const dx_normal = dy_tangent / length_tangent;
+		const dy_normal = -dx_tangent / length_tangent;
+	
+		// 5. Две точки на перпендикуляре
+		const x1 = x + length * dx_normal;
+		const y1 = y + length * dy_normal;
+		const x2 = x - length * dx_normal;
+		const y2 = y - length * dy_normal;
+	
+		return {
+			point1: { x: x1, y: y1 },
+			point2: { x: x2, y: y2 }
+		};
+	}
+	
 	static arraysAreEqual(arr1, arr2) {
 		if (arr1.length !== arr2.length) {
 		   return false;

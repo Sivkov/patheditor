@@ -1,8 +1,8 @@
 import util from '../utils/util';
 import SVGPathCommander from 'svg-path-commander';
 import arc from './arc';
+import CONSTANTS from '../constants/constants';
 import svgStore from '../components/stores/svgStore';
-import editorStore from '../components/stores/editorStore';
 import { addToLog } from './../scripts/addToLog';
 
 
@@ -19,8 +19,18 @@ class Inlet {
         return pointIndex               
     }
 
+    randomSVGColor() {
+        // Генерируем случайные значения R, G, B (от 0 до 255)
+        let r = Math.floor(Math.random() * 256);
+        let g = Math.floor(Math.random() * 256);
+        let b = Math.floor(Math.random() * 256);
+
+        // Конвертируем в шестнадцатеричный формат и возвращаем в виде #RRGGBB
+        return `rgb(${r},${g},${b})`;
+    }
+
     createSVG(coords, color="green", id="idz") {
-        return
+        return;
         /* try {
             let element = document.getElementById(id)
             if (element) element.remove();
@@ -30,9 +40,9 @@ class Inlet {
         var polygon = document.createElementNS("http://www.w3.org/2000/svg", "path");
         polygon.setAttribute("d", 'M'+coords.join(' '));
         polygon.setAttribute("fill", "none");
-        polygon.setAttribute("stroke", color);
+        polygon.setAttribute("stroke", this.randomSVGColor());
         polygon.setAttribute("stroke-width", "0.2");
-        svg.appendChild(polygon);        */
+        svg.appendChild(polygon);         */
     }
 
     detectInletType (selectedInletPath) {
@@ -60,7 +70,7 @@ class Inlet {
 
     detectInletLength (path) {
         let type = this.detectInletType ( path )
-        let IL =6 
+        let IL = CONSTANTS.defaultInletLength
         path = SVGPathCommander.normalizePath( path )
         if (type === 'Tangent') {
             path.forEach( seg=>{     
@@ -729,12 +739,11 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
- 
-					let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
-					let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
+                    let PP = this.getPrevEndPoint (contourCommand, nearestSegment);
+                    let arcParams= arc.svgArcToCenterParam ( PP.x, PP.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
+					let perpPoint = util.getPerpendicularCoordinatesToPoint(arcParams, {x:endPoint.x,y:endPoint.y},IL);
 					let startPoint 
 					pointIn = util.pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
-					console.log ('pointIn' + pointIn)
 					if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
 						startPoint = perpPoint.point1
 					}  else {
@@ -1018,8 +1027,9 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
-                    let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
-                    let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
+                    let PP = this.getPrevEndPoint (contourCommand, nearestSegment);
+                    let arcParams= arc.svgArcToCenterParam ( PP.x, PP.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
+					let perpPoint = util.getPerpendicularCoordinatesToPoint(arcParams, {x:endPoint.x,y:endPoint.y},IL);
                     let startPoint 
                     pointIn = util.pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
                     if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
@@ -1028,7 +1038,7 @@ class Inlet {
                         startPoint = perpPoint.point2
                     } 
                     // TODO если был повернут то нужно повернуть мутная хрень -  подвинул повернул на нужный угол
-                    newOutletPath= `M ${startPoint.x} ${startPoint.y} L ${endPoint.x} ${endPoint.y}` 
+                    newOutletPath= `M ${endPoint.x} ${endPoint.y} L${startPoint.x} ${startPoint.y}` 
                 break;
              } 
         } else if (newOutleType === "Tangent")  {
@@ -2079,7 +2089,7 @@ class Inlet {
             }
 
         } else {
-            for (let i = 0; i < totalLength-1; i++) {
+            for (let i = 1; i < totalLength-1; i++) {
                 let point = SVGPathCommander.getPointAtLength( path, totalLength-i* seg)
                 let fill = util.pointInSvgPath( contour, point.x, point.y) 
                 if ((type === 'inner' && !fill) || (type === 'outer' && fill)) {
@@ -2099,7 +2109,7 @@ class Inlet {
             selectedOutletPath    
         } = svgStore;
     
-		editorStore.setInletMode('inletInMoving')
+		//editorStore.setInletMode('inletInMoving')
 		let nearest = util.findNearestPointOnPath (selectedPath, { x: coords.x, y: coords.y })
 		let inletType = this.detectInletType (selectedInletPath)
 		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
@@ -2145,10 +2155,10 @@ class Inlet {
             if (!paths.hasOwnProperty('contour')) {
                 contour = svgStore.getElementByCidAndClass (cid, 'contour', 'path')
             }
-            if (! paths.hasOwnProperty('inlet')) {
+            if (!paths.hasOwnProperty('inlet')) {
                 inlet = svgStore.getElementByCidAndClass (cid, 'inlet', 'path')
             }
-            if (! paths.hasOwnProperty('outlet')) {
+            if (!paths.hasOwnProperty('outlet')) {
                 outlet = svgStore.getElementByCidAndClass (cid, 'outlet', 'path')
             }
             // safeMode ON
