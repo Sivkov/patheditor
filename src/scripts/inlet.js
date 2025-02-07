@@ -468,7 +468,6 @@ class Inlet {
 		}
 	}
 
-
     getNewInletOutlet(cid, className, val, newVal, angle=false) {
 		if (!angle) {
 			angle ={angle: 0, x:0, y:0}
@@ -650,7 +649,6 @@ class Inlet {
         return [arc1, arc2];
     }
     
-
     calculateAngle(centerX, centerY, x1, y1, x2, y2, clockwise) {
         // Вычисляем векторы между центром и точками
         const vector1X = x1 - centerX;
@@ -930,9 +928,9 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
-     
-					let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
-					let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
+                    let PP = this.getPrevEndPoint (contourCommand, nearestSegment);
+                    let arcParams= arc.svgArcToCenterParam ( PP.x, PP.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
+					let perpPoint = util.getPerpendicularCoordinatesToPoint(arcParams, {x:endPoint.x,y:endPoint.y},IL);
 					let startPoint 
 					pointIn = util.pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
 					if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
@@ -1214,8 +1212,9 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
-                    let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
-					let perpPoint = util.getPerpendicularCoordinates(arcParams, IL);
+                    let PP = this.getPrevEndPoint (contourCommand, nearestSegment);
+                    let arcParams= arc.svgArcToCenterParam ( PP.x, PP.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
+					let perpPoint = util.getPerpendicularCoordinatesToPoint(arcParams, {x:endPoint.x,y:endPoint.y},IL);
 					let startPoint 
 					pointIn = util.pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
 					if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
