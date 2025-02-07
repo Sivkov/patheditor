@@ -819,8 +819,10 @@ class Inlet {
                     const flag3 = parseFloat(nearestSegment[5]);
                     const EX = parseFloat(nearestSegment[6]);
                     const EY = parseFloat(nearestSegment[7]);
-                    let arcParams= arc.svgArcToCenterParam ( endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
-                    let perpPoint = util.getPerpendicularCoordinates(arcParams, r);
+
+                    let PP = this.getPrevEndPoint (contourCommand, nearestSegment);
+                    let arcParams= arc.svgArcToCenterParam ( PP.x, PP.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
+					let perpPoint = util.getPerpendicularCoordinatesToPoint(arcParams, {x:endPoint.x,y:endPoint.y},IL);
                     let startPoint 
                     pointIn = util.pointInSvgPath(contourPath , perpPoint.point1.x, perpPoint.point1.y)
                     if ((pointIn && contourType==='inner') ||(!pointIn && contourType==='outer')){
@@ -1104,9 +1106,12 @@ class Inlet {
 					const EX = parseFloat(nearestSegment[6]);
 					const EY = parseFloat(nearestSegment[7]);
 					// Calculate the center of the arc
-					let arcParams = arc.svgArcToCenterParam(endPoint.x, endPoint.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
-					let perpPoint = util.getPerpendicularCoordinates(arcParams, 1);
-					let startPoint
+
+
+                    let PP = this.getPrevEndPoint (contourCommand, nearestSegment);
+                    let arcParams= arc.svgArcToCenterParam ( PP.x, PP.y, rx, ry, flag1, flag2, flag3, EX, EY, true)
+					let perpPoint = util.getPerpendicularCoordinatesToPoint(arcParams, {x:endPoint.x,y:endPoint.y},IL);
+ 					let startPoint
 					pointIn = util.pointInSvgPath(contourPath, perpPoint.point1.x, perpPoint.point1.y)
 					if ((pointIn && contourType === 'inner') || (!pointIn && contourType === 'outer')) {
 						startPoint = perpPoint.point1
