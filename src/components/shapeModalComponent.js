@@ -3,20 +3,59 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import '@fortawesome/fontawesome-free/css/all.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { observer } from 'mobx-react-lite';  
+import { addToLog } from '../scripts/addToLog';
+import svgStore from './stores/svgStore';
+import Util from '../utils/util';
+import SVGPathCommander from 'svg-path-commander';
 
 
-const ShapeModalComponent =()=> {
+const ShapeModalComponent =observer(()=> {
 	const [show, setShow] = useState(false);
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
 	const [selected, setSelected] = useState(0)
+	const [partXPosition,setPartXPosition ] = useState(0)
+	const [partYPosition,setPartYPosition ] = useState(0)
+	const [partWidth,setPartWidth ] = useState(50)
+	const [partHeight,setPartHeight ] = useState(50)
+	const [partCenterXPosition, setPartCenterXPosition] = useState(true)
+	const [partCenterYPosition, setPartCenterYPosition] = useState(true)
+
 	let shapes = [
 		"M10 5 A5 5 0 0 0 0 5 A5 5 0 0 0 5 10 A5 5 0 0 0 10 5",
 		"M5 0 H10 V10 H0 L0 0 L5 0",
-		"M10 10 0 10 5 1.34 L10 10" , 
+		"M5 0 L10 8.66 L0 8.66 L5 0" , 
 		"M4.86 9.27 L 1.78 9.27 L 0 3.54 L 4.86 0 L 9.72 3.54 L 7.94 9.27 L 4.86 9.27",
 		"M9.41 5 9.41 7.5 5.08 10 .75 7.5.75 2.5 5.08 0 9.41 2.5 9.41 5",	
 	]
+
+	const addContour =()=>{
+		let d = shapes[selected]
+        const myPathBBox = SVGPathCommander.getPathBBox(d)
+
+        let iniX = myPathBBox.width
+        let iniY = myPathBBox.height
+        let scaleX = partWidth/iniX
+        let scaleY = partHeight/iniY
+		let translateX = 0
+		let translateY = 0
+
+		if (partCenterXPosition) {
+			translateX = svgStore.svgData.width*0.5-myPathBBox.cx*scaleX
+		}
+
+		if (partCenterYPosition) {
+			translateY = svgStore.svgData.height*0.5-myPathBBox.cy*scaleY
+		}
+
+        if (!d || !d.length) return;
+        var transformed = Util.applyTransform(d, scaleX, scaleY, translateX, translateY, {angle: 0, x:0, y:0})
+		console.log (transformed)
+		
+		svgStore.addElementPath( transformed, '', '') 
+		addToLog ('Contour added')
+	}
 
 	return (
 		<>
@@ -69,17 +108,26 @@ const ShapeModalComponent =()=> {
 													className="mx-2"
 													id="newPartPositionX"
 													type="number"
-													min={1}
+													min={0}
 													max={1500}
 													step={1}
-													defaultValue={0}
+													value={partXPosition}
+													onChange={(e) => {
+														let value = Number(e.target.value); 
+														if (!isNaN(value)) {
+														  if (value < 0) value = 0; 
+														  if (value > 1500) value = 1500; // Максимум 1500
+														  setPartXPosition(value);
+														}
+													  }}																										
 												/>
 												mm
 												<input
 													className="mx-2"
 													id="newPartPositionXCenter"
 													type="checkbox"
-													defaultChecked=""
+													checked={ partCenterXPosition }
+													onChange={()=>setPartCenterXPosition ( !Boolean(partCenterXPosition))}
 												/>
 												В середине X
 											</div>
@@ -95,17 +143,26 @@ const ShapeModalComponent =()=> {
 													className="mx-2"
 													id="newPartPositionY"
 													type="number"
-													min={1}
+													min={0}
 													max={2500}
 													step={1}
-													defaultValue={0}
+													value={partYPosition}
+													onChange={(e) => {
+														let value = Number(e.target.value); 
+														if (!isNaN(value)) {
+														  if (value < 0) value = 0; 
+														  if (value > 1500) value = 1500; // Максимум 1500
+														  setPartYPosition(value);
+														}
+													}}												
 												/>
 												mm
 												<input
 													className="mx-2"
 													id="newPartPositionYCenter"
 													type="checkbox"
-													defaultChecked=""
+													checked={ partCenterYPosition }
+													onChange={()=> setPartCenterYPosition ( !Boolean(partCenterYPosition))}
 												/>
 												В середине Y
 											</div>
@@ -123,7 +180,15 @@ const ShapeModalComponent =()=> {
 												min={1}
 												max={1500}
 												step={1}
-												defaultValue={100}
+												value={partWidth}
+												onChange={(e) => {
+													let value = Number(e.target.value); 
+													if (!isNaN(value)) {
+													  if (value < 1) value = 1; 
+													  if (value > 1500) value = 1500; // Максимум 1500
+													  setPartWidth(value);
+													}
+												}}
 											/>
 											mm
 										</td>
@@ -140,7 +205,15 @@ const ShapeModalComponent =()=> {
 												min={1}
 												max={2500}
 												step={1}
-												defaultValue={100}
+												value={partHeight}
+												onChange={(e) => {
+													let value = Number(e.target.value); 
+													if (!isNaN(value)) {
+													  if (value < 1) value = 1; 
+													  if (value > 1500) value = 1500; // Максимум 1500
+													  setPartHeight(value);
+													}
+												}}
 											/>
 											mm
 										</td>
@@ -154,13 +227,15 @@ const ShapeModalComponent =()=> {
 					<Button variant="secondary" onClick={handleClose}>
 						Close
 					</Button>
-					<Button variant="primary" onClick={handleClose}>
+					<Button variant="primary" 
+						onClick={ handleClose }
+						onMouseDown={ addContour }>
 						Add Contour
 					</Button>
 				</Modal.Footer>
 			</Modal>
 		</>
 	);
-}
+})
 
 export default ShapeModalComponent;

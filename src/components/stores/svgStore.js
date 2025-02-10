@@ -184,6 +184,41 @@ class SvgStore {
 		console.log("Adding elements with new cid:", newElements);
  		this.svgData.code.push(...newElements);
 	}
+
+
+	addElementPath (path, inletPath='', outletPath='') {
+		let maxCid = this.svgData.code.length > 0 
+		? Math.max(...this.svgData.code.map(el => el.cid)) 
+		: 0;
+		maxCid+=1
+
+		let inlet={
+			cid:maxCid,
+			class:"inlet inner macro0 closed1",
+			path: inletPath,
+			stroke:'red',
+			strokeWidth:0.2,
+		}
+		let outlet={
+			cid:maxCid,
+			class:"outlet inner macro0 closed1",
+			path:outletPath,
+			stroke:'lime',
+            strokeWidth:0.2,
+		};
+		let contour={
+			class: 'contour inner macro0 closed1',
+			cid:maxCid,
+			path: path,
+			stroke:'red',
+            strokeWidth:0.2,
+            //piercingMode: null,
+            selected: false
+		};
+		this.svgData.code.push( contour, inlet, outlet);
+		this.setContourSelected(maxCid)
+
+	}
 	
 
 	updateElementValue(cid, className, val, newVal) {
