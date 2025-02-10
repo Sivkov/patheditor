@@ -7,7 +7,8 @@ import svgStore from "../stores/svgStore.js";
 import editorStore from "../stores/editorStore.js";
 import log from './../../scripts/log.js';
 import inlet from './../../scripts/inlet.js'
- 
+import ShapeModalComponent from '../shapeModalComponent.js';
+
 
 const ToolsPanel = observer(() => {
 	const deleteContour =()=>{
@@ -109,12 +110,7 @@ const ToolsPanel = observer(() => {
 				  >
 					<i className="fa-solid fa-rotate"></i>
 				  </button>
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_shapes btn_tool"
-				  >
-					<i className="fa-solid fa-shapes"></i>
-				  </button>
+  				 <ShapeModalComponent />
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_text btn_tool"

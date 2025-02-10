@@ -27,7 +27,7 @@ const Selector = observer(() => {
 	},[ selectedCid, selectedPath ])
 
 
-	let circleSize = 0.5
+	let circleSize = 2
 	//circleSize = circleSize > 2 ? 2 : circleSize
 	let part = {};
 	part.svg = document.getElementById("svg")

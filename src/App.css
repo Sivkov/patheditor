@@ -1793,3 +1793,28 @@ top:var(--hEdge);
 @keyframes blink {
   to { opacity:1; stroke-dashoffset: 40;}
 }
+
+.btn-shape-select {
+  width: 30px;
+  height: 30px;
+}
+
+.btn-shape-select svg path{
+  fill:white;
+}
+
+.shape-select-wrapper {
+  width: 30px;
+  height: 30px;
+}
+
+.btn-shape-selected svg path,
+.btn-figure-selected svg path{
+  fill:aqua;
+  fill: #0d6efd;
+}
+
+.custom_modal{
+  background-color: var(--darkBg) !important;
+  color:var(--color) !important;
+}
