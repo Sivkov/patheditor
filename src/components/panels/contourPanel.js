@@ -16,6 +16,7 @@ const ContourPanel = observer(() => {
 			selected,
 			selectedPath,
 			selectedType,
+			selectedCid,
 			selectedContourModeType, 
 		   	selectedInletModeType,
 			selectedPiercingType } = svgStore;
@@ -24,8 +25,34 @@ const ContourPanel = observer(() => {
 		let n = (Number(e.target.value))
 		let newMode = 'macro'+n
 		let selected = svgStore.getSelectedElement()
+		let oldMode = selected.class.split(' ').filter(a => a.startsWith('macro')).join('')
 		if (selected) {
 			let newClass =  selected.class.replace(/macro\d/gm, '')+' '+newMode
+			if (newMode === 'macro2') {
+				newClass+=' engraving'
+				svgStore.removeElementByCidAndClass(selectedCid, 'inlet')
+				svgStore.removeElementByCidAndClass(selectedCid, 'outlet')
+			}
+			if (oldMode === 'macro2' && oldMode !== newMode) {
+				newClass = newClass.replace('engraving', 'inner')
+				let inlet={
+					cid:selectedCid,
+					class:"inlet inner macro0 closed1",
+					path: '',
+					stroke:'red',
+					strokeWidth:0.2,
+				}
+
+				let outlet={
+					cid:selectedCid,
+					class:"outlet inner macro0 closed1",
+					path:'',
+					stroke:'lime',
+					strokeWidth:0.2,
+				};
+				svgStore.addElement(inlet)
+				svgStore.addElement(outlet)
+			}
 			svgStore.updateElementValue(selected.cid, 'contour', 'class', newClass)
 			addToLog ('Contour type changed')
 		}		

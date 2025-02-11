@@ -152,7 +152,7 @@ class Part {
                     mode = 'contour'
                 }
                 Part.joints=''
-                let eng = line.includes('mode="engraving"')
+                //let eng = line.includes('mode="engraving"')
                 cid = util.getAttributeValue(line, 'contour_id')
                 let macroValue = +util.getAttributeValue(line, 'macro')
                 let innerOuter = util.getAttributeValue(line, 'mode')

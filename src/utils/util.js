@@ -16,6 +16,15 @@ class Util {
 		return rad;
 	}
 
+/* 	static isPathClosed(normalizedPath) {
+		normalizedPath = SVGPathCommander.normalizePath(normalizedPath); 
+		if (!normalizedPath || normalizedPath.length < 2) return false;
+		const first = normalizedPath[0]; 
+		const last = normalizedPath[normalizedPath.length - 1]; 
+		if (first[0] !== "M") return false;
+		return first[1] === last[last.length - 2] && first[2] === last[last.length - 1];
+	} */
+	
 	static radianToDegree(rad) {
 		return rad * (180 / Math.PI);
 	}

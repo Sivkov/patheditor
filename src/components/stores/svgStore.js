@@ -136,6 +136,12 @@ class SvgStore {
 		this.svgData = { width: 0, height: 0, code: [] , params:{}}; // Очищаем данные SVG
 	}
 
+	addElement (element) {
+		if (element) {
+			this.svgData.code.push(element);
+		}
+	}
+
 	getElementByCidAndClass(cid, className, val = '') {
 		const element = this.svgData.code.find(
 			(el) => el.cid === cid && el.class.includes(className)
@@ -186,7 +192,7 @@ class SvgStore {
 	}
 
 
-	addElementPath (path, inletPath='', outletPath='') {
+	addElementPath (path='', inletPath='', outletPath='') {
 		let maxCid = this.svgData.code.length > 0 
 		? Math.max(...this.svgData.code.map(el => el.cid)) 
 		: 0;
