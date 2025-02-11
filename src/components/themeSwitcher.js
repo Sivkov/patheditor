@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 function ThemeSwitcher() {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Check the current theme in localStorage
@@ -31,7 +33,7 @@ function ThemeSwitcher() {
 
   return (
     <div className="form-check form-switch themeSwitcher d-flex align-items-center mx-4" style={{}}>
-      <label htmlFor="themeSwitcher" className="form-check-label" style={{ marginRight: '0px', fontSize:'16px' }}>Dark</label>
+      <label htmlFor="themeSwitcher" className="form-check-label" style={{ marginRight: '0px', fontSize:'16px' }}>{t('Dark')}</label>
       <input
         className="form-check-input"
         type="checkbox"
@@ -40,7 +42,7 @@ function ThemeSwitcher() {
         style={{ marginLeft: '6px' }}
         checked={isDarkMode}
       />
-      <label htmlFor="themeSwitcher" className="form-check-label mx-1" style={{ marginRight: '0px', fontSize:'16px' }}>Light</label>
+      <label htmlFor="themeSwitcher" className="form-check-label mx-1" style={{ marginRight: '0px', fontSize:'16px' }}>{t('Light')}</label>
     </div>
   );
 }

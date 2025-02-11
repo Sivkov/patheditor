@@ -4,9 +4,13 @@ import panelStore from './stores/panelStore';
 import coordStore from './stores/coordsStore';
 import CONSTANTS from '../constants/constants';
 import { Icon } from '@iconify/react';
+import LanguageSwitcher from './languageSwitcher';
+import { useTranslation } from 'react-i18next';
    
 
 const viewSwitcher = observer(() => {
+	
+	const {t} = useTranslation();
 
 	const minimize_all_panels = () => {
 		for (let key in CONSTANTS.panelPostions) {
@@ -29,7 +33,7 @@ const viewSwitcher = observer(() => {
 				href="#"
  				role="button"
 			>
-				Part
+				{t('Part')}
 			</a>
 			<a
 				className="nav-link"
@@ -40,29 +44,23 @@ const viewSwitcher = observer(() => {
 					window.location.reload();
 				}}
 			>
-				Reload
+				{t('Reload')}
 			</a>	
 			<a
 				className="nav-link"
 				href="#"
  				role="button"
  			>
-				Tasks
+				{t('Tasks')}
 			</a>			
 			<a
 				className="nav-link"
 				href="#"
  				role="button"
   			>
-				Plan editor
+				{t('Plan')} {t('Editor')}
 			</a>
-			<a
-				className="nav-link dropdown-toggle"
-				href="#"
-				role="button"
-			>
-				Language
-			</a>
+			<LanguageSwitcher />
 			<div className="nav-item dropdown" id="viewsDropDown">
 				<a
 					className="nav-link dropdown-toggle"
@@ -71,9 +69,7 @@ const viewSwitcher = observer(() => {
 					role="button"
 					data-bs-toggle="dropdown"
 					aria-expanded="false"
-				>
-					View
-				</a>
+				>{t('View')}</a>
 				<ul className="dropdown-menu" aria-labelledby="viewsDropdown">
 					<li>
 						<a className="dropdown-item" 
@@ -82,7 +78,7 @@ const viewSwitcher = observer(() => {
 							onClick={ fit }					
 							>
 							<Icon icon="fluent:scale-fit-24-filled" width="18" height="30" className="me-2" />
-							Fit to page
+							{t('Fit to page')}
 						</a>
 					</li> 
 					<li>
@@ -91,7 +87,7 @@ const viewSwitcher = observer(() => {
 							onClick={ minimize_all_panels }
 						>
 							<i className="fa-solid fa-align-justify me-2" />
-							Minimize all panels
+							{t('Minimize all panels')}
 						</a>
 					</li>
 				</ul>
@@ -102,7 +98,7 @@ const viewSwitcher = observer(() => {
 				id="viewsDropdown"
 				role="button"
  			>
-				Exit
+				{t('Exit')}
 			</a>			
 		</div>
 	</>

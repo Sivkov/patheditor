@@ -1,7 +1,7 @@
 import React from 'react';
 import ThemeSwitcher from './themeSwitcher';
 import Intro from './intro';
- import ViewSwitcher from './viewSwitcher';
+import ViewSwitcher from './viewSwitcher';
 
 const Navbar = () => {
 
