@@ -8,7 +8,7 @@ class SvgStore {
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
 	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
 	safeMode = {mode: false, intend: CONSTANTS.defaultInletIntend}
-	copiedCid =  false
+	copiedCid = false
 
 	constructor() {
 		makeAutoObservable(this, {

@@ -8,6 +8,7 @@ import editorStore from "../stores/editorStore.js";
 import log from './../../scripts/log.js';
 import inlet from './../../scripts/inlet.js'
 import ShapeModalComponent from '../shapeModalComponent.js';
+import { addToLog } from '../../scripts/addToLog.js';
 
 
 const ToolsPanel = observer(() => {
@@ -40,8 +41,10 @@ const ToolsPanel = observer(() => {
 	}
 
 	const pasteContour =()=>{
+		if (typeof svgStore.copiedCid !== 'number') return;
 		svgStore.addElementWithCid ( svgStore.copiedCid )
 		svgStore.setCopiedCid ( false )
+		addToLog("Contour pasted")
 	}
 
 	const reverse =()=>{

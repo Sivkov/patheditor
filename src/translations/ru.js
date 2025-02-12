@@ -407,7 +407,14 @@ let ru = {
     "Show danger inlets outlets":"Опасные врезки и выходы",
     "Prevent danger inlets and outlets":"Запретить опасные врезки и выходы",
     "outer":"внешний",
-    "inner":"внутренний"        
+    "inner":"внутренний",
+    "Contour changed by selector":"Контур изменен",
+    "Set inlet type":"Новый тип врезки",
+    "Set outlet type":"Новый тип выхода",
+    "Contour reversed":"Путь развернут",
+    "Contour deleted":"Контур удален",      
+    "Contour pasted":"Контур добавлен",        
+  
     }
 
     export default ru;
