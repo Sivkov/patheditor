@@ -8,9 +8,11 @@ import { addToLog } from '../scripts/addToLog';
 import svgStore from './stores/svgStore';
 import Util from '../utils/util';
 import SVGPathCommander from 'svg-path-commander';
+import { useTranslation } from 'react-i18next';
 
 
 const ShapeModalComponent =observer(()=> {
+	const { t } = useTranslation();
 	const [show, setShow] = useState(false);
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
@@ -69,7 +71,7 @@ const ShapeModalComponent =observer(()=> {
 
 			<Modal variant="" show={show} onHide={handleClose}>
 				<Modal.Header closeButton className="custom_modal">
-					<Modal.Title>Add contoour</Modal.Title>
+					<Modal.Title>{t('Add contour from shapes')}</Modal.Title>
 				</Modal.Header>
 				<Modal.Body className="custom_modal">
 					<div className="modal-body">
@@ -100,7 +102,7 @@ const ShapeModalComponent =observer(()=> {
 								<tbody>
 									<tr>
 										<td>
-											<div>Положение центра X</div>
+											<div>{t('Position center')} X</div>
 										</td>
 										<td>
 											<div className="">
@@ -129,13 +131,13 @@ const ShapeModalComponent =observer(()=> {
 													checked={ partCenterXPosition }
 													onChange={()=>setPartCenterXPosition ( !Boolean(partCenterXPosition))}
 												/>
-												В середине X
+												{t('In the center')} X
 											</div>
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<div>Положение центра Y</div>
+											<div>{t('Position center')} Y</div>
 										</td>
 										<td>
 											<div className="">
@@ -164,13 +166,13 @@ const ShapeModalComponent =observer(()=> {
 													checked={ partCenterYPosition }
 													onChange={()=> setPartCenterYPosition ( !Boolean(partCenterYPosition))}
 												/>
-												В середине Y
+												{t('In the center')} Y
 											</div>
 										</td>
 									</tr>
 									<tr>
 										<td>
-											<div>Ширина</div>
+											<div>{t('Width')}</div>
 										</td>
 										<td>
 											<input
@@ -195,7 +197,7 @@ const ShapeModalComponent =observer(()=> {
 									</tr>
 									<tr>
 										<td>
-											<div>Высота</div>
+											<div>{t('Height')}</div>
 										</td>
 										<td>
 											<input
@@ -225,12 +227,12 @@ const ShapeModalComponent =observer(()=> {
 				</Modal.Body>
 				<Modal.Footer className="custom_modal">
 					<Button variant="secondary" onClick={handleClose}>
-						Close
+						{t('Close')}
 					</Button>
 					<Button variant="primary" 
 						onClick={ handleClose }
 						onMouseDown={ addContour }>
-						Add Contour
+						{t('Add contour')}
 					</Button>
 				</Modal.Footer>
 			</Modal>

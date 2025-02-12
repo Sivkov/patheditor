@@ -12,10 +12,11 @@ import SVGPathCommander from 'svg-path-commander';
 import inlet from '../../scripts/inlet.js';
 import util from '../../utils/util.js';
 import { addToLog } from './../../scripts/addToLog.js';
+import { useTranslation } from 'react-i18next';
 
 
 const OutletPanel = observer(() => {
-
+	const { t } = useTranslation();
 	const {
 		selectedCid,
 		selectedPath,
@@ -265,7 +266,7 @@ const OutletPanel = observer(() => {
 	const panelInfo = [
 		  {
 			id: 'outletPopup',
-			fa: (<><Icon icon="ion:exit-outline" width="24" height="24" style={{color: 'white'}} className='me-2' /><div>Outlet</div></>),
+			fa: (<><Icon icon="ion:exit-outline" width="24" height="24" style={{color: 'white'}} className='me-2' /><div>{t('Outlet')}</div></>),
 			content:  (
 				<div className="d-flex flex-column">
 					<table className="table mb-0">
@@ -287,7 +288,7 @@ const OutletPanel = observer(() => {
 												step={1}
 												defaultValue={2}
 											/>
-											<div>mm</div>
+											<div>{t('mm')}</div>
 										</div>
 										<div className="ms-2">
 											<button className="btn btn-sm btn-primary btn_ShowDangerOutlets">
@@ -308,9 +309,7 @@ const OutletPanel = observer(() => {
 											onMouseDown={() => { setMode('set') }}
 											checked={mode === 'set'}
 										/>
-										<label className="form-check-label mx-1" htmlFor="outletModeSet">
-											Set
-										</label>
+										<label className="form-check-label mx-1" htmlFor="outletModeSet">{t('Set')}</label>
 									</div>
 									<div className="d-flex">
 										<input
@@ -320,11 +319,8 @@ const OutletPanel = observer(() => {
 											id="outletModeEdit"
 											onMouseDown={() => { setMode('edit') }}
 											checked={mode === 'edit'}
-
 										/>
-										<label className="form-check-label mx-1" htmlFor="outletModeEdit">
-											Edit
-										</label>
+										<label className="form-check-label mx-1" htmlFor="outletModeEdit">{t('Edit')}</label>
 									</div>									
 								</td>
 							</tr>
@@ -347,7 +343,7 @@ const OutletPanel = observer(() => {
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletTypeStraight">
 											<div>
-												Straight
+											{t('Straight')}
 											</div>
 										</label>
 									</div>
@@ -362,9 +358,7 @@ const OutletPanel = observer(() => {
 											onMouseDown={()=>{ setNewOutlet('Direct')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletTypeDirect">
-											<div>
-												Direct
-											</div>
+											<div>{t('Direct')}</div>
 										</label>
 									</div>
 									<div className="form-check text-left ms-4">
@@ -376,12 +370,9 @@ const OutletPanel = observer(() => {
 											disabled={mode !== 'set'}
 											checked={type === 'Hook'}
 											onMouseDown={()=>{ setNewOutlet('Hook')}}
-
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletTypeHook">
-											<div>
-												Hook
-											</div>
+											<div>{t('Hook')}</div>
 										</label>
 									</div>
 									<div className="form-check text-left ms-4">
@@ -395,9 +386,7 @@ const OutletPanel = observer(() => {
 											onMouseDown={()=>{ setNewOutlet('Tangent')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletTypeTangent">
-											<div>
-												Tangent
-											</div>
+											<div>{t('Tangent')}</div>
 										</label>
 									</div>
 								</td>
@@ -420,9 +409,7 @@ const OutletPanel = observer(() => {
 											className="btn btn-sm btn-primary btn_outletApplyForAll"
 											id="outletApplyForAll"
 											onMouseDown={()=>{ setOutletForAll()}}
-										>
-											Apply for all
-										</button>
+										>{t('Apply for all')}</button>
 									</div>
 								</td>
 							</tr>
@@ -433,8 +420,8 @@ const OutletPanel = observer(() => {
 											(type === "Hook" && mode === 'edit') ? (
 												<div className="d-flex flex-column">
 													<div className="d-flex justify-content-center">
-														<div className="d-flex align-items-center">															<div className="mr-2">
-															<div className='popup_input_label'>r</div>
+														<div className="d-flex align-items-center"><div className="mr-2">
+															<div className='popup_input_label'>{t('r')}</div>
 														</div>
 															<div>
 																<input
@@ -448,13 +435,13 @@ const OutletPanel = observer(() => {
 																/>
 															</div>
 															<div className="ml-2">
-																<div className='popup_input_label'>mm</div>
+																<div className='popup_input_label'>{t('mm')}</div>
 															</div>
 														</div>
 													</div>
 													<div className="d-flex justify-content-center">
-														<div className="d-flex align-items-center">															<div className="mr-2">
-															<div className='popup_input_label'>d</div>
+														<div className="d-flex align-items-center"><div className="mr-2">
+															<div className='popup_input_label'>{t('d')}</div>
 														</div>
 															<div>
 															<input
@@ -468,7 +455,7 @@ const OutletPanel = observer(() => {
 															/>
 															</div>
 															<div className="ml-2">
-																<div className='popup_input_label'>mm</div>
+																<div className='popup_input_label'>{t('mm')}</div>
 															</div>
 														</div>
 													</div>
@@ -478,8 +465,8 @@ const OutletPanel = observer(() => {
 												(type === "Direct"  && mode === 'edit' )? (
 													<div className="d-flex flex-column">
 														<div className="d-flex justify-content-center">
-															<div className="d-flex align-items-center">																<div className="mr-2">
-																<div className='popup_input_label'>l</div>
+															<div className="d-flex align-items-center"><div className="mr-2">
+																<div className='popup_input_label'>{t('l')}</div>
 															</div>
 																<div>
 																	<input
@@ -493,13 +480,13 @@ const OutletPanel = observer(() => {
 																	/>
 																</div>
 																<div className="ml-2">
-																	<div className='popup_input_label'>mm</div>
+																	<div className='popup_input_label'>{t('mm')}</div>
 																</div>
 															</div>
 														</div>
 														<div className="d-flex justify-content-center">
-															<div className="d-flex align-items-center">																<div className="mr-2">
-																<div className='popup_input_label'>a</div>
+															<div className="d-flex align-items-center"><div className="mr-2">
+																<div className='popup_input_label'>{t('a')}</div>
 															</div>
 																<div>
 																<input
@@ -514,7 +501,7 @@ const OutletPanel = observer(() => {
 																/>
 																</div>
 																<div className="ml-2">
-																	<div className='popup_input_label'>deg</div>
+																	<div className='popup_input_label'>{t('deg')}</div>
 																</div>
 															</div>
 														</div>
@@ -522,8 +509,8 @@ const OutletPanel = observer(() => {
 													(type === "Tangent" && mode === 'edit')  ? (
 													<div className="d-flex flex-column">
 														<div className="d-flex justify-content-center">
-															<div className="d-flex align-items-center">																<div className="mr-2">
-																<div className='popup_input_label'>r</div>
+															<div className="d-flex align-items-center"><div className="mr-2">
+																<div className='popup_input_label'>{t('r')}</div>
 															</div>
 																<div>
 																	<input
@@ -537,13 +524,13 @@ const OutletPanel = observer(() => {
 																	/>
 																</div>
 																<div className="ml-2">
-																	<div className='popup_input_label'>mm</div>
+																	<div className='popup_input_label'>{t('mm')}</div>
 																</div>
 															</div>
 														</div>
 														<div className="d-flex justify-content-center">
-															<div className="d-flex align-items-center">																<div className="mr-2">
-																<div className='popup_input_label'>l</div>
+															<div className="d-flex align-items-center"><div className="mr-2">
+																<div className='popup_input_label'>{t('l')}</div>
 															</div>
 																<div>
 																	<input
@@ -558,7 +545,7 @@ const OutletPanel = observer(() => {
 																	/>
 																</div>
 																<div className="ml-2">
-																	<div className='popup_input_label'>mm</div>
+																	<div className='popup_input_label'>{t('mm')}</div>
 																</div>
 															</div>
 														</div>

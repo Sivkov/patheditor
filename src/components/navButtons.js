@@ -8,7 +8,7 @@ import LanguageSwitcher from './languageSwitcher';
 import { useTranslation } from 'react-i18next';
    
 
-const viewSwitcher = observer(() => {
+const NavButtons = observer(() => {
 	
 	const {t} = useTranslation();
 
@@ -105,7 +105,7 @@ const viewSwitcher = observer(() => {
 	);
 });
 
-export default viewSwitcher;
+export default NavButtons;
 
 
 

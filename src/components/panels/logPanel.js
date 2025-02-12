@@ -6,10 +6,11 @@ import logStore from '../stores/logStore.js';
 import svgStore from "../stores/svgStore.js";
 import { useEffect, useState } from 'react';
 import log from './../../scripts/log.js'
+import { useTranslation } from 'react-i18next';
 
 
 const LogPanel = observer(() => {
-
+	const { t } = useTranslation();
 	useEffect(() => {
 		log.initDatabase()
 			.then(() => {
@@ -61,7 +62,7 @@ const LogPanel = observer(() => {
 	const panelInfo = [
 		  {
 			id: 'logPopup',
-			fa: (<><Icon icon="vaadin:time-backward" width="24" height="24"  style={{color: 'white'}} className='me-2' /><div>History</div></>),
+			fa: (<><Icon icon="vaadin:time-backward" width="24" height="24"  style={{color: 'white'}} className='me-2' /><div>{t('History')}</div></>),
 			content: (
 				<div id="logger_wrapper">
 				  <div id="logger">
@@ -74,7 +75,7 @@ const LogPanel = observer(() => {
 										<h6>{time(element.time)}</h6>
 									</div>
 									<div className="ms-2">
-										<h6 className="text-white">{element.action}</h6>
+										<h6 className="text-white">{t(element.action)}</h6>
 									</div>
 								</div>
 								<div className="me-4">
@@ -82,9 +83,7 @@ const LogPanel = observer(() => {
 									'btn btn-sm mt-1 ms-2 btn-secondary btn-log-restore active' : 
 									'btn btn-sm mt-1 ms-2 btn-secondary btn-log-restore'} 
 									data-stamp={ element.time } 
-									onMouseDown={restore}>
-									Restore
-								</button>
+									onMouseDown={restore}>{t('Restore')}</button>
 								</div>                
 							</div>              
 							<div className="custom_devide mt-2"></div>

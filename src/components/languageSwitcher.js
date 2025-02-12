@@ -30,7 +30,7 @@ const LanguageSwitcher = () => {
 						href="#"
 						onClick={() => changeLanguage('en')}
 					>
-						{t('English')}
+						🇬🇧 {t('English')}
 					</a>
 				</li>
 				<li>
@@ -39,7 +39,7 @@ const LanguageSwitcher = () => {
 						href="#"
 						onClick={() => changeLanguage('ru')}
 					>
-						{t("Russian")}
+						🇷🇺 {t("Russian")}
 					</a>
 				</li>
 			</ul>

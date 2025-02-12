@@ -1,15 +1,15 @@
 import React from 'react';
- import Panel from './panel';
+import Panel from './panel';
 import '@fortawesome/fontawesome-free/css/all.css'
 import svgStore from '../stores/svgStore';
 import { observer } from 'mobx-react-lite';
 import Util from '../../utils/util';
 import Part from '../../scripts/part';
-
+import { useTranslation } from 'react-i18next';
 
 
 const PartPanel = observer(() => {
-
+	const { t } = useTranslation();
 	const checkCollisions =()=> {
 		console.log (' checkCollisions ')
 		let contours = svgStore.getFiltered('contour')
@@ -36,29 +36,29 @@ const PartPanel = observer(() => {
 	const panelInfo = [
 		{
 			id: 'partPopup',
-			fa: (<><i className="fa-solid fa-gear me-2"></i><div>Part data</div></>),
+			fa: (<><i className="fa-solid fa-gear me-2"></i><div>{t('Part data')}</div></>),
 			content: (
 				<div className="d-flex">
 					<table className="table">
 						<tbody>
 						{/*  TODO add or not ??	<tr>
-								<td>id</td>
+								<td>{t('id')}</td>
 								<td>{svgData.params.id}</td>
  							</tr> */}
 							<tr>
-								<td>code</td>
+								<td>{t('code')}</td>
 								<td>{svgData.params.code}</td>
  							</tr>
 							<tr>
-								<td>uuid</td>
+								<td>{t('uuid')}</td>
 								<td id="info_uuid" contentEditable=""> {svgData.params.uuid}</td>
 							</tr>
 							<tr>
-								<td>width</td>
+								<td>{t('width')}</td>
  								<td>{Util.round (svgData.width, 3)}</td>
  							</tr>
 							 <tr>
-								<td>height</td>
+								<td>{t('height')}</td>
  								<td>{ Util.round(svgData.height, 3)}</td>
  							</tr>
 							<tr>
@@ -68,10 +68,10 @@ const PartPanel = observer(() => {
 										className="btn btn-sm btn-danger btn_partDetectCollision"
 										onMouseDown={ checkCollisions }
 										>
-											Check collision
+											{t('Check collision')}
 										</button>								
 										<div>
-											<input id="ignoreColissions" type="checkbox" />Ignore contour collisions
+											<input id="ignoreColissions" type="checkbox" />{t('Ignore contour collisions')}
 										</div>										
 									</div>
 								</td>

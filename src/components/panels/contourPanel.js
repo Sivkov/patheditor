@@ -9,9 +9,11 @@ import Util from '../../utils/util.js';
 //import { toJS } from "mobx";
 import inlet from '../../scripts/inlet.js';
 import { addToLog } from './../../scripts/addToLog.js';
+import { useTranslation } from 'react-i18next';
+
 
 const ContourPanel = observer(() => {
-
+	const { t } = useTranslation();
 	const { 
 			selected,
 			selectedPath,
@@ -242,19 +244,19 @@ const ContourPanel = observer(() => {
 	const panelInfo = [
 		{
 			id: "contourPopup",
-			fa: (<><Icon icon="oui:polygon" width="24" height="24" style={{ color: 'white' }} className='me-2' /><div>Contour</div></>),
+			fa: (<><Icon icon="oui:polygon" width="24" height="24" style={{ color: 'white' }} className='me-2' /><div>{t('Contour')}</div></>),
 			content: (<div className="d-flex flex-column">
 			<table className="table mb-0">
 			  <tbody>
 				<tr>
 				  <td colSpan={2} className="text-start ps-2">
-					Type:
+				  {t('Type')}:
 				  </td>
-				  <td colSpan={2}><div id="info_type">{selectedType}</div></td>
+				  <td colSpan={2}><div id="info_type">{t(selectedType)}</div></td>
 				  </tr>
 				<tr style={{ height: "1.5rem" }}>
 				  <td colSpan={2} className="text-start ps-2">
-					Piercing:
+				  {t('Piercing')}:
 				  </td>
 				  <td colSpan={2} style={{ padding: "0 0.2rem" }} id="info_piercing_mode">
 					<select
@@ -265,17 +267,17 @@ const ContourPanel = observer(() => {
 						value={selectedPiercingType}
 						>
  							<option value={-1} disabled={typeof selectedPiercingType  === 'number'}>
-								-- Select Piercing Type --
+								-- {t('Select Piercing Type')} --
 							</option>	
-							<option value={0}>normal</option>
-							<option value={1}>pulse</option>
-							<option value={2}>without_time</option>
+							<option value={0}>{t('normal')}</option>
+							<option value={1}>{t('pulse')}</option>
+							<option value={2}>{t('without time')}</option>
 						</select>
 				  </td>
 				</tr>
 				<tr style={{ height: "1.5rem" }}>
 				  <td colSpan={2} className="text-start ps-2">
-					Inlet:
+				  {t('Inlet')}:
 				  </td>
 				  <td
 					colSpan={2}
@@ -290,14 +292,14 @@ const ContourPanel = observer(() => {
 						onChange={ setSelectedInletModeType }
                         >
 							<option value={-1} disabled={selectedInletModeType}>
-								-- Select Inlet Mode --
+								-- {t('Select Inlet Mode')} --
 							</option>							
-							<option value={0} >cutting</option>
-							<option value={1} >pulse</option>
-							<option value={2} >engraving</option>
-							<option value={3} >macro3</option>
-							<option value={4} >macro4</option>
-							<option value={5} >cutless</option>
+							<option value={0} >{t('cutting')}</option>
+							<option value={1} >{t('pulse')}</option>
+							<option value={2} >{t('engraving')}</option>
+							<option value={3} >{t('macro')}3</option>
+							<option value={4} >{t('macro')}4</option>
+							<option value={5} >{t('cutless')}</option>
                         </select> 				  
 					</td>
 				</tr>
@@ -319,14 +321,14 @@ const ContourPanel = observer(() => {
 						onChange={ setSelectedContourModeType }
                         >
 							<option value={-1} disabled={selectedContourModeType}>
-								-- Select Contour Mode --
+								-- {t('Select Contour Mode')} --
 							</option>								
-							<option value={0} >cutting</option>
-							<option value={1} >pulse</option>
-							<option value={2} >engraving</option>
-							<option value={3} >macro3</option>
-							<option value={4} >macro4</option>
-							<option value={5} >cutless</option>
+							<option value={0} >{t('cutting')}</option>
+							<option value={1} >{t('pulse')}</option>
+							<option value={2} >{t('engraving')}</option>
+							<option value={3} >{t('macro')}3</option>
+							<option value={4} >{t('macro')}4</option>
+							<option value={5} >{t('cutless')}</option>
                         </select> 
 				  </td>
 				</tr>
@@ -335,7 +337,7 @@ const ContourPanel = observer(() => {
 			<table className="table mb-0">
 			  <thead className="table-dark">
 				<tr>
-				  <th colSpan={5}>Transformations</th>
+				  <th colSpan={5}>{t('Transformations')}</th>
 				</tr>
 			  </thead>
 			  <tbody>
@@ -489,7 +491,7 @@ const ContourPanel = observer(() => {
 				  <td className="w-25" rowSpan={3}></td>
 				  <td>
 					<div className="d-flex flex-row align-items-top justify-content-center">
-					<Icon icon="tabler:angle" width="24" height="24" />					  <div
+					<Icon icon="tabler:angle" width="24" height="24" /><div
 						style={{ fontFamily: '"Font Awesome 6 Pro"', marginTop: "-7px" }}
 					  >
 						°
@@ -514,16 +516,14 @@ const ContourPanel = observer(() => {
 					<i className="fa-solid fa-rectangles-mixed" />
 				  </td>
 				  <td colSpan={4}>
-					<input id="transformAll" type="checkbox" defaultChecked="" />
-					outer &amp; inner
-				  </td>
+					<input id="transformAll" type="checkbox" defaultChecked="" />{t('outer&inner')}</td>
 				</tr>
 			  </tbody>
 			</table>
 			<table className="table">
 			  <thead className="table-dark">
 				<tr>
-				  <th colSpan={5}>Align</th>
+				  <th colSpan={5}>{t('Align')}</th>
 				</tr>
 			  </thead>
 			  <tbody>
@@ -580,7 +580,7 @@ const ContourPanel = observer(() => {
 			<table className="table">
 			  <thead className="table-dark">
 				<tr>
-				  <th colSpan={5}>Rounding</th>
+				  <th colSpan={5}>{t('Rounding')}</th>
 				</tr>
 			  </thead>
 			  <tbody>
@@ -589,7 +589,7 @@ const ContourPanel = observer(() => {
 					<div className="d-flex align-items-center justify-content-around">
 					  <div className="d-flex align-items-center">
 					  	<Icon icon="ant-design:radius-upright-outlined" width="24" height="24" />
-						<div className="ms-2">Rounding radius</div>
+						<div className="ms-2">{t('Rounding radius')}</div>
 						<input
 						  className="mx-2"
 						  id="rounding_radius"
@@ -600,7 +600,7 @@ const ContourPanel = observer(() => {
 						  step={1}
 						  defaultValue={5}
 						/>
-						<div>mm</div>
+						<div>{t('mm')}</div>
 					  </div>
 					</div>
 				  </td>

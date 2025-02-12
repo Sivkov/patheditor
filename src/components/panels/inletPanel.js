@@ -14,11 +14,11 @@ import inlet from '../../scripts/inlet.js';
 import util from '../../utils/util.js';
 import CONSTANTS from '../../constants/constants.js';
 import { addToLog } from './../../scripts/addToLog.js';
-
+import { useTranslation } from 'react-i18next';
 
 
 const InletPanel = observer(() => {
-
+	const { t } = useTranslation();
 	const {
 		selectedCid,
 		selectedPath,
@@ -272,7 +272,7 @@ const InletPanel = observer(() => {
 		{
 			id: 'inletPopup',
 			fa: (<>
-				<Icon icon="ion:enter-outline" width="24" height="24" style={{ color: 'white' }} className='me-2' /><div>Inlet</div></>),
+				<Icon icon="ion:enter-outline" width="24" height="24" style={{ color: 'white' }} className='me-2' /><div>{t('Inlet')}</div></>),
 			content: (
 				<div className="d-flex flex-column">
 					<table className="table mb-0">
@@ -287,9 +287,7 @@ const InletPanel = observer(() => {
 										<label
 											className="form-check-label ms-2"
 											htmlFor="preventDangerInlets"
-										>
-											Prevent danger inlets and outlets
-										</label>
+										>{t('Prevent danger inlets and outlets')}</label>
 									</div>
 								</td>
 							</tr>
@@ -314,15 +312,13 @@ const InletPanel = observer(() => {
 													setInletIntend(Math.min(5, Math.max(1, value)));
 												}}
 											/>
-											<div>mm</div>
+											<div>{t('mm')}</div>
 										</div>
 										<div className="ms-2">
 											<button 
 												className="btn btn-sm btn-primary btn_ShowDangerInlets"
 												onMouseDown={ ()=>{ inlet.findDangerInletsOutlets() }}
-												>
-												Show danger inlets outlets
-											</button>
+												>{t('Show danger inlets outlets')}</button>
 										</div>
 									</div>
 								</td>
@@ -338,9 +334,7 @@ const InletPanel = observer(() => {
 											onMouseDown={() => { setMode('set') }}
 											checked={mode === 'set'}										
 										/>
-										<label className="form-check-label mx-1" htmlFor="inletModeSet">
-											Set
-										</label>
+										<label className="form-check-label mx-1" htmlFor="inletModeSet">{t('Set')}</label>
 									</div>
 									<div className="d-flex">
 										<input
@@ -351,9 +345,7 @@ const InletPanel = observer(() => {
 											onMouseDown={() => { setMode('edit') }}
 											checked={mode === 'edit'}										
 										/>
-										<label className="form-check-label mx-1" htmlFor="inletModeEdit">
-											Edit
-										</label>
+										<label className="form-check-label mx-1" htmlFor="inletModeEdit">{t('Edit')}</label>
 									</div>
 									<div className="d-flex">
 										<input
@@ -364,9 +356,7 @@ const InletPanel = observer(() => {
 											onMouseDown={() => { setMode('move') }}
 											checked={mode === 'move'}											
 										/>
-										<label className="form-check-label mx-1" htmlFor="inletModeMove">
-											Move
-										</label>
+										<label className="form-check-label mx-1" htmlFor="inletModeMove">{t('Move')}</label>
 									</div>
 								</td>
 							</tr>
@@ -388,9 +378,7 @@ const InletPanel = observer(() => {
 											onMouseDown={()=>{ setNewInlet('Straight')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeStraight">
-											<div>
-												Straight
-											</div>
+											<div>{t('Straight')}</div>
 										</label>
 									</div>
 									<div className="form-check text-left ms-4">
@@ -404,9 +392,7 @@ const InletPanel = observer(() => {
 											onMouseDown={()=>{ setNewInlet('Direct')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeDirect">
-											<div>
-												Direct
-											</div>
+											<div>{t('Direct')}</div>
 										</label>
 									</div>
 									<div className="form-check text-left ms-4">
@@ -421,9 +407,7 @@ const InletPanel = observer(() => {
 
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeHook">
-											<div>
-												Hook
-											</div>
+											<div>{t('Hook')}</div>
 										</label>
 									</div>
 									<div className="form-check text-left ms-4">
@@ -437,9 +421,7 @@ const InletPanel = observer(() => {
 											onMouseDown={()=>{ setNewInlet('Tangent')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeTangent">
-											<div>
-												Tangent
-											</div>
+											<div>{t('Tangent')}</div>
 										</label>
 									</div>
 								</td>
@@ -462,9 +444,7 @@ const InletPanel = observer(() => {
 											className="btn btn-sm btn-primary btn_inletApplyForAll"
 											id="inletApplyForAll"
 											onMouseDown={ () =>{ setInletForAll() } }
-										>
-											Apply for all
-										</button>
+										>{t('Apply for all')}</button>
 									</div>
 								</td>
 							</tr>
@@ -475,8 +455,8 @@ const InletPanel = observer(() => {
 											(type === "Hook" && mode === 'edit') ? (
 												<div className="d-flex flex-column">
 													<div className="d-flex justify-content-center">
-														<div className="d-flex align-items-center">															<div className="mr-2">
-															<div className='popup_input_label'>r</div>
+														<div className="d-flex align-items-center"><div className="mr-2">
+															<div className='popup_input_label'>{t('r')}</div>
 														</div>
 															<div>
 																<input
@@ -490,13 +470,13 @@ const InletPanel = observer(() => {
 																/>
 															</div>
 															<div className="ml-2">
-																<div className='popup_input_label'>mm</div>
+																<div className='popup_input_label'>{t('mm')}</div>
 															</div>
 														</div>
 													</div>
 													<div className="d-flex justify-content-center">
-														<div className="d-flex align-items-center">															<div className="mr-2">
-															<div className='popup_input_label'>d</div>
+														<div className="d-flex align-items-center"><div className="mr-2">
+															<div className='popup_input_label'>{t('d')}</div>
 														</div>
 															<div>
 															<input
@@ -510,7 +490,7 @@ const InletPanel = observer(() => {
 															/>
 															</div>
 															<div className="ml-2">
-																<div className='popup_input_label'>mm</div>
+																<div className='popup_input_label'>{t('mm')}</div>
 															</div>
 														</div>
 													</div>
@@ -520,8 +500,8 @@ const InletPanel = observer(() => {
 												(type === "Direct"  && mode === 'edit' )? (
 													<div className="d-flex flex-column">
 														<div className="d-flex justify-content-center">
-															<div className="d-flex align-items-center">																<div className="mr-2">
-																<div className='popup_input_label'>l</div>
+															<div className="d-flex align-items-center"><div className="mr-2">
+																<div className='popup_input_label'>{t('l')}</div>
 															</div>
 																<div>
 																	<input
@@ -535,13 +515,14 @@ const InletPanel = observer(() => {
 																	/>
 																</div>
 																<div className="ml-2">
-																	<div className='popup_input_label'>mm</div>
+																	<div className='popup_input_label'>{t('mm')}</div>
 																</div>
 															</div>
 														</div>
 														<div className="d-flex justify-content-center">
-															<div className="d-flex align-items-center">																<div className="mr-2">
-																<div className='popup_input_label'>a</div>
+															<div className="d-flex align-items-center">
+																<div className="mr-2">
+																<div className='popup_input_label'>{t('a')}</div>
 															</div>
 																<div>
 																<input
@@ -556,7 +537,7 @@ const InletPanel = observer(() => {
 																/>
 																</div>
 																<div className="ml-2">
-																	<div className='popup_input_label'>deg</div>
+																	<div className='popup_input_label'>{t('deg')}</div>
 																</div>
 															</div>
 														</div>
@@ -564,8 +545,8 @@ const InletPanel = observer(() => {
 													(type === "Tangent" && mode === 'edit')  ? (
 													<div className="d-flex flex-column">
 														<div className="d-flex justify-content-center">
-															<div className="d-flex align-items-center">																<div className="mr-2">
-																<div className='popup_input_label'>r</div>
+															<div className="d-flex align-items-center"><div className="mr-2">
+																<div className='popup_input_label'>{t('r')}</div>
 															</div>
 																<div>
 																	<input
@@ -579,13 +560,13 @@ const InletPanel = observer(() => {
 																	/>
 																</div>
 																<div className="ml-2">
-																	<div className='popup_input_label'>mm</div>
+																	<div className='popup_input_label'>{t('mm')}</div>
 																</div>
 															</div>
 														</div>
 														<div className="d-flex justify-content-center">
-															<div className="d-flex align-items-center">																<div className="mr-2">
-																<div className='popup_input_label'>l</div>
+															<div className="d-flex align-items-center"><div className="mr-2">
+																<div className='popup_input_label'>{t('l')}</div>
 															</div>
 																<div>
 																	<input
@@ -599,7 +580,7 @@ const InletPanel = observer(() => {
 																	/>
 																</div>
 																<div className="ml-2">
-																	<div className='popup_input_label'>mm</div>
+																	<div className='popup_input_label'>{t('mm')}</div>
 																</div>
 															</div>
 														</div>
