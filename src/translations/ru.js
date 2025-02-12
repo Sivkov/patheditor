@@ -413,7 +413,10 @@ let ru = {
     "Set outlet type":"Новый тип выхода",
     "Contour reversed":"Путь развернут",
     "Contour deleted":"Контур удален",      
-    "Contour pasted":"Контур добавлен",        
+    "Contour pasted":"Контур добавлен",
+    "Select Inlet Mode":"Выбрать режим врезки",
+    "Select Piercing Type":"Выбрать режим пирсинга",  
+    "Select Contour Mode":"Выбрать режим контура",       
   
     }
 

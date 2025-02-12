@@ -21,4 +21,8 @@ function App() {
  	);
 }
 
+document.addEventListener('contextmenu', function(event) {
+	event.preventDefault(); // Отменяем стандартное поведение
+});
+
 export default App;

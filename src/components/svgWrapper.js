@@ -4,10 +4,11 @@ import { observer } from 'mobx-react-lite';
 import coordsStore from './stores/coordsStore.js'; 
 import editorStore from './stores/editorStore.js'; 
 import SvgComponent from './svg';
-import Util from './../utils/util';
+import util from './../utils/util';
 import Part from '../scripts/part.js';
 //import tch from './../scripts/touches'
 import inlet from './../scripts/inlet.js'
+import svgStore from './stores/svgStore.js';
 
 
 var tch = {}
@@ -49,14 +50,14 @@ const  SvgWrapper = observer (() => {
 		var svg = document.getElementById("svg")
 		var gTransform = svg.createSVGMatrix()
 		var group = document.getElementById("group").transform.baseVal.consolidate().matrix
-		let coords = Util.convertScreenCoordsToSvgCoords(event.clientX, event.clientY);
+		let coords = util.convertScreenCoordsToSvgCoords(event.clientX, event.clientY);
 		let scale = 1.0 + (-event.deltaY * 0.001);
 
 		gTransform = gTransform.translate(coords.x, coords.y);
 		gTransform = gTransform.scale(scale, scale);
 		gTransform = gTransform.translate(-coords.x, -coords.y);
 
-		let comboMatrix = Util.multiplyMatrices(group, gTransform)
+		let comboMatrix = util.multiplyMatrices(group, gTransform)
 		setMatrix({
 			a: comboMatrix.a,
 			b: comboMatrix.b,
@@ -77,14 +78,14 @@ const  SvgWrapper = observer (() => {
         // Вычисление координат центра между двумя точками касания
         let x = (tch.evCache[0].clientX + tch.evCache[1].clientX) / 2;
         let y = (tch.evCache[0].clientY + tch.evCache[1].clientY) / 2;
-        let coords = Util.convertScreenCoordsToSvgCoords(x, y);
+        let coords = util.convertScreenCoordsToSvgCoords(x, y);
     
         // Применение трансформации
 		var gTransform = svg.createSVGMatrix()
         gTransform = gTransform.translate(coords.x, coords.y);
         gTransform = gTransform.scale(scale, scale);
         gTransform = gTransform.translate(-coords.x, -coords.y);
-		let comboMatrix = Util.multiplyMatrices(group, gTransform)
+		let comboMatrix = util.multiplyMatrices(group, gTransform)
 		
 		setMatrix({
 			a: comboMatrix.a,
@@ -156,20 +157,63 @@ const  SvgWrapper = observer (() => {
 	}
 
 	const startDrag = (e) =>{
-		//console.log ('startDrag')
+		console.log ('startDrag' + e.buttons)
 		inMoveRef.current = 1;	
 		if (e.target && (e.buttons === 4  || editorStore.mode== 'drag')) {            
-			let off = Util.getMousePosition(e);
+			let off = util.getMousePosition(e);
 			let transforms = gmatrix //document.getElementById("group1").transform.baseVal.consolidate().matrix
             off.x -= transforms.e;
             off.y -= transforms.f;
 			setOffset({x:off.x,y:off.y})
-        } 
+        } else if (e.button === 0 && editorStore.mode === 'selectPoint') {
+			console.log ("editorStore.mode   "+editorStore.mode)
+			let searchResult = util.findNearesPoint(e)
+			var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			//circle.setAttribute('id', 'selectedPoint2');
+			circle.setAttribute('fill', 'green');
+			circle.setAttribute('r', 1);
+			circle.setAttribute('stroke-width', 0.1);
+			circle.setAttribute('pointer-events', 'all');
+			circle.setAttribute('cx', searchResult.point.x);
+			circle.setAttribute('cy', searchResult.point.y);
+			document.querySelector('#group').appendChild(circle); 
+			
+		} else if (e.button === 0 && editorStore.mode === 'addPoint') {
+			
+			console.log ("editorStore.mode   "+editorStore.mode)
+			let contours = svgStore.getFiltered('contour')
+			let coords = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);			
+			let min = Infinity
+			let point;
+
+			contours.forEach((contour)=>{
+				let path = contour.path
+				let nearest = util.findNearestPointOnPath (path, { x: coords.x, y: coords.y })
+				let distance = util.distance(coords.x, coords.y, nearest.x, nearest.y )
+				if (distance < min) {
+					min=distance
+					point=nearest
+				}		
+			})
+			var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			//circle.setAttribute('id', 'selectedPoint1');
+			circle.setAttribute('fill', 'red');
+			circle.setAttribute('r', 1);
+			circle.setAttribute('stroke-width', 0.1);
+			circle.setAttribute('pointer-events', 'all');
+			circle.setAttribute('cx', point.x);
+			circle.setAttribute('cy', point.y);
+			document.querySelector('#group').appendChild(circle); 
+
+		} else if (e.button === 2) {		
+			console.log ('ку - ку')
+
+		}
 	}
 
 	const endDrag =(e) =>{
 		inMoveRef.current = 0;	
-		/* let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
+		/* let coords= util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
 		if (updContor) {
 			inlet.updateElement(coords, true, true, true)			
 			setUpdContour(false)
@@ -181,11 +225,11 @@ const  SvgWrapper = observer (() => {
 	}
 
 	const drag =(e) =>{
- 		let coords= Util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
+ 		let coords= util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
 		coordsStore.setCoords({ x: Math.round( coords.x*100) / 100, y: Math.round( coords.y*100) / 100 });
 		if (e.target && ((e.buttons === 4 ) || editorStore.mode== 'drag')) {
 			if (!inMoveRef.current) return;
-			var coord = Util.getMousePosition(e);
+			var coord = util.getMousePosition(e);
 			if (e.target && (e.buttons === 4 || e.buttons === 1)){
 				gmatrix.e = (coord.x - offset.x)
 				gmatrix.f = (coord.y - offset.y) 
@@ -240,14 +284,14 @@ const  SvgWrapper = observer (() => {
 			let xd = (box.x + box.width * 0.5)
 			let yd = (box.y + box.height * 0.5)
 
-			let coords1 = Util.convertScreenCoordsToSvgCoords(xd, yd);
-			let center = Util.convertScreenCoordsToSvgCoords(wBox.x+wBox.width*0.5, wBox.y+wBox.height*0.5)
+			let coords1 = util.convertScreenCoordsToSvgCoords(xd, yd);
+			let center = util.convertScreenCoordsToSvgCoords(wBox.x+wBox.width*0.5, wBox.y+wBox.height*0.5)
 		
 			let outerBox = document.querySelector('#contours').getBoundingClientRect()
 			let oxd = (outerBox.x + outerBox.width * 0.5)
 			let oyd = (outerBox.y + outerBox.height * 0.5)
 
-			let dif = Util.convertScreenCoordsToSvgCoords(oxd, oyd)
+			let dif = util.convertScreenCoordsToSvgCoords(oxd, oyd)
 			let ydif = dif.y - center.y
 			let xdif = dif.x - center.x
 
@@ -315,7 +359,7 @@ const  SvgWrapper = observer (() => {
 		const heightSVG = svgParams.height
 	
         // Ширина и высота исходя из scale
-        const combinedMatrix = Util.multiplyMatrices(gmatrix, matrix);
+        const combinedMatrix = util.multiplyMatrices(gmatrix, matrix);
         const scaleX = combinedMatrix.a;
         const scaleY = combinedMatrix.d;
 

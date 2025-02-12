@@ -30,6 +30,7 @@ class SvgStore {
 		if (typeof cid === 'number') {
 			return this.getElementByCidAndClass(cid, 'inlet', 'path')	|| ''
 		}	
+		return ''
 	}
 
 	get selectedOutletPath () {
@@ -37,6 +38,7 @@ class SvgStore {
 		if (typeof cid === 'number') {
 			return this.getElementByCidAndClass(cid, 'outlet', 'path')	|| ''
 		}	
+		return ''
 	}
 
 	get selectedCid () {

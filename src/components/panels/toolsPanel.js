@@ -25,12 +25,8 @@ const ToolsPanel = observer(() => {
 		}
 	}
 
-	const setResize =()=>{
-		editorStore.setMode('resize')
-	}
-
-	const setDrag =()=>{
-		editorStore.setMode('drag')
+	const setMode =(mode)=>{
+		editorStore.setMode(mode)
 	}
 
 	const copyContour =()=>{
@@ -60,20 +56,21 @@ const ToolsPanel = observer(() => {
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
-					onMouseDown={setResize}
+					onMouseDown={()=> setMode('resize')}
 				  >
 					<i className="fa-solid fa-arrow-pointer"></i>
 				  </button>
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_tool btn_drag_mode"
-					onMouseDown={setDrag}
+					onMouseDown={()=> setMode('drag')}
 				  >
 					<i className="fa-solid fa-hand"></i>
 				  </button>
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
+					onMouseDown={()=> setMode('addPoint')}
 				  >
 					<div className="d-flex flex-row align-items-center justify-content-center">
 					  <i className="fa-solid fa-arrow-pointer"></i>
@@ -90,6 +87,7 @@ const ToolsPanel = observer(() => {
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+					onMouseDown={()=> setMode('selectPoint')}
 				  >
 					<Icon icon="gis:arrow-o" width="24" height="24"  style={{color: 'white'}} />
 				  </button>

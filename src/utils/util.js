@@ -4,6 +4,7 @@ import inlet from "../scripts/inlet";
 import arc from "../scripts/arc";
 import inside from 'point-in-polygon-hao'
 import ClipperLib from 'clipper-lib'
+import svgStore from "../components/stores/svgStore";
 
 class Util {
 	static radian(ux, uy, vx, vy) {
@@ -1109,6 +1110,49 @@ class Util {
 			{ x: x5, y: y5 }  // Конец отрезка слева от точки (x3, y3)
 		];
 	}
+
+	static findNearesPoint(event) {
+
+        let coord = this.convertScreenCoordsToSvgCoords(event.clientX, event.clientY);
+        let minDistance = Infinity
+        let searchResult ={}
+        
+        let contours = svgStore.getFiltered('contour')
+        contours.forEach((contour,i)=>{
+			
+           	let cid= contour.cid
+            let path = contour.path
+            let updPath = SVGPathCommander.normalizePath(path)
+            updPath.forEach((seg,i,arr)=>{               
+                let x, y;                               
+                if (seg.includes('A')) {
+                    x = seg[6]
+                    y = seg[7]
+                }
+                if (seg.includes('L') || seg.includes('M')  ) {
+                    x = seg[1]
+                    y = seg[2]
+                }
+
+                const distance = Math.sqrt(
+                    Math.pow(coord.x - x, 2) +
+                    Math.pow(coord.y - y, 2)
+                );
+                if (distance < minDistance){
+                    minDistance=distance
+                    //part.searchResult.distance = distance
+                    searchResult.cid = cid
+                    searchResult.point ={x,y}
+                    searchResult.prevSeg =arr[i-1]
+                    searchResult.nextSeg =arr[i+1]
+                    searchResult.currentSeg =arr[i]
+                    searchResult.segIndex=i                    
+                }
+            })
+        })
+		return searchResult
+  
+    }
 
 
 }
