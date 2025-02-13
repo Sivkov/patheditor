@@ -255,7 +255,7 @@ class SvgStore {
 				this.updateElementValue (el.cid, 'contour', 'selected', false)		
 			}
 		}) 
-		this.updateElementValue (cid, 'contour', 'selected', true)
+		if (typeof cid  === 'number') this.updateElementValue (cid, 'contour', 'selected', true);
 	}
 
 	getSelectedElement(val = '') {	

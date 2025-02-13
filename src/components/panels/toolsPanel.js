@@ -30,6 +30,7 @@ const ToolsPanel = observer(() => {
 		editorStore.setMode(mode)
 		svgStore.setSelectedPointOnEdge(false)
 		svgStore.setSelectedPointOnPath(false)
+		svgStore.setContourSelected(false)
 	}
 
 	const copyContour =()=>{
@@ -51,10 +52,34 @@ const ToolsPanel = observer(() => {
 	}
 
 	const addPointToPath =()=>{
-			let newPathData = util.addPointToPath()
+		let newPathData = util.addPointToPath()
+		if (newPathData) {
 			svgStore.updateElementValue(svgStore.selectedPointOnPath.cid, 'contour', 'path', newPathData) 
 			svgStore.setSelectedPointOnPath(false)
 			addToLog('Added new point to path') 
+		}		
+	}
+
+	const deletePoint =()=>{
+		let newPathData = util.deletePoint()
+		if (newPathData) {
+			svgStore.updateElementValue(svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData) 
+			svgStore.setSelectedPointOnEdge(false)
+			addToLog('Point deleted from path') 
+		} else {
+			console.log ('No cut signor!')
+		}
+	}
+
+	const roundEdge =()=>{
+		let newPathData = util.createFilletArc()
+		if (newPathData) {
+			svgStore.updateElementValue(svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData) 
+			svgStore.setSelectedPointOnEdge(false)
+			addToLog('Edge rounded') 
+		} else {
+			console.log ('No cut signor!')
+		}
 	}
 
 	const panelInfo = [
@@ -83,7 +108,7 @@ const ToolsPanel = observer(() => {
 							type="button"
 							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
 							onMouseDown={addPointToPath}>
-							<Icon icon="gridicons:add-outline" width="24" height="24" />
+							<Icon icon="gridicons:add" width="24" height="24" />
 						</button>
 						:
 						<button
@@ -104,16 +129,28 @@ const ToolsPanel = observer(() => {
 				  >
 					<i className="fa-solid fa-copy"></i>
 				  </button>
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
-					onMouseDown={()=> setMode('selectPoint')}
-				  >
-					<Icon icon="mage:mouse-pointer" width="24" height="24" style={{color: 'white'}}/>
-				  </button>
+					{ svgStore.selectedPointOnEdge ?
+
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+							onMouseDown={ deletePoint }
+						>
+						<Icon icon="gridicons:cross-circle" width="24" height="24" />
+						</button>						
+						:
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+							onMouseDown={()=> setMode('selectPoint')}
+						>
+							<Icon icon="mage:mouse-pointer" width="24" height="24" style={{color: 'white'}}/>
+						</button>
+					}
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
+					onMouseDown={roundEdge}
 				  >
 					<Icon icon="proicons:arc" width="24" height="24" style={{color: 'white'}} />
 				  </button>

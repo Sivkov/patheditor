@@ -17,6 +17,40 @@ class Util {
 		return rad;
 	}
 
+	static degreeToRadian(deg) {
+		return deg * (Math.PI / 180);
+	}
+
+	static 	getBisectorPoint(x, y, x1, y1, x2, y2, l) {
+		// вычисляем точку на биисектрисе для поиска координать скругдления
+		// Вычисляем векторы A и B
+		let vectorA = { x: x1 - x, y: y1 - y };
+		let vectorB = { x: x2 - x, y: y2 - y };
+		
+		// Находим длины векторов
+		let lengthA = Math.sqrt(vectorA.x ** 2 + vectorA.y ** 2);
+		let lengthB = Math.sqrt(vectorB.x ** 2 + vectorB.y ** 2);
+		
+		// Нормализуем векторы (делаем их единичной длины)
+		let normA = { x: vectorA.x / lengthA, y: vectorA.y / lengthA };
+		let normB = { x: vectorB.x / lengthB, y: vectorB.y / lengthB };
+		
+		// Суммируем нормализованные векторы для получения направления биссектрисы
+		let bisector = { x: normA.x + normB.x, y: normA.y + normB.y };
+		
+		// Находим длину вектора биссектрисы
+		let bisectorLength = Math.sqrt(bisector.x ** 2 + bisector.y ** 2);
+		
+		// Нормализуем вектор биссектрисы
+		let normBisector = { x: bisector.x / bisectorLength, y: bisector.y / bisectorLength };
+		
+		// Возвращаем точку на биссектрисе длиной l
+		return {
+			x: x + normBisector.x * l,
+			y: y + normBisector.y * l
+		};
+	}
+
 /* 	static isPathClosed(normalizedPath) {
 		normalizedPath = SVGPathCommander.normalizePath(normalizedPath); 
 		if (!normalizedPath || normalizedPath.length < 2) return false;
@@ -1145,7 +1179,9 @@ class Util {
                     searchResult.prevSeg =arr[i-1]
                     searchResult.nextSeg =arr[i+1]
                     searchResult.currentSeg =arr[i]
-                    searchResult.segIndex=i                    
+                    searchResult.segIndex=i
+					searchResult.path=arr
+
                 }
             })
         })
@@ -1198,6 +1234,121 @@ class Util {
 		} 
 		return updPath.toString().replaceAll(',', ' ')	
 	}
+
+	static deletePoint () {
+		let searchResult = svgStore.selectedPointOnEdge	
+		let updPath = searchResult.path;
+		let commandIndex = searchResult.segIndex
+		let commandType = searchResult.currentSeg[0]; // Например, 'L'
+		if( commandType === 'M' ||updPath.length < 4) {
+			console.log ('inappropriate action')
+			return false
+		}
+
+ 		if ( updPath[commandIndex+1] && updPath[commandIndex+1][0] === 'A') {
+			let next = updPath[commandIndex+1]
+			let prev = updPath[commandIndex-1]
+			let minRadius = 0.5*Math.sqrt(
+				Math.pow(prev[prev.length-1] - next[next.length-1], 2) +
+				Math.pow(prev[prev.length-2] -next[next.length-2], 2)
+        	);
+			updPath[commandIndex+1][1] = updPath[commandIndex+1][1] < minRadius ? minRadius : updPath[commandIndex+1][1]
+			updPath[commandIndex+1][2] = updPath[commandIndex+1][2] < minRadius ? minRadius : updPath[commandIndex+1][2]
+		} 
+
+		updPath.splice(commandIndex, 1);
+		let newPathData = updPath.toString().replaceAll(',', ' ')
+		return newPathData; 
+   	}
+
+	static createFilletArc({nextSeg, point, prevSeg, cid, currentSeg, path}=svgStore.selectedPointOnEdge) {
+        if (!nextSeg || !point || !prevSeg || !currentSeg || !cid || !path) return
+        const nextX = nextSeg[nextSeg.length-2];
+        const nextY = nextSeg[nextSeg.length-1];
+        const prevX = prevSeg[prevSeg.length-2]
+        const prevY = prevSeg[prevSeg.length-1]
+        const currX = currentSeg[currentSeg.length-2]
+        const currY = currentSeg[currentSeg.length-1]
+        const radius = +document.querySelector('#rounding_radius').value
+
+        if ( [nextSeg, prevSeg, point, cid, currentSeg, radius].some( n=> !n)) return
+        if ( nextSeg[0]=='A' ||  currentSeg[0]=='A') return
+        let angle = this.calculateAngleVector(point.x, point.y, nextX, nextY, prevX, prevY)
+        if (Math.abs(angle - 180) < 0.5) {
+            console.log ("No scruglation signor!")
+            return false
+        }
+
+		let gypLength =  radius / Math.sin( this.degreeToRadian(angle/2))
+        let bisPoint = this.getBisectorPoint (point.x, point.y, nextX, nextY, prevX, prevY, gypLength)
+        let k2 = gypLength * Math.cos( this.degreeToRadian(angle/2))
+        let p1= this.findPointWithSameDirection( point.x, point.y, nextX, nextY, k2)
+        let p2= this.findPointWithSameDirection( point.x, point.y, prevX, prevY, k2)
+
+        let updPath = path
+		let classList = svgStore.getElementByCidAndClass(cid, 'contour', 'class')
+        let contourType = classList.includes('inner') ? 'inner' :'outer'
+        let clockwise =SVGPathCommander.getDrawDirection(path)
+        var pointIn = this.pointInSvgPath(path , bisPoint.x, bisPoint.y)        
+        let arcClockwise= 0
+
+        if ( contourType === 'inner') {
+            if (clockwise) {
+                //угол внешний и внутренний по точке в контуре или за контуром
+                if (pointIn) {
+                    arcClockwise=1                    
+                } else {
+                    arcClockwise=0    
+                }
+            } else {
+                if (pointIn) {
+                    arcClockwise=0                    
+                } else {
+                    arcClockwise=1    
+                }
+            }         
+        } else {
+            if (clockwise) {
+                if (pointIn) {
+                    arcClockwise=1                    
+                } else {
+                    arcClockwise=0    
+                }
+            }   else {
+                if (pointIn) {
+                    arcClockwise=0                    
+                } else {
+                    arcClockwise=1    
+                }
+            }   
+        }
+
+        const distance1 = Math.sqrt(
+            Math.pow(currX - nextX, 2) +
+            Math.pow(currY -nextY, 2)
+        );
+
+        const distance2 = Math.sqrt(
+            Math.pow(currX - prevX, 2) +
+            Math.pow(currY -prevY, 2)
+        );
+ 
+        if (this.round(k2) > this.round(distance1) || this.round(k2) > this.round(distance2)) {
+             console.log ('El contour deformation, signor!')
+           return false
+        }
+
+        // Создание команды для дуги
+        const arcSeg = ['A', radius, radius, 0, 0, arcClockwise, p1.x, p1.y];    
+        // Создание изменённой команды L
+        const modifiedPrevSeg = ['L', p2.x, p2.y];    
+        // Возвращаем обе команды
+        const arcanisation = { arcSeg, modifiedPrevSeg };
+        //меняем путь
+        updPath.splice ( svgStore.selectedPointOnEdge.segIndex+1 ,0, arcanisation.arcSeg)
+        updPath[svgStore.selectedPointOnEdge.segIndex] = arcanisation.modifiedPrevSeg
+        return  updPath.toString().replaceAll(',', ' ')
+    }
 }
 
 export default Util;
