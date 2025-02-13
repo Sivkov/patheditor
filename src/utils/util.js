@@ -1150,11 +1150,8 @@ class Util {
                 }
             })
         })
-		return searchResult
-  
+		return searchResult  
     }
-
-
 }
 
 export default Util;

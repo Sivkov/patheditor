@@ -9,6 +9,8 @@ class SvgStore {
 	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
 	safeMode = {mode: false, intend: CONSTANTS.defaultInletIntend}
 	copiedCid = false
+	selectedPointOnPath = false
+	selectedPointOnEdge = false
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -117,6 +119,14 @@ class SvgStore {
 			return Part.detectContourType(selected);
 		}
 		return '';
+	}
+
+	setSelectedPointOnEdge (val) {
+		this.selectedPointOnEdge = val
+	}
+
+	setSelectedPointOnPath (val) {
+		this.selectedPointOnPath=val
 	}
 
 	setsafeMode (mode) {

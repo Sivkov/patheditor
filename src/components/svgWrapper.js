@@ -23,8 +23,6 @@ const  SvgWrapper = observer (() => {
 	const [gmatrix, setGroupMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [offset, setOffset] = useState({x:0,y:0});
 	const [rectParams, setRectParams] = useState({x:0, y:0, width:0, heigh:0});
-	//const [ updContor, setUpdContour] = useState(false);
-
 	const [gridState, setGridState] = useState({
 		xsGrid: {
 			visibility: "visible",
@@ -105,15 +103,13 @@ const  SvgWrapper = observer (() => {
  
 	const pointerdown_handler = (ev) => {
 		ev.preventDefault()
-		// ev.stopPropagation()
-		console.log ('pointer_down_')
+ 		console.log ('pointer_down_')
 		tch.evCache.push(ev);
 	}
 
 	const pointermove_handler = (ev) => {
 		console.log('pointer_move_');
 		ev.preventDefault()
-		// ev.stopPropagation()
 		for (let i = 0; i < tch.evCache.length; i++) {
 			if (ev.pointerId === tch.evCache[i].pointerId) {
 				tch.evCache[i] = ev;
@@ -138,8 +134,7 @@ const  SvgWrapper = observer (() => {
 
 	const pointerup_handler = (ev) => {
 		ev.preventDefault()
-		// ev.stopPropagation()
-		console.log ('pointer_up_')
+ 		//console.log ('pointer_up_')
 		remove_event(ev);
 		if (tch.evCache.length < 2) prevDiff = -1;
 	}
@@ -168,15 +163,8 @@ const  SvgWrapper = observer (() => {
         } else if (e.button === 0 && editorStore.mode === 'selectPoint') {
 			console.log ("editorStore.mode   "+editorStore.mode)
 			let searchResult = util.findNearesPoint(e)
-			var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-			//circle.setAttribute('id', 'selectedPoint2');
-			circle.setAttribute('fill', 'green');
-			circle.setAttribute('r', 1);
-			circle.setAttribute('stroke-width', 0.1);
-			circle.setAttribute('pointer-events', 'all');
-			circle.setAttribute('cx', searchResult.point.x);
-			circle.setAttribute('cy', searchResult.point.y);
-			document.querySelector('#group').appendChild(circle); 
+			svgStore.setSelectedPointOnEdge(searchResult)
+	
 			
 		} else if (e.button === 0 && editorStore.mode === 'addPoint') {
 			
@@ -195,15 +183,8 @@ const  SvgWrapper = observer (() => {
 					point=nearest
 				}		
 			})
-			var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-			//circle.setAttribute('id', 'selectedPoint1');
-			circle.setAttribute('fill', 'red');
-			circle.setAttribute('r', 1);
-			circle.setAttribute('stroke-width', 0.1);
-			circle.setAttribute('pointer-events', 'all');
-			circle.setAttribute('cx', point.x);
-			circle.setAttribute('cy', point.y);
-			document.querySelector('#group').appendChild(circle); 
+			svgStore.setSelectedPointOnPath(point)
+	
 
 		} else if (e.button === 2) {		
 			console.log ('ку - ку')
@@ -213,11 +194,6 @@ const  SvgWrapper = observer (() => {
 
 	const endDrag =(e) =>{
 		inMoveRef.current = 0;	
-		/* let coords= util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
-		if (updContor) {
-			inlet.updateElement(coords, true, true, true)			
-			setUpdContour(false)
-		} */
 	}
 
 	const leave =(e)=>{	

@@ -27,6 +27,8 @@ const ToolsPanel = observer(() => {
 
 	const setMode =(mode)=>{
 		editorStore.setMode(mode)
+		svgStore.setSelectedPointOnEdge(false)
+		svgStore.setSelectedPointOnPath(false)
 	}
 
 	const copyContour =()=>{
@@ -89,7 +91,7 @@ const ToolsPanel = observer(() => {
 					className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
 					onMouseDown={()=> setMode('selectPoint')}
 				  >
-					<Icon icon="gis:arrow-o" width="24" height="24"  style={{color: 'white'}} />
+					<Icon icon="mage:mouse-pointer" width="24" height="24" style={{color: 'white'}}/>
 				  </button>
 				  <button
 					type="button"

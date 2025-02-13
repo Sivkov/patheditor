@@ -3,6 +3,9 @@ import React, { useEffect, useState } from 'react';
 import Util from './../utils/util';
 import SimpleReturnComponent from './simpleReturnComponent'
 import Selector from './selector.js'
+import SelectedPointOnEdge from './selectedPointOnEdge.js';
+import SelectedPointOnPath from './selectedPointOnPath.js';
+
 
 const SvgComponent = ({ matrix, gmatrix, gridState, svgParams, rectParams}) => {
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
@@ -101,6 +104,8 @@ const SvgComponent = ({ matrix, gmatrix, gridState, svgParams, rectParams}) => {
                             </>
                        </g>
                        <Selector />
+                       <SelectedPointOnEdge/>
+                       <SelectedPointOnPath/>
                     </g>
                 </g>
             </g>
