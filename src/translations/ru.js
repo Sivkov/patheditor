@@ -416,7 +416,8 @@ let ru = {
     "Contour pasted":"Контур добавлен",
     "Select Inlet Mode":"Выбрать режим врезки",
     "Select Piercing Type":"Выбрать режим пирсинга",  
-    "Select Contour Mode":"Выбрать режим контура",       
+    "Select Contour Mode":"Выбрать режим контура",
+    "Added new point to path":"Добавлена точка к пути"       
   
     }
 

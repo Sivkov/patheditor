@@ -181,6 +181,9 @@ const  SvgWrapper = observer (() => {
 				if (distance < min) {
 					min=distance
 					point=nearest
+					point.cid = contour.cid
+					point.path= contour.path
+					point.command = nearest.command
 				}		
 			})
 			svgStore.setSelectedPointOnPath(point)

@@ -937,7 +937,6 @@ class Util {
 		let nearestPointOnCommand ={}
 		let minDistance = Infinity
 		let tangentAngle
-		let centers
 		let dist 
         let currentX = 0;
         let currentY = 0;
@@ -1152,6 +1151,53 @@ class Util {
         })
 		return searchResult  
     }
+
+	static addPointToPath =()=>{
+					
+		let updPath = SVGPathCommander.normalizePath (svgStore.selectedPointOnPath.path)
+		let targetCommand = svgStore.selectedPointOnPath.command;
+		let newPoint = {x:svgStore.selectedPointOnPath.x,y:svgStore.selectedPointOnPath.y}
+		let commandParts = targetCommand.split(' ');
+		let commandType = commandParts[0]; // Например, 'L'
+		let commandIndex = updPath.findIndex(cmd => cmd.join(' ') === targetCommand );
+		if (commandIndex === -1) {
+			console.log("Команда для разбиения не найдена.");
+			return;
+		}
+
+		if (commandType==='L'){
+			let newSegment2 = ['L', newPoint.x, newPoint.y];
+			updPath.splice(commandIndex, 0, newSegment2);
+		} else if ((commandType==='A')) {
+			let oldCom = updPath[commandIndex];
+			let newSegment2 = ['A', oldCom[1], oldCom[2],oldCom[3],oldCom[4],oldCom[5],newPoint.x, newPoint.y]
+			if (oldCom[4] === 1) {
+				console.log ('Large arc problem')
+				let oldArcStart= updPath[commandIndex-1]
+				let oldArcStartX = oldArcStart[oldArcStart.length-2]
+				let oldArcStartY = oldArcStart[oldArcStart.length-1]
+				let oldCenters = this.svgArcToCenterParam( oldArcStartX, oldArcStartY,oldCom[1], oldCom[2],oldCom[3],oldCom[4],oldCom[5], oldCom[6],oldCom[7], true)
+				let newArc0 =this.svgArcToCenterParam( oldArcStartX, oldArcStartY,oldCom[1], oldCom[2],oldCom[3],0,oldCom[5], newPoint.x, newPoint.y, true)
+				let newArc1 =this.svgArcToCenterParam( oldArcStartX, oldArcStartY,oldCom[1], oldCom[2],oldCom[3],1,oldCom[5], newPoint.x, newPoint.y, true)
+
+				let stayArc0 =this.svgArcToCenterParam( newPoint.x, newPoint.y, oldCom[1], oldCom[2],oldCom[3],0,oldCom[5], oldCom[6],oldCom[7], true)
+				let stayArc1 =this.svgArcToCenterParam( newPoint.x, newPoint.y, oldCom[1], oldCom[2],oldCom[3],1,oldCom[5], oldCom[6],oldCom[7], true)
+
+				if (this.distance(oldCenters,newArc0 ) < this.distance(oldCenters,newArc1 )) {
+					newSegment2 = ['A', oldCom[1], oldCom[2],oldCom[3],0,oldCom[5],newPoint.x, newPoint.y]
+				} else {
+					newSegment2 = ['A', oldCom[1], oldCom[2],oldCom[3],1,oldCom[5],newPoint.x, newPoint.y]
+				}
+				if (this.distance(oldCenters,stayArc0 ) < this.distance(oldCenters,stayArc1 )) {
+					updPath[commandIndex] = ['A', oldCom[1], oldCom[2],oldCom[3],0,oldCom[5],oldCom[6],oldCom[7] ]
+				} else {
+					updPath[commandIndex] = ['A', oldCom[1], oldCom[2],oldCom[3],1,oldCom[5],oldCom[6],oldCom[7] ]
+				}
+			}
+			updPath.splice(commandIndex, 0, newSegment2);
+		} 
+		return updPath.toString().replaceAll(',', ' ')	
+	}
 }
 
 export default Util;

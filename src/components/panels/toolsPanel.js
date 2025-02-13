@@ -9,6 +9,7 @@ import log from './../../scripts/log.js';
 import inlet from './../../scripts/inlet.js'
 import ShapeModalComponent from '../shapeModalComponent.js';
 import { addToLog } from '../../scripts/addToLog.js';
+import util from '../../utils/util.js';
 
 
 const ToolsPanel = observer(() => {
@@ -49,6 +50,13 @@ const ToolsPanel = observer(() => {
 		inlet.reversePath ()
 	}
 
+	const addPointToPath =()=>{
+			let newPathData = util.addPointToPath()
+			svgStore.updateElementValue(svgStore.selectedPointOnPath.cid, 'contour', 'path', newPathData) 
+			svgStore.setSelectedPointOnPath(false)
+			addToLog('Added new point to path') 
+	}
+
 	const panelInfo = [
 		{
 			id: "toolsPopup",
@@ -69,16 +77,26 @@ const ToolsPanel = observer(() => {
 				  >
 					<i className="fa-solid fa-hand"></i>
 				  </button>
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
-					onMouseDown={()=> setMode('addPoint')}
-				  >
-					<div className="d-flex flex-row align-items-center justify-content-center">
-					  <i className="fa-solid fa-arrow-pointer"></i>
-					  <div style={{ marginTop: 11 }}>+</div>
-					</div>
-				  </button>
+				 
+					{svgStore.selectedPointOnPath ? 
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
+							onMouseDown={addPointToPath}>
+							<Icon icon="gridicons:add-outline" width="24" height="24" />
+						</button>
+						:
+						<button
+							type="button"
+							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
+							onMouseDown={()=> setMode('addPoint')}							>
+							<div className="d-flex flex-row align-items-center justify-content-center">
+							<i className="fa-solid fa-arrow-pointer"></i>
+							<div style={{ marginTop: 11 }}>+</div>
+							</div>
+						</button>
+					}					
+					
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_copy btn_tool" 
