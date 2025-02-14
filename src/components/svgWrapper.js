@@ -38,6 +38,7 @@ const  SvgWrapper = observer (() => {
 			fill: "none",
 		},
 	});
+	const [wrapperClass, setWrapperClass] = useState('')
 
 	const [svgParams, setSvgParams]= useState({width:0, height:0}) 
 
@@ -204,6 +205,9 @@ const  SvgWrapper = observer (() => {
 			addToLog("Contour was changed")
 			svgStore.setPointInMove(false)
 		}
+		if (editorStore.mode === 'dragging') {
+			editorStore.setMode('drag')
+		}
 	}
 
 	const leave =(e)=>{	
@@ -214,7 +218,14 @@ const  SvgWrapper = observer (() => {
 
  		let coords= util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
 		coordsStore.setCoords({ x: Math.round( coords.x*100) / 100, y: Math.round( coords.y*100) / 100 });
-		if (e.target && ((e.buttons === 4 ) || editorStore.mode== 'drag')) {
+		if (e.target && 
+				(
+					(e.buttons === 4)  || 
+					(editorStore.mode== 'drag' && e.buttons === 1) || 
+					(editorStore.mode== 'dragging' && e.buttons === 1)
+				)
+			) 
+		{
 			if (!inMoveRef.current) return;
 			var coord = util.getMousePosition(e);
 			if (e.target && (e.buttons === 4 || e.buttons === 1)){
@@ -229,6 +240,7 @@ const  SvgWrapper = observer (() => {
 					f: gmatrix.f,
 				})
 			}
+			editorStore.setMode('dragging')
 		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
 			inlet.getNewPathsInMove (coords)				
 		} else if (e.button === 0 && svgStore.pointInMove) {
@@ -343,6 +355,24 @@ const  SvgWrapper = observer (() => {
 			setRectParams( calculateRectAttributes())
 	},[matrix, gmatrix, offset])  
 
+	useEffect(()=>{
+		console.log (editorStore.mode)
+		if (editorStore.mode === 'resize') {
+			setWrapperClass('cursorArrow')
+		} else if (editorStore.mode === 'drag') {
+			setWrapperClass('cursorGrab')
+		} else if (editorStore.mode === 'dragging') {
+			setWrapperClass('cursorGrabbing')
+		} else if (editorStore.mode === 'addPoint') {
+			setWrapperClass('cursorCustomPlus')
+		} else if (editorStore.mode === 'selectPoint') {
+			setWrapperClass('cursorSelecPoint')
+		} else {
+			setWrapperClass('cursorArrow')
+		}
+	},
+	[editorStore.mode])
+
 	const calculateRectAttributes = () => {
 		const widthSVG = svgParams.width
 		const heightSVG = svgParams.height
@@ -373,7 +403,8 @@ const  SvgWrapper = observer (() => {
 							onMouseDown = {startDrag}
 							onMouseMove = {drag} 
 							onMouseUp = {endDrag}
-							onMouseLeave = {leave}		 
+							onMouseLeave = {leave}
+							className={ wrapperClass }		 
 							/* TODO RESIZING using touches onPointerDown = {pointerdown_handler}
 							onPointerMove = {pointermove_handler}
 							onPointerUp = {pointerup_handler}

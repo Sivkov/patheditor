@@ -253,36 +253,34 @@ tr.selected_row {
   background-color: var(--darkBg);
 }
 
- 
-
-
-
 #wrapper_part_list {
     overflow: hidden;
     width: 20%;
     height: 20%;
 }
 
-
-#group {
-    cursor: grab;
+.cursorArrow {
+  cursor: default !important;
 }
 
-#group2{
-  transform-origin: center;
+.cursorGrabbing {
+  cursor: grabbing !important;
 }
 
-
-.grabbing {
-    cursor: grab !important;
+.cursorGrab {
+  cursor: grab !important;
 }
 
-.arrow {
-    cursor: crosshair !important;
+.cursorText {
+cursor: text !important;
 }
 
-.rcut {
-  cursor: cell !important;
+.cursorCustomPlus{
+cursor: url('./img/cursor_plus.cur'), auto !important;
+}
+
+.cursorSelecPoint {
+  cursor: default !important;
 }
 
 .hidden,
