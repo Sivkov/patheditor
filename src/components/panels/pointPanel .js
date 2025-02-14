@@ -1,32 +1,14 @@
-import { Icon } from '@iconify/react';
 import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
 import svgStore from "../stores/svgStore.js";
-import { useEffect, useState, useRef } from 'react';
-import SVGPathCommander from 'svg-path-commander';
-import Util from '../../utils/util.js';
-//import { toJS } from "mobx";
-import inlet from '../../scripts/inlet.js';
-import { addToLog } from '../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
 
 
 const PointPanel = observer(() => {
 	const { t } = useTranslation();
-	const { 
-			selected,
-			selectedPath,
-			selectedType,
-			selectedCid,
-			selectedContourModeType, 
-		   	selectedInletModeType,
-			selectedPiercingType,
-			selectedPointOnEdge } = svgStore;
-
-	const applyPointPosition =()=>{		
-
-	}
+	const { selectedPointOnEdge } = svgStore;
+	const applyPointPosition =()=>{}
 
 	
 	const panelInfo = [
@@ -55,7 +37,7 @@ const PointPanel = observer(() => {
 							disabled=""
 							//defaultValue={ selectedPointOnEdge ? selectedPointOnEdge.angle : ''}
 							value={ selectedPointOnEdge ? selectedPointOnEdge.angle : ''}
-
+							onChange={()=>{}}
 						  />
 						  <div>°</div>
 						</div>
@@ -70,8 +52,9 @@ const PointPanel = observer(() => {
 							step={1}
 							//defaultValue={ selectedPointOnEdge ? selectedPointOnEdge.point.x : ''}
 							value={ selectedPointOnEdge ? selectedPointOnEdge.point.x : ''}
-/>
-						  <div>{t('mm')}</div>
+							onChange={()=>{}}
+						/>
+						<div>{t('mm')}</div>
 						</div>
 						<div className="d-flex align-items-center ms-2">
 						  <div className="">y</div>
@@ -84,6 +67,7 @@ const PointPanel = observer(() => {
 							step={1}
 							//defaultValue={ selectedPointOnEdge ? selectedPointOnEdge.point.y : ''}
 							value={ selectedPointOnEdge ? selectedPointOnEdge.point.y : ''}
+							onChange={()=>{}}
 						  />
 						  <div>{t('mm')}</div>
 						</div>

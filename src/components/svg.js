@@ -4,6 +4,7 @@ import SimpleReturnComponent from './simpleReturnComponent'
 import Selector from './selector.js'
 import SelectedPointOnEdge from './selectedPointOnEdge.js';
 import SelectedPointOnPath from './selectedPointOnPath.js';
+import Guides from './guides.js'
 
 
 const SvgComponent = ({ matrix, gmatrix, gridState, svgParams, rectParams}) => {
@@ -105,6 +106,7 @@ const SvgComponent = ({ matrix, gmatrix, gridState, svgParams, rectParams}) => {
                        <Selector />
                        <SelectedPointOnEdge/>
                        <SelectedPointOnPath/>
+                       <Guides />
                     </g>
                 </g>
             </g>
