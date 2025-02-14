@@ -613,7 +613,7 @@ class Inlet {
                     let oy2 = OV[7]
                     try {
                         this.centers = util.svgArcToCenterParam (ocurrent.currentX, ocurrent.currentY, orx, ory, oflag1, oflag2, oflag3, ox2, oy2, true);
- 					    flag2 = this.calculateAngle ( this.centers.x, this.centers.y,  current.currentX, current.currentY, x2, y2,  Boolean(flag3) )
+ 					    flag2 = this.calculateAngle ( this.centers.x, this.centers.y,  current.currentX, current.currentY, x2, y2,  Boolean(flag3), oflag1)
                          segments[index]=['A', rx, ry, flag1, flag2, flag3, x2, y2] 
                     } catch (e) {
                         console.log (`bitch`)
@@ -649,7 +649,7 @@ class Inlet {
         return [arc1, arc2];
     }
     
-    calculateAngle(centerX, centerY, x1, y1, x2, y2, clockwise) {
+/*     calculateAngle(centerX, centerY, x1, y1, x2, y2, clockwise) {
         // Вычисляем векторы между центром и точками
         const vector1X = x1 - centerX;
         const vector1Y =  (y1*-1 - centerY*-1);
@@ -670,8 +670,49 @@ class Inlet {
 
         //console.log (util.radianToDegree(angle)+ " "+ `${angle > Math.PI ? 1 : 0}`)    
         return angle >= Math.PI ? 1 : 0;
-    }
+    } */
 
+    calculateAngle(centerX, centerY, x1, y1, x2, y2, clockwise, xAxisRotation) {
+        // Преобразование угла из градусов в радианы
+        const rotationRad = xAxisRotation * Math.PI / 180;
+    
+        // Функция для поворота точки относительно центра
+        const rotatePoint = (x, y, cx, cy, angleRad) => {
+            const cosA = Math.cos(angleRad);
+            const sinA = Math.sin(angleRad);
+            const dx = x - cx;
+            const dy = y - cy;
+            return {
+                x: cx + dx * cosA - dy * sinA,
+                y: cy + dx * sinA + dy * cosA
+            };
+        };
+    
+        // Поворачиваем начальную и конечную точки на x-axis-rotation
+        const p1 = rotatePoint(x1, y1, centerX, centerY, -rotationRad);
+        const p2 = rotatePoint(x2, y2, centerX, centerY, -rotationRad);
+    
+        // Вычисляем векторы между центром и повернутыми точками
+        const vector1X = p1.x - centerX;
+        const vector1Y = p1.y - centerY;
+        const vector2X = p2.x - centerX;
+        const vector2Y = p2.y - centerY;
+    
+        // Вычисляем угол между векторами
+        let angle = Math.atan2(vector1X * vector2Y - vector2X * vector1Y, vector1X * vector2X + vector1Y * vector2Y);
+    
+        // Приводим угол к диапазону [0, 2π]
+        angle = (angle + 2 * Math.PI) % (2 * Math.PI);
+    
+        // Проверяем направление угла
+        if (clockwise) {
+            angle = 2 * Math.PI - angle;
+        }
+    
+        // Возвращаем флаг large-arc-flag (1, если угол ≥ 180°, иначе 0)
+        return angle >= Math.PI ? 0 : 1;
+    }
+    
     getPrevEndPoint (path, segment) {
         for (let i=0; i< path.length ;i++) {
             let curr = path[i]
@@ -1701,94 +1742,6 @@ class Inlet {
         },5000) 
     }
 
-
-    /* updateInletOutletContour (inlet=false, outlet=false, contour=false, cid, action='set' ) {        //console.log (inl)
-        let inletIscorrect 
-        let outletIscorrect 
-
-        if (!contour) {
-            contour= svgStore.getElementByCidAndClass( cid , 'contour', )
-        } 
-
-        if (!inlet) inlet = svgStore.getElementByCidAndClass( cid , 'inlet', 'path')
-        if (!outlet) inlet = svgStore.getElementByCidAndClass( cid , 'outlet', 'path')
-       
-
-        if (contour) {
-            if ( contour.path.includes('NaN')) {
-                console.log ('Invalid contour path')
-                return
-            }
-        }
-
-        
-        if (inlet) {
-            if ( inlet.newInletPath.includes('NaN')) {
-                //log.add(__("Error outlet editing"), 'error')
-                console.log (inlet.newInletPath)
-                return
-            }
-            inletIscorrect = this.checkInletPosition (inlet.newInletPath,  inlet.contourType, inlet.newInleType, 'inlet')
-             if (inletIscorrect) {
-                inletIscorrect = this.checkInletIntend (inlet)
-            } 
-            //console.log ("!!!  "+ inletIscorrect)
-        } else {
-            inletIscorrect = true
-        }
-
-        if (outlet) {
-            if ( outlet.newOutletPath.includes('NaN')) {
-                //log.add(__("Error outlet editing"), 'error')
-                console.log (outlet.newOutletPath)
-                return
-            }
-            outletIscorrect = this.checkInletPosition (outlet.newOutletPath, outlet.contourType, outlet.newOutleType, 'outlet')             
-        } else {
-            outletIscorrect = true
-        }
-
-        if (outletIscorrect && inletIscorrect) {
-
-            if (inlet) {                
- 
-            }
-
-            if (outlet) {
-              
-            }
-
-            if (inlet && inlet.action ==='set') {
-                //log.add( __("New inlet set"))
-            }
-
-            if (outlet  && outlet.action ==='set') {
-                //log.add( __("New outlet set"))
-            } 
-            //здесь в панели уст значение макроИнлет на равное макро
-            if (inlet && inlet.action ==='set' && inlet.oldInletType === 'Straight' && inlet.newInleType !== 'Straight'){
-               // part.macroInlet = part.macro
-                
-            }
-            //здесь в панели уст значение макроИнлет равное -1 так врезки нет
-            if (inlet && inlet.action ==='set' && inlet.newInleType === 'Straight' && inlet.oldInletType !== 'Straight'){
-                part.macroInlet = -1                
-            }
-
-            if ((inlet && inlet.action === 'move') || (outlet && outlet.action === 'move')) {
-             }
-            return true
-        } else {
-            if (action === 'reverse' || action === 'set'){
-                //util.messaging(__("Danger inlet position"), true, false)
-                //this.updateInletPanel( inl.oldInletType )
-                //this.updateOutletPanel( outlet.oldOutletType)
-                return false
-            }
-        }
-    }
- */
-
     checkInletIntend (inl, contourPath =false) {
         let needCheck = svgStore.safeMode.mode
         let intend = svgStore.safeMode.intend
@@ -2149,6 +2102,7 @@ class Inlet {
         let reversePath =  SVGPathCommander.reversePath( selectedPath ).join(' ').replaceAll(',', ' ')
         let res = inlet.getNewInletOutlet( selectedCid, 'contour', 'path', reversePath)
         inlet.applyNewPaths( res )
+        addToLog('Contour reversed')
     }
 
     applyNewPaths (paths) {
@@ -2188,7 +2142,6 @@ class Inlet {
                 console.log ('Catch in checkInletPosition')
             }
             let inletCheck =  this.checkInletIntend (resp, contour ) 
-
             if (outletCheck && inletCheck) {
                 if ( paths.hasOwnProperty('contour')) svgStore.updateElementValue ( cid, 'contour', 'path', contour );
                 if ( paths.hasOwnProperty('outlet')) svgStore.updateElementValue ( cid, 'outlet', 'path', outlet );
@@ -2199,6 +2152,7 @@ class Inlet {
                 return false;
             }
         } else {
+
             if ( paths.hasOwnProperty('contour')) svgStore.updateElementValue ( cid, 'contour', 'path', contour );
             if ( paths.hasOwnProperty('outlet')) svgStore.updateElementValue ( cid, 'outlet', 'path', outlet );
 		    if ( paths.hasOwnProperty('inlet')) svgStore.updateElementValue ( cid, 'inlet', 'path', inlet );
