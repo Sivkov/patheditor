@@ -1334,7 +1334,7 @@ class Util {
         );
  
         if (this.round(k2) > this.round(distance1) || this.round(k2) > this.round(distance2)) {
-             console.log ('El contour deformation, signor!')
+            console.log ('El contour deformation, signor!')
            return false
         }
 
@@ -1349,6 +1349,53 @@ class Util {
         updPath[svgStore.selectedPointOnEdge.segIndex] = arcanisation.modifiedPrevSeg
         return  updPath.toString().replaceAll(',', ' ')
     }
+
+	static 	pointMoving (e=false, coord=false) {
+		if (!coord) coord = this.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);   
+		let searchResult = svgStore.selectedPointOnEdge
+		let updPath = searchResult.path
+		let commandIndex = searchResult.segIndex
+		let commandType = searchResult.currentSeg[0];
+		let current = updPath[commandIndex]
+
+ 		if (commandType  === 'M') {
+			console.log ('inappropriate action')
+			return false
+		}	 
+	
+		svgStore.setSelectedPointOnEdge({
+			...svgStore.selectedPointOnEdge, 
+			point: { x: coord.x, y: coord.y }
+		});
+
+
+	 	updPath[commandIndex][current.length-1] = coord.y
+		updPath[commandIndex][current.length-2]= coord.x
+
+		if ( updPath[commandIndex] && updPath[commandIndex][0] === 'A') {
+			let prev = updPath[commandIndex-1]
+			let minRadius = 0.5*Math.sqrt(
+				Math.pow(prev[prev.length-1] -coord.y, 2) +
+				Math.pow(prev[prev.length-2] -coord.x, 2)
+        	);
+			updPath[commandIndex][1] = minRadius 
+			updPath[commandIndex][2] = minRadius 
+		} 
+
+		if ( updPath[commandIndex+1] && updPath[commandIndex+1][0] === 'A') {
+			let next = updPath[commandIndex+1]
+			let minRadius = 0.5*Math.sqrt(
+				Math.pow(next[next.length-1] -coord.y, 2) +
+				Math.pow(next[next.length-2] -coord.x, 2)
+        	);
+			updPath[commandIndex+1][1] = minRadius 
+			updPath[commandIndex+1][2] = minRadius
+		} 
+
+		let newPathData = updPath.toString().replaceAll(',', ' ')
+		svgStore.updateElementValue(svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData) 
+		
+	}
 }
 
 export default Util;

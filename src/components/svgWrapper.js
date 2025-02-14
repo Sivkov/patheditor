@@ -9,6 +9,7 @@ import Part from '../scripts/part.js';
 //import tch from './../scripts/touches'
 import inlet from './../scripts/inlet.js'
 import svgStore from './stores/svgStore.js';
+import { addToLog } from '../scripts/addToLog.js';
 
 
 var tch = {}
@@ -154,13 +155,16 @@ const  SvgWrapper = observer (() => {
 	const startDrag = (e) =>{
 		console.log ('startDrag' + e.buttons)
 		inMoveRef.current = 1;	
-		if (e.target && (e.buttons === 4  || editorStore.mode== 'drag')) {            
+		if (e.target && (e.buttons === 4  || editorStore.mode== 'drag')) {    
+
 			let off = util.getMousePosition(e);
 			let transforms = gmatrix //document.getElementById("group1").transform.baseVal.consolidate().matrix
             off.x -= transforms.e;
             off.y -= transforms.f;
 			setOffset({x:off.x,y:off.y})
+
         } else if (e.button === 0 && editorStore.mode === 'selectPoint') {
+
 			console.log ("editorStore.mode   "+editorStore.mode)
 			let searchResult = util.findNearesPoint(e)
 			svgStore.setSelectedPointOnEdge(searchResult)
@@ -191,12 +195,15 @@ const  SvgWrapper = observer (() => {
 
 		} else if (e.button === 2) {		
 			console.log ('ку - ку')
-
-		}
+		} 
 	}
 
 	const endDrag =(e) =>{
 		inMoveRef.current = 0;	
+		if (svgStore.pointInMove) {
+			addToLog("Contour was changed")
+			svgStore.setPointInMove(false)
+		}
 	}
 
 	const leave =(e)=>{	
@@ -204,6 +211,7 @@ const  SvgWrapper = observer (() => {
 	}
 
 	const drag =(e) =>{
+
  		let coords= util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
 		coordsStore.setCoords({ x: Math.round( coords.x*100) / 100, y: Math.round( coords.y*100) / 100 });
 		if (e.target && ((e.buttons === 4 ) || editorStore.mode== 'drag')) {
@@ -223,6 +231,8 @@ const  SvgWrapper = observer (() => {
 			}
 		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
 			inlet.getNewPathsInMove (coords)				
+		} else if (e.button === 0 && svgStore.pointInMove) {
+			util.pointMoving(e, coords)			
 		}		
 	}
  

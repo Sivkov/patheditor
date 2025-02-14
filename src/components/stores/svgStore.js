@@ -11,6 +11,7 @@ class SvgStore {
 	copiedCid = false
 	selectedPointOnPath = false
 	selectedPointOnEdge = false
+	pointInMove = false
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -119,6 +120,10 @@ class SvgStore {
 			return Part.detectContourType(selected);
 		}
 		return '';
+	}
+
+	setPointInMove (val) {
+		this.pointInMove = val
 	}
 
 	setSelectedPointOnEdge (val) {
