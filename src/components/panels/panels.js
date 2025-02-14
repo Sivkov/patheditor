@@ -6,6 +6,7 @@ import TecnologyPanel from './tecnologyPanel';
 import PartPanel from './partPanel';
 import InletPanel from './inletPanel';
 import OutletPanel from './outletPanel';
+import PointPanel from './pointPanel ';
 
 
 const Panels =  () => {
@@ -20,6 +21,7 @@ const Panels =  () => {
 			<PartPanel />
 			<InletPanel />
 			<OutletPanel />
+			<PointPanel />
 		</>
 	);
 };

@@ -15,11 +15,9 @@ import { addToLog } from '../scripts/addToLog.js';
 var tch = {}
 tch.evCache = new Array();
 var prevDiff = -1;
-
   
 
 const  SvgWrapper = observer (() => {
-
 	const [matrix, setMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [gmatrix, setGroupMatrix] = useState({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
 	const [offset, setOffset] = useState({x:0,y:0});
@@ -206,7 +204,15 @@ const  SvgWrapper = observer (() => {
 			svgStore.setPointInMove(false)
 		}
 		if (editorStore.mode === 'dragging') {
-			editorStore.setMode('drag')
+			if (svgStore.selectedPointOnEdge) {
+				editorStore.setMode('selectPoint')
+			} else if (svgStore.selectedPointOnPath) {
+				editorStore.setMode('addPoint')
+			} else if (svgStore.selectedPath) {
+				editorStore.setMode('resize')
+			} else {
+				editorStore.setMode('resize')
+			}
 		}
 	}
 

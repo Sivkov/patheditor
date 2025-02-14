@@ -1174,6 +1174,10 @@ class Util {
                 if (distance < minDistance){
                     minDistance=distance
                     //part.searchResult.distance = distance
+					let next = i < arr.length - 1 ? arr[i + 1] : arr[0]; // Если последний элемент, берём первый (цикл)
+					let prev = i > 0 ? arr[i - 1] : arr[arr.length - 1]; // Если первый элемент, берём последний (цикл)
+					let angle = this.calculateAngleVector(x, y, next[1], next[2], prev[1], prev[2]);
+
                     searchResult.cid = cid
                     searchResult.point ={x,y}
                     searchResult.prevSeg =arr[i-1]
@@ -1181,6 +1185,7 @@ class Util {
                     searchResult.currentSeg =arr[i]
                     searchResult.segIndex=i
 					searchResult.path=arr
+					searchResult.angle= this.round (angle,2)
 
                 }
             })

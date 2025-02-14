@@ -68,6 +68,15 @@ const CONSTANTS = {
 				height: 400,
 			}
 		},
+		pointPopup: {
+			mini: true,
+			style: {
+				top: 280,
+				left: 12,
+				width: 400,
+				height: 120,
+			}
+		},
     },
 	code1:[
 	'(<Part id="8" offsetx="0.000" offsety="0.000" rotation="0.000" color="#51ff9f" part_id="8" originx="230.696000" originy="133.100000">)',
