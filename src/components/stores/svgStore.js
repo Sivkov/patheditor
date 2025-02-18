@@ -153,7 +153,7 @@ class SvgStore {
 			let res = Util.checkGuides( val.point )
 
 			//console.log ( res )
-			if (res.yy) {
+			if (typeof res.yy === 'number') {
 				let val = { x1: res.min.x, y1: res.yy, x2: res.max.x, y2: res.yy };
 				this.updateXGuide(val)
 			} else {
@@ -161,7 +161,7 @@ class SvgStore {
 				this.updateXGuide(val)
 			}
 
-			if (res.xx){
+			if (typeof res.xx === 'number'){
 				let val = { x1: res.xx, y1: res.min.y, x2: res.xx, y2: res.max.y };
 				this.updateYGuide(val)
 			} else {

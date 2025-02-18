@@ -104,9 +104,9 @@ const SvgComponent = ({ matrix, gmatrix, gridState, svgParams, rectParams}) => {
                             </>
                        </g>
                        <Selector />
+                       <Guides />
                        <SelectedPointOnEdge/>
                        <SelectedPointOnPath/>
-                       <Guides />
                     </g>
                 </g>
             </g>

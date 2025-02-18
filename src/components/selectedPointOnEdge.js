@@ -15,7 +15,6 @@ const SelectedPointOnEdge = observer(() => {
 	}
 
 	const onMouseUp =()=>{
-		svgStore.setPointInMove(false)
 		addToLog("Contour was changed")
 		svgStore.setBoundsList(false)
 	}

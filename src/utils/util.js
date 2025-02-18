@@ -1448,7 +1448,7 @@ class Util {
 			let xx = false, yy = false, aa = false;
 			for (let x of svgStore.boundsList.x) {
 				if (Math.abs(x - coord.x) < threshold) {
-					//console.log ('show x guide')
+					//console.log ('show x guide on'+x)
 					xx = x
 					break
 				}
@@ -1456,7 +1456,7 @@ class Util {
 
 			for (let y of svgStore.boundsList.y) {
 				if (Math.abs(y - coord.y) < threshold) {
-					//console.log ('show y guide')
+					//console.log ('show y guide on'+ y)
 					yy = y
 					break
 				}
@@ -1515,6 +1515,64 @@ class Util {
 				xx, yy, aa, min, max
 			} 
 		}
+	}
+
+	static setGuidesPositionForPoint (e) {
+	
+			const { aGuide, xGuide, yGuide, selectedPointOnEdge } = svgStore;
+			let x = selectedPointOnEdge.point.x;
+			let y = selectedPointOnEdge.point.y;
+			
+			// Функция проверки видимости направляющей
+			const isGuideVisible = (guide) => !Object.values(guide).every(value => value === 0);
+			if ( isGuideVisible(xGuide) || isGuideVisible(yGuide) || isGuideVisible(aGuide)) {
+				// Проверка на видимость направляющей по X
+				if (isGuideVisible(yGuide)) {
+					x = +yGuide.x1;
+				}
+				
+				// Проверка на видимость направляющей по Y
+				if (isGuideVisible(xGuide)) {
+					y = +xGuide.y1;
+				}
+				
+				// Проверка на видимость наклонной направляющей
+				if (isGuideVisible(aGuide)) {
+					let { x1, y1, x2, y2 } = aGuide;
+				
+					// Если **НЕТ** вертикальной и горизонтальной направляющих
+					if (!isGuideVisible(xGuide) && !isGuideVisible(yGuide)) {
+						let curPos = this.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);
+						let point = this.findNearestPointOnSegment(curPos.x, curPos.y, x1, y1, x2, y2);
+						if (point) {
+							x = point.x;
+							y = point.y;
+						}
+					}
+					// Если **ЕСТЬ** хотя бы одна из направляющих (xGuide или yGuide)
+					else if (isGuideVisible(xGuide) || isGuideVisible(yGuide)) {
+						let xx1, xx2, yy1, yy2;
+				
+						if (isGuideVisible(xGuide)) {
+							({ x1: xx1, x2: xx2, y1: yy1, y2: yy2 } = xGuide);
+						} else {
+							({ x1: xx1, x2: xx2, y1: yy1, y2: yy2 } = yGuide);
+						}
+				
+						let edge1 = [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+						let edge2 = [{ x: xx1, y: yy1 }, { x: xx2, y: yy2 }];
+						let point = this.intersects(edge1, edge2);
+				
+						if (point) {
+							x = point.x;
+							y = point.y;
+						}
+					}
+				}			
+			let coord = { x, y };			
+			this.pointMoving(false, coord);			
+		}
+		svgStore.setPointInMove(false)
 	}
 }
 

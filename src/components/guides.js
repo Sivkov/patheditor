@@ -19,8 +19,8 @@ const Guides = observer(() => {
 				y1={xGuide.y1}
 				x2={xGuide.x2}
 				y2={xGuide.y2}
-				stroke="white"
-				strokeWidth="0.3"
+				stroke="lime"
+				strokeWidth="0.25"
 				className="smartGuide"
 				id="xGuide"
 			/>
@@ -31,8 +31,8 @@ const Guides = observer(() => {
 				y1={yGuide.y1}
 				x2={yGuide.x2}
 				y2={yGuide.y2}
-				stroke="white"
-				strokeWidth="0.3"
+				stroke="lime"
+				strokeWidth="0.25"
 				className="smartGuide"
 				id="yGuide"
 			/>
@@ -43,7 +43,7 @@ const Guides = observer(() => {
 				y1={aGuide.y1}
 				x2={aGuide.x2}
 				y2={aGuide.y2}
-				stroke="white"
+				stroke="lime"
 				strokeWidth="0.25"
 				className="smartGuide"
 				id="aGuide"

@@ -37,11 +37,8 @@ const  SvgWrapper = observer (() => {
 		},
 	});
 	const [wrapperClass, setWrapperClass] = useState('')
-
 	const [svgParams, setSvgParams]= useState({width:0, height:0}) 
-
 	const inMoveRef = useRef(0); 
-	//const group = useRef(null);
     const wrapperSVG = useRef(null);
 			
 	const handleMouseWheel = (event) => {
@@ -200,8 +197,8 @@ const  SvgWrapper = observer (() => {
 	const endDrag =(e) =>{
 		inMoveRef.current = 0;	
 		if (svgStore.pointInMove) {
+			util.setGuidesPositionForPoint (e)
 			addToLog("Contour was changed")
-			svgStore.setPointInMove(false)
 		}
 		if (editorStore.mode === 'dragging') {
 			if (svgStore.selectedPointOnEdge) {
