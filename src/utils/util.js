@@ -5,6 +5,7 @@ import arc from "../scripts/arc";
 import inside from 'point-in-polygon-hao'
 import ClipperLib from 'clipper-lib'
 import svgStore from "../components/stores/svgStore";
+import { toJS } from 'mobx'; 
 
 class Util {
 	static radian(ux, uy, vx, vy) {
@@ -1355,7 +1356,7 @@ class Util {
         return  updPath.toString().replaceAll(',', ' ')
     }
 
-	static 	pointMoving (e=false, coord=false) {
+	static pointMoving (e=false, coord=false) {
 		if (!coord) coord = this.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);   
 		let searchResult = svgStore.selectedPointOnEdge
 		let updPath = searchResult.path
@@ -1372,7 +1373,6 @@ class Util {
 			...svgStore.selectedPointOnEdge, 
 			point: { x: coord.x, y: coord.y }
 		});
-
 
 	 	updPath[commandIndex][current.length-1] = coord.y
 		updPath[commandIndex][current.length-2]= coord.x
@@ -1399,7 +1399,122 @@ class Util {
 
 		let newPathData = updPath.toString().replaceAll(',', ' ')
 		svgStore.updateElementValue(svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData) 
+	}
+
+	static createBoundsList () {
+		let xcoords = new Set()
+		let ycoords = new Set()
+		let angles = new Set([45,135,315,30,60,120,150,210,240,270])
 		
+		let searchResult = svgStore.selectedPointOnEdge
+		let updPath = searchResult.path
+		let commandIndex = searchResult.segIndex
+
+		for (let c in updPath){
+			let cx, cy, command=updPath[c];
+			if (+c !== commandIndex){
+				if (command[0] === "M") {
+					cx=command[1]
+					cy=command[2]
+				} else if (command[0] === "L") {
+					cx=command[1]
+					cy=command[2]
+				} else if (command[0] === "A") {
+					cx=command[6]
+					cy=command[7]
+				}
+				xcoords.add(cx)
+				ycoords.add(cy)
+			}
+			if ( +c < updPath.length-2 ) {
+				let nx, ny, commandNext=updPath[+c+1];
+				if (commandNext[0] === "M" || commandNext[0] === "L") {
+					nx=commandNext[1]
+					ny=commandNext[2]
+					let angle = this.angleBetweenPoints (cx, cy, nx, ny) 
+					angles.add(angle)
+				}
+			}
+		}
+		console.log ( {x:xcoords,y:ycoords,angles:angles})
+		return {x:xcoords,y:ycoords,angles:angles}
+	}
+
+
+	static checkGuides(coord) {
+		//console.log ('checking guides')
+		if (svgStore.boundsList) {
+			let threshold = 1
+			let xx = false, yy = false, aa = false;
+			for (let x of svgStore.boundsList.x) {
+				if (Math.abs(x - coord.x) < threshold) {
+					//console.log ('show x guide')
+					xx = x
+					break
+				}
+			}
+
+			for (let y of svgStore.boundsList.y) {
+				if (Math.abs(y - coord.y) < threshold) {
+					//console.log ('show y guide')
+					yy = y
+					break
+				}
+			}
+
+
+			//console.log ( toJS (svgStore.selectedPointOnEdge))
+
+			let nsg = svgStore.selectedPointOnEdge.nextSeg
+			let psg = svgStore.selectedPointOnEdge.prevSeg
+
+			let psgX = psg[psg.length - 2]
+			let psgY = psg[psg.length - 1]
+			let nsgX = nsg[nsg.length - 2]
+			let nsgY = nsg[nsg.length - 1]
+			let ap = this.angleBetweenPoints(psgX, psgY, coord.x, coord.y)
+			let an = this.angleBetweenPoints(coord.x, coord.y, nsgX, nsgY,)
+
+			for (let a of svgStore.boundsList.angles) {
+				if (a % 90 > 0) {
+					if (Math.abs((a - ap) % 180) < threshold) {
+						aa = { a: a, x: psgX, y: psgY }
+					}
+					if (Math.abs((a - an) % 180) < threshold) {
+						aa = { a: a, x: nsgX, y: nsgY }
+					}
+				}
+			}
+
+			let min = this.convertScreenCoordsToSvgCoords(0, 0);       
+			let max = this.convertScreenCoordsToSvgCoords( window.screen.width,  window.screen.height); 
+
+			if (aa) {
+				const radians = aa.a * (Math.PI / 180);
+				// Получаем размеры SVG
+				const svg = document.querySelector('#svg')
+				const svgWidth = svg.viewBox.baseVal.width;
+				const svgHeight = svg.viewBox.baseVal.height;
+				let group = document.getElementById("group");
+				let matrix = group.transform.baseVal.consolidate().matrix
+	
+				const lineLength = Math.max(svgWidth/matrix.a, svgHeight/matrix.a); // Длина линии, чтобы она проходила через всю SVG
+				const x1 = aa.x - lineLength * Math.cos(radians);
+				const y1 = aa.y - lineLength * Math.sin(radians);
+			
+				// Конечные координаты (в другом направлении, чтобы линия пересекала весь SVG)
+				const x2 = aa.x + lineLength * Math.cos(radians);
+				const y2 = aa.y + lineLength * Math.sin(radians);
+				aa.x1 = x1
+				aa.x2 = x2
+				aa.y1 = y1
+				aa.y2 = y2
+			}
+
+			return {
+				xx, yy, aa, min, max
+			} 
+		}
 	}
 }
 

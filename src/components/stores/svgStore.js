@@ -3,6 +3,7 @@ import { makeAutoObservable, computed } from "mobx";
 import { toJS } from "mobx";
 import Part from "../../scripts/part";
 import CONSTANTS from "../../constants/constants";
+import Util from "../../utils/util";
 
 class SvgStore {
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
@@ -12,6 +13,10 @@ class SvgStore {
 	selectedPointOnPath = false
 	selectedPointOnEdge = false
 	pointInMove = false
+	boundsList = false
+	xGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
+    yGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
+    aGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -122,12 +127,56 @@ class SvgStore {
 		return '';
 	}
 
+	setBoundsList (val) {
+		this.boundsList = val
+	}
+
 	setPointInMove (val) {
 		this.pointInMove = val
 	}
 
+	updateXGuide(newValues) {
+        Object.assign(this.xGuide, newValues);
+    }
+
+    updateYGuide(newValues) {
+        Object.assign(this.yGuide, newValues);
+    }
+
+    updateAGuide(newValues) {
+        Object.assign(this.aGuide, newValues);
+    }
+
 	setSelectedPointOnEdge (val) {
 		this.selectedPointOnEdge = val
+		if (svgStore.boundsList && val) {
+			let res = Util.checkGuides( val.point )
+
+			//console.log ( res )
+			if (res.yy) {
+				let val = { x1: res.min.x, y1: res.yy, x2: res.max.x, y2: res.yy };
+				this.updateXGuide(val)
+			} else {
+				let val = { x1: 0, y1: 0, x2:0, y2: 0 };
+				this.updateXGuide(val)
+			}
+
+			if (res.xx){
+				let val = { x1: res.xx, y1: res.min.y, x2: res.xx, y2: res.max.y };
+				this.updateYGuide(val)
+			} else {
+				let val = { x1: 0, y1: 0, x2:0, y2: 0 };
+				this.updateYGuide(val)			
+			}
+
+			if (res.aa) {
+				let val = { x1: res.aa.x1, y1: res.aa.y1, x2: res.aa.x2, y2: res.aa.y2 };
+				this.updateAGuide(val)	
+			} else  {
+				let val = { x1: 0, y1: 0, x2:0, y2: 0 };
+				this.updateAGuide(val)			
+			}
+		}
 	}
 
 	setSelectedPointOnPath (val) {
@@ -284,7 +333,7 @@ class SvgStore {
 		if (!filtered) {
 			return [];
 		}
-		console.log ('filtered', toJS(filtered))
+		//console.log ('filtered', toJS(filtered))
 		return filtered
 	}
 

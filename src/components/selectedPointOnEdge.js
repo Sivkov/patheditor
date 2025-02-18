@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import svgStore from './stores/svgStore';
 import { addToLog } from '../scripts/addToLog';
+import Util from '../utils/util';
 
 
 const SelectedPointOnEdge = observer(() => {
@@ -16,6 +17,12 @@ const SelectedPointOnEdge = observer(() => {
 	const onMouseUp =()=>{
 		svgStore.setPointInMove(false)
 		addToLog("Contour was changed")
+		svgStore.setBoundsList(false)
+	}
+
+	const onMouseDown =()=>{
+		svgStore.setPointInMove(true)
+		svgStore.setBoundsList (Util.createBoundsList())
 	}
 
 	return (
@@ -26,7 +33,7 @@ const SelectedPointOnEdge = observer(() => {
 			pointerEvents="all"
 			cx={selectedPointOnEdge.point.x}
 			cy={selectedPointOnEdge.point.y}
-			onMouseDown = {()=> svgStore.setPointInMove(true)}
+			onMouseDown = { onMouseDown }
 			onMouseUp ={ onMouseUp }
 		/>
 	);
