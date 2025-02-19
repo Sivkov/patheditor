@@ -6,10 +6,12 @@ import { observer } from 'mobx-react-lite';
 import Util from '../../utils/util';
 import Part from '../../scripts/part';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 
 const PartPanel = observer(() => {
 	const { t } = useTranslation();
+	const [guidesMode, setGuidesMode] =useState(true)
 	const checkCollisions =()=> {
 		console.log (' checkCollisions ')
 		let contours = svgStore.getFiltered('contour')
@@ -30,6 +32,11 @@ const PartPanel = observer(() => {
 
 		},5000)
 
+	}
+
+	const setStoreGuidesMode = (mode)=>{
+		setGuidesMode(mode)
+		svgStore.setGuidesMode(mode)
 	}
 
 	const { svgData } = svgStore
@@ -62,18 +69,33 @@ const PartPanel = observer(() => {
  								<td>{ Util.round(svgData.height, 3)}</td>
  							</tr>
 							<tr>
-								<td colSpan={2}>
+								<td colSpan={3}>
 									<div className='d-flex align-items-center justify-content-around'>
 										<button 
-										className="btn btn-sm btn-danger btn_partDetectCollision"
+										className="btn btn-sm btn-danger btn_partDetectCollision me-2"
 										onMouseDown={ checkCollisions }
 										>
 											{t('Check collision')}
 										</button>								
-										<div>
-											<input id="ignoreColissions" type="checkbox" />{t('Ignore contour collisions')}
-										</div>										
-									</div>
+ 										<input 
+											id="ignoreColissions" 
+											type="checkbox" />
+										<label
+											className="form-check-label"
+											htmlFor="ignoreColissions"
+										>{t('Ignore contour collisions')}
+										</label>
+ 										<input 
+											id="guidesMode" 
+											type="checkbox" 
+											checked={guidesMode}
+											onChange={ (e)=>{ setStoreGuidesMode(e.target.checked);}}/>
+										<label
+											className="form-check-label"
+											htmlFor="guidesMode"
+										>{t('Use guides')}
+										</label>
+									</div>									
 								</td>
 							</tr>
 						</tbody>

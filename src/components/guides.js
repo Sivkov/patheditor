@@ -10,6 +10,9 @@ const Guides = observer(() => {
 		return null;
 	} 
  	
+	if (!svgStore.guidesMode) {
+		return null;
+	} 
 
 	return (
 		<>

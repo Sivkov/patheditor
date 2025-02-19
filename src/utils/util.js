@@ -1368,12 +1368,7 @@ class Util {
 			console.log ('inappropriate action')
 			return false
 		}	 
-	
-		svgStore.setSelectedPointOnEdge({
-			...svgStore.selectedPointOnEdge, 
-			point: { x: coord.x, y: coord.y }
-		});
-
+		
 	 	updPath[commandIndex][current.length-1] = coord.y
 		updPath[commandIndex][current.length-2]= coord.x
 
@@ -1396,15 +1391,37 @@ class Util {
 			updPath[commandIndex+1][1] = minRadius 
 			updPath[commandIndex+1][2] = minRadius
 		} 
-
+		
 		let newPathData = updPath.toString().replaceAll(',', ' ')
-		svgStore.updateElementValue(svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData) 
+		
+		if (svgStore.safeMode.mode) {
+			// TODO доделать проверку столкновения
+			// Дичь дикая что может наделать пользователь если править арки
+
+			let res = inlet.getNewInletOutlet( svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData, {angle: 0, x:0, y:0} )
+			let success = inlet.applyNewPaths( res )	
+			if (success) {
+				console.log (success+ '  updating POsitions')
+				svgStore.setSelectedPointOnEdge({
+					...svgStore.selectedPointOnEdge, 
+					point: { x: coord.x, y: coord.y }
+				});
+			}
+		} else {
+			svgStore.setSelectedPointOnEdge({
+				...svgStore.selectedPointOnEdge, 
+				point: { x: coord.x, y: coord.y }
+			});
+			svgStore.updateElementValue(svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData) 
+
+		}
+		////
 	}
 
 	static createBoundsList () {
 		let xcoords = new Set()
 		let ycoords = new Set()
-		let angles = new Set([45,135,315,30,60,120,150,210,240,270])
+		let angles = new Set([0,45,135,315,30,60,120,150,210,240,270])
 		
 		let searchResult = svgStore.selectedPointOnEdge
 		let updPath = searchResult.path

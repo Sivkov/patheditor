@@ -419,7 +419,8 @@ let ru = {
     "Select Contour Mode":"Выбрать режим контура",
     "Added new point to path":"Добавлена точка к пути",
     "Point deleted from path":"Точка удалена",
-    "Edge rounded":"Грань скруглена"  
+    "Edge rounded":"Грань скруглена",
+    "Use guides":"Использовать направляющие",  
   
     }
 

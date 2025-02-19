@@ -17,6 +17,7 @@ class SvgStore {
 	xGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
     yGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
     aGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
+	guidesMode = true;
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -125,6 +126,10 @@ class SvgStore {
 			return Part.detectContourType(selected);
 		}
 		return '';
+	}
+
+	setGuidesMode (val) {
+		this.guidesMode = val
 	}
 
 	setBoundsList (val) {
