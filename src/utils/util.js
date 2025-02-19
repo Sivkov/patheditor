@@ -1180,12 +1180,12 @@ class Util {
 					let angle = this.calculateAngleVector(x, y, next[1], next[2], prev[1], prev[2]);
 
                     searchResult.cid = cid
-                    searchResult.point ={x,y}
-                    searchResult.prevSeg =arr[i-1]
-                    searchResult.nextSeg =arr[i+1]
-                    searchResult.currentSeg =arr[i]
-                    searchResult.segIndex=i
-					searchResult.path=arr
+                    searchResult.point = {x,y}
+                    searchResult.prevSeg = prev
+                    searchResult.nextSeg = next
+                    searchResult.currentSeg = arr[i]
+                    searchResult.segIndex = i 
+					searchResult.path = arr
 					searchResult.angle= this.round (angle,2)
 
                 }
@@ -1364,10 +1364,14 @@ class Util {
 		let commandType = searchResult.currentSeg[0];
 		let current = updPath[commandIndex]
 
- 		if (commandType  === 'M') {
-			console.log ('inappropriate action')
+ 	 	if (commandType  === 'M') {
+			//console.log ('inappropriate action')
+			//TODO нужно решить позволятьь ли пользователю менять начальную точку контура которая врезка. Или нет ?Пока нет!
 			return false
-		}	 
+			updPath[0]= ['M', coord.x, coord.y]
+			updPath[updPath.length-1][2] = coord.y
+			updPath[updPath.length-1][1] = coord.x
+		}	
 		
 	 	updPath[commandIndex][current.length-1] = coord.y
 		updPath[commandIndex][current.length-2]= coord.x
@@ -1412,10 +1416,9 @@ class Util {
 				...svgStore.selectedPointOnEdge, 
 				point: { x: coord.x, y: coord.y }
 			});
-			svgStore.updateElementValue(svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData) 
-
+			let res = inlet.getNewInletOutlet( svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData, {angle: 0, x:0, y:0} )
+			inlet.applyNewPaths( res )	
 		}
-		////
 	}
 
 	static createBoundsList () {

@@ -178,6 +178,7 @@ const ToolsPanel = observer(() => {
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_new_outer btn_tool"
+					onClick={() => svgStore.setNewOuter()}
 				  >
 					<Icon icon="material-symbols:settings-applications-outline" width="24" height="24"  style={{color: 'white'}} />				  </button>
 				  <button

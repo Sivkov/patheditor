@@ -128,6 +128,34 @@ class SvgStore {
 		return '';
 	}
 
+	setNewOuter() {
+		if (typeof this.selectedCid === 'number') {
+			this.svgData.code.forEach(element => {
+				if (element.class.includes("outer")) {
+					element.class = element.class.replace("outer", "inner");
+				} else if (element.class.includes("inner") && this.selectedCid === element.cid) {
+					element.class = element.class.replace("inner", "outer");
+				}
+			});
+	
+			// Сортировка после изменений
+			const order = ['outer', 'contour', 'engraving', 'inlet', 'outlet', 'joint'].reverse();
+			
+			this.svgData.code = this.svgData.code.sort((a, b) => {
+				let ac = a.class.split(' ')
+					.map(cls => order.indexOf(cls))
+					.sort((a, b) => b - a)[0] || -1;
+				
+				let bc = b.class.split(' ')
+					.map(cls => order.indexOf(cls))
+					.sort((a, b) => b - a)[0] || -1;
+	
+				return bc - ac;
+			});
+		}
+	}
+	
+
 	setGuidesMode (val) {
 		this.guidesMode = val
 	}
