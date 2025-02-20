@@ -187,12 +187,13 @@ const  SvgWrapper = observer (() => {
 				}		
 			})
 			svgStore.setSelectedPointOnPath(point)
-	
 
-		} else if (e.button === 2) {		
+		} else if (e.button === 2) {
+
 			let selectedEdge = util.selectEdge(e)
-			console.log ( selectedEdge )
+			//console.log ( selectedEdge )
 			svgStore.setSelectedEdge ( selectedEdge )
+			
 		} 
 	}
 

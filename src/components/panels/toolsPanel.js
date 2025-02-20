@@ -31,6 +31,7 @@ const ToolsPanel = observer(() => {
 		svgStore.setSelectedPointOnEdge(false)
 		svgStore.setSelectedPointOnPath(false)
 		svgStore.setContourSelected(false)
+		svgStore.setSelectedEdge(false)
 	}
 
 	const copyContour =()=>{

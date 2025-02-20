@@ -8,6 +8,11 @@ import svgStore from "../components/stores/svgStore";
 import { toJS } from 'mobx'; 
 
 class Util {
+
+	static normPath (path) {
+		return SVGPathCommander.normalizePath(path)
+	}
+
 	static radian(ux, uy, vx, vy) {
 		var dot = ux * vx + uy * vy;
 		var mod = Math.sqrt((ux * ux + uy * uy) * (vx * vx + vy * vy));
@@ -975,6 +980,7 @@ class Util {
 		let dist 
         let currentX = 0;
         let currentY = 0;
+		let index =0
 		         
         for (const command of pathCommands) {
             const commandType = command[0]
@@ -995,6 +1001,8 @@ class Util {
  						tangentAngle = Math.atan2(nearestPoint.y-currentY, nearestPoint.x-currentX) * (180 / Math.PI);
 						nearestPoint.a = tangentAngle
 						nearestPoint.command = command.join(' ')
+						nearestPoint.prev =  {x:currentX,y:currentY}
+						nearestPoint.segIndex = index
 					}
 					currentX = x;
                     currentY = y;
@@ -1060,14 +1068,18 @@ class Util {
 							tangentAngle = Math.atan2(nearestPoint.y-arcParams.cy, nearestPoint.x-arcParams.cx) * (180 / Math.PI);
 							nearestPoint.a = tangentAngle
 							nearestPoint.command = command.join(' ')
-							nearestPoint.centers = {x:arcParams.cx, y:arcParams.cy, r:rx} 
-
+							nearestPoint.centers = {x:arcParams.cx, y:arcParams.cy, rx:rx, ry:ry} 
+							nearestPoint.prev =  {x:currentX,y:currentY}
+							nearestPoint.segIndex = index
+							
+							
 						}
 					} 
 				    currentX = EX;
                     currentY = EY;
                     break;
             }
+			index++
         }
 		//createSVG ([nearestPoint.x, nearestPoint.y])
  		return nearestPoint
@@ -1594,6 +1606,32 @@ class Util {
 		}
 		svgStore.setPointInMove(false)
 	}
+
+	static selectEdge (event) {
+        let coord = this.convertScreenCoordsToSvgCoords(event.clientX, event.clientY);
+        let minDistance = Infinity
+        let edgeSearchResult ={}
+		let contours = svgStore.getFiltered('contour')
+
+        contours.forEach((contour, index, arr) => {
+			let path = contour.path;
+			let cid = contour.cid;
+			let nearestEdge = this.findNearestPointOnPath(path, coord);
+			
+			const distance = Math.sqrt(
+				Math.pow(coord.x - nearestEdge.x, 2) +
+				Math.pow(coord.y - nearestEdge.y, 2)
+			);
+		
+			if (distance < minDistance) {
+				minDistance = distance;
+				edgeSearchResult.cid = cid;
+				edgeSearchResult.command = nearestEdge.command;
+				edgeSearchResult.edge = nearestEdge;
+			}
+		});
+        return edgeSearchResult;
+    }
 }
 
 export default Util;

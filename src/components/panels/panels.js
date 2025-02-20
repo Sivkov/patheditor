@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import LogPanel from './logPanel';
 import ToolsPanel from './toolsPanel';
 import ContourPanel from './contourPanel';
@@ -7,11 +7,11 @@ import PartPanel from './partPanel';
 import InletPanel from './inletPanel';
 import OutletPanel from './outletPanel';
 import PointPanel from './pointPanel ';
+import EdgePanel from './edgePanel';
 
 
 const Panels =  () => {
 
-	
 	return (
 		<>
 			<LogPanel />
@@ -22,6 +22,7 @@ const Panels =  () => {
 			<InletPanel />
 			<OutletPanel />
 			<PointPanel />
+			<EdgePanel />
 		</>
 	);
 };

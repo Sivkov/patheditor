@@ -290,9 +290,9 @@ class Part {
         let cids = [] 
         svg.map(a => cids.push(a.cid))
         cids = [ ...new Set (cids)]
-        console.log (cids)
+        //console.log (cids)
         cids.forEach((id, i, arr) =>{
-            console.log ('cui')
+            //console.log ('cui')
             let contour = svg.filter(a=> a.cid === id && a.class.includes('contour'))
             let inlet = svg.filter(a=> a.cid === id && a.class.includes('inlet'))
             let outlet = svg.filter(a=> a.cid === id && a.class.includes('outlet'))

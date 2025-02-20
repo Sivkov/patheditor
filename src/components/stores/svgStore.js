@@ -18,6 +18,7 @@ class SvgStore {
     yGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
     aGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
 	guidesMode = true;
+	selectedEdge = false;
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -31,6 +32,7 @@ class SvgStore {
 			tecnology: computed,
 			selectedInletPath: computed,
 			selectedOutletPath: computed,			
+			selectedEdgePath: computed,
         });
     }
 
@@ -86,7 +88,7 @@ class SvgStore {
 			allClasses+=' '
    		});
 		let allTec = [...new Set (allClasses.split(/\s{1,}/gm))]
-		console.log("printStore:", toJS(allTec));
+		//console.log("printStore:", toJS(allTec));
 	    return allTec
 	}
 
@@ -128,6 +130,33 @@ class SvgStore {
 		return '';
 	}
 
+	get selectedEdgePath() {
+		let val = this.selectedEdge || '';
+		if (val) {
+			let contour = this.getElementByCidAndClass(this.selectedEdge.cid, 'contour', 'path');
+			let updContour = Util.normPath(contour);
+	
+			let segIndex = val.edge.segIndex;
+			let segment = updContour[segIndex];
+	
+			// Определяем предыдущий сегмент (учитываем замыкание контура)
+			let prevSegmentIndex = segIndex > 0 ? segIndex - 1 : updContour.length - 1;
+			let prevSegment = updContour[prevSegmentIndex];
+	
+			// Получаем координаты конца предыдущего сегмента
+			let prevX = prevSegment[prevSegment.length - 2]; // X-координата последней точки
+			let prevY = prevSegment[prevSegment.length - 1]; // Y-координата последней точки
+	
+			return `M${prevX} ${prevY} ${segment.join(' ')}`;
+		} else {
+			return '';
+		}
+	}
+	
+	setSelectedEdge ( val ) {
+		this.selectedEdge = val
+	}
+
 	setNewOuter() {
 		if (typeof this.selectedCid === 'number') {
 			this.svgData.code.forEach(element => {
@@ -155,7 +184,6 @@ class SvgStore {
 		}
 	}
 	
-
 	setGuidesMode (val) {
 		this.guidesMode = val
 	}

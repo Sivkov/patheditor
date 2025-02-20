@@ -1499,7 +1499,7 @@ top:var(--hEdge);
 
 #selectedEdge {
   stroke: aqua;
-  stroke-width: 1px;
+  stroke-width: .5px;
   fill: none;
   marker-start: url(#dotRed);
   marker-end: url(#dotRed);
