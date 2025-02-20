@@ -1,11 +1,12 @@
 // CoordsStore.js
-import { findAllByTestId } from "@testing-library/react";
 import { makeAutoObservable } from "mobx";
 
 class CoordsStore {
   coords = { x: 0, y: 0 };
-  needeToFit = false
-  fittedPosition = false
+  needeToFit = false;
+  fittedPosition = false;
+  preloader = true;
+
 
   constructor() {
     makeAutoObservable(this);
@@ -16,7 +17,7 @@ class CoordsStore {
     this.coords = newCoords;
   }
 
-  setFitted (val) {
+  setNeedToFit (val) {
     this.needeToFit = val
   }
 
@@ -24,6 +25,12 @@ class CoordsStore {
     console.log (JSON.stringify(val))
     this.fittedPosition = val
   }
+
+  setPreloader (val) {
+    this.preloader = val;
+  }
+
+
 
 }
 

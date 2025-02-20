@@ -21,7 +21,7 @@ const NavButtons = observer(() => {
 
 	const fit = () => {
 		console.log ('Fit *** Fit *** Fit *** Fit *** Fit *** Fit *** Fit')
-		coordStore.setFitted(true)
+		coordStore.setNeedToFit(true)
 	}
 
 

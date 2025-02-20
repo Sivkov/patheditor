@@ -1,8 +1,10 @@
 import React from 'react';
+import { observer } from 'mobx-react-lite';
+import coordsStore from './stores/coordsStore';
 
-const Preloader = () => {
+const Preloader = observer(() => {
 	return (
-		<div id="preloader" >
+		<div id="preloader" className={coordsStore.preloader ? '' : 'fadeOut'}>
 			<div id="arc_container">
 				<div className="arc_reactor">
 				<div className="case_container">
@@ -16,7 +18,7 @@ const Preloader = () => {
 					</div>
 					<div className="core2"></div>
 					</div>
-					<ul className="marks">
+					<ul className="marks p-0">
 					<li></li><li></li><li></li><li></li><li></li><li></li>
 					<li></li><li></li><li></li><li></li><li></li><li></li>
 					<li></li><li></li><li></li><li></li><li></li><li></li>
@@ -33,7 +35,7 @@ const Preloader = () => {
 			</div>
 		</div>
 	);
-};
+});
 
 export default Preloader;
 

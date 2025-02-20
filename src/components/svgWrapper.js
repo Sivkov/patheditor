@@ -190,7 +190,9 @@ const  SvgWrapper = observer (() => {
 	
 
 		} else if (e.button === 2) {		
-			console.log ('ку - ку')
+			let selectedEdge = util.selectEdge(e)
+			console.log ( selectedEdge )
+			svgStore.setSelectedEdge ( selectedEdge )
 		} 
 	}
 
@@ -257,7 +259,8 @@ const  SvgWrapper = observer (() => {
  		const timeoutId = setTimeout(() => {
 			console.log ('Delayed message after 2 seconds!');
  			fitToPage()
-		}, 100);
+			coordsStore.setPreloader(false)
+		}, 500);
 	  		return () => clearTimeout(timeoutId); 
 		}
 	}, []); 
@@ -301,7 +304,7 @@ const  SvgWrapper = observer (() => {
 
 			let matrix = { a: scale, b: 0, c: 0, d: scale, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }
 			setGroupMatrix (matrix)
- 			coordsStore.setFitted(false)
+ 			coordsStore.setNeedToFit(false)
 			coordsStore.setFittedPosition ({matrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }, gmatrix: matrix , rectParams:rectParams})
 
 		} else {
@@ -309,7 +312,7 @@ const  SvgWrapper = observer (() => {
 	 		setMatrix(coordsStore.fittedPosition.matrix)
 			setGroupMatrix(coordsStore.fittedPosition.gmatrix)
 			setRectParams(coordsStore.fittedPosition.rectParams)
-			coordsStore.setFitted(false)
+			coordsStore.setNeedToFit(false)
  
 		/*	TODO: доделть смещение e f.
 			масштаб поучаем из мм1
@@ -323,7 +326,7 @@ const  SvgWrapper = observer (() => {
 			console.log(mm1)
 			setMatrix( { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
 			setGroupMatrix(mm1)
-			coordsStore.setFitted(false)		
+			coordsStore.setNeedToFit(false)		
   			*/
 		}	
     }
@@ -355,7 +358,9 @@ const  SvgWrapper = observer (() => {
 	}, [matrix]);
 
   	useEffect(()=>{
-			setRectParams( calculateRectAttributes())
+		//console.log ("Rect In UseEffect:  " + JSON.stringify( attr ))
+		let attr = calculateRectAttributes()
+		setRectParams( attr)
 	},[matrix, gmatrix, offset])  
 
 	useEffect(()=>{
@@ -377,6 +382,7 @@ const  SvgWrapper = observer (() => {
 	[editorStore.mode])
 
 	const calculateRectAttributes = () => {
+		//debugger
 		const widthSVG = svgParams.width
 		const heightSVG = svgParams.height
 	
