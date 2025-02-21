@@ -71,8 +71,8 @@ const CONSTANTS = {
 		pointPopup: {
 			mini: true,
 			style: {
-				top: 280,
-				left: 12,
+				top: 200,
+				left: 500,
 				width: 400,
 				height: 120,
 			}
@@ -80,7 +80,16 @@ const CONSTANTS = {
 		edgePopup: {
 			mini: true,
 			style: {
-				top: 320,
+				top: 100,
+				left: 500,
+				width: 350,
+				height: 120,
+			}
+		},
+		textPopup: {
+			mini: true,
+			style: {
+				top: 280,
 				left: 12,
 				width: 350,
 				height: 120,

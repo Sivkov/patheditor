@@ -8,6 +8,7 @@ import InletPanel from './inletPanel';
 import OutletPanel from './outletPanel';
 import PointPanel from './pointPanel ';
 import EdgePanel from './edgePanel';
+import TextPanel from './textPanel';
 
 
 const Panels =  () => {
@@ -23,6 +24,7 @@ const Panels =  () => {
 			<OutletPanel />
 			<PointPanel />
 			<EdgePanel />
+			<TextPanel />
 		</>
 	);
 };
