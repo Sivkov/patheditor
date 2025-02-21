@@ -3,7 +3,7 @@ import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
 import svgStore from "../stores/svgStore.js";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import SVGPathCommander from 'svg-path-commander';
 import util from '../../utils/util.js';
 import { addToLog } from './../../scripts/addToLog.js';
@@ -14,19 +14,22 @@ import GOST from '../../constants/gost.js';
 
 const TextPanel = observer(() => {
 	const { t } = useTranslation();
+	const textareaRef = useRef(null);
 	const {
-		selectedCid,
-		selectedPath,
-		selectedOutletPath
+		
+		textFocus
 	} = svgStore;
 
-	
 
-	useEffect(() => {
-		
- 	}, [ selectedOutletPath, selectedCid]) 
+	useEffect(()=>{
+		handleFocus ()
+	},
+	[textFocus])
 
-
+    const handleFocus = () => {
+        textareaRef.current?.focus();		
+		textareaRef.current.textContent = textareaRef.current.textContent+ ' чxxx'		
+    };
 
 	const panelInfo = 
 		  {
@@ -44,7 +47,7 @@ const TextPanel = observer(() => {
 									<Icon icon="fluent:text-font-16-regular" width="20" height="20"  style={{color:'white'}} />
 								</div>
 								<input
-									className="mx-2"
+									className="mx-2 text-center"
 									id="textSize"
 									type="number"
 									min={1}
@@ -59,7 +62,7 @@ const TextPanel = observer(() => {
 									<Icon icon="carbon:text-kerning" width="24" height="24"  style={{color: 'white'}} />
 								</div>
 								<input
-									className="mx-2"
+									className="mx-2 text-center"
 									id="textKerning"
 									type="number"
 									placeholder={100}
@@ -77,7 +80,13 @@ const TextPanel = observer(() => {
 							<td>
 							<div className="d-flex justify-content-around">
 								<div className="mt-2">
-								<textarea id="textarea" rows={4} cols={50} defaultValue={""} />
+								<textarea 
+									id="textarea" 
+									rows={4} 
+									cols={40} 
+									defaultValue={""}
+									ref={textareaRef}
+								 />
 								<br />
 								</div>
 							</div>

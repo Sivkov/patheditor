@@ -376,6 +376,8 @@ const  SvgWrapper = observer (() => {
 			setWrapperClass('cursorCustomPlus')
 		} else if (editorStore.mode === 'selectPoint') {
 			setWrapperClass('cursorSelecPoint')
+		} else if (editorStore.mode === 'text') {
+			setWrapperClass('cursorText')
 		} else {
 			setWrapperClass('cursorArrow')
 		}

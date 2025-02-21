@@ -19,6 +19,7 @@ class SvgStore {
     aGuide = { x1: 0, y1: 0, x2: 0, y2: 0 };
 	guidesMode = true;
 	selectedEdge = false;
+	textFocus =false;
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -151,6 +152,10 @@ class SvgStore {
 		} else {
 			return '';
 		}
+	}
+
+	setTextFocus (val) {
+		this.textFocus = val
 	}
 	
 	setSelectedEdge ( val ) {
@@ -317,6 +322,26 @@ class SvgStore {
 		console.log("Adding elements with new cid:", newElements);
  		this.svgData.code.push(...newElements);
 	}
+
+	addTextElement(coords={x:0,y:0}) {
+		const maxCid = this.svgData.code.length > 0 
+			? Math.max(...this.svgData.code.map(el => el.cid)) 
+			: 0;
+	
+		const newElement = {
+			path: "",
+			cid: maxCid + 1,
+			class: "contour inner engraving macro2 closed0 noOutlet skeletonText",
+			path: '', 
+			stroke: 'lime',
+			strokeWidth: 0.2,
+			coords:  coords
+		};
+	
+		console.log("Adding new TEXT element with new cid:", newElement);
+		this.svgData.code.push(newElement); 
+	}
+	
 
 
 	addElementPath (path='', inletPath='', outletPath='') {

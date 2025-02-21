@@ -173,6 +173,7 @@ const ToolsPanel = observer(() => {
 				  <button
 					type="button"
 					className="btn text-white mt-1 ms-2 btn_text btn_tool"
+					onMouseDown={()=> setMode('text')}
 				  >
 					<Icon icon="tabler:text-size" width="24" height="24" />
 				  </button>
