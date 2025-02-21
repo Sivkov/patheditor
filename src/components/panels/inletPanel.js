@@ -331,7 +331,8 @@ const InletPanel = observer(() => {
 											type="radio"
 											name="inletMode"
 											id="inletModeSet"
-											onMouseDown={() => { setMode('set') }}
+											//onMouseDown={() => { setMode('set') }}
+											onChange={() => { setMode('set') }}
 											checked={mode === 'set'}										
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletModeSet">{t('Set')}</label>
@@ -342,7 +343,8 @@ const InletPanel = observer(() => {
 											type="radio"
 											name="inletMode"
 											id="inletModeEdit"
-											onMouseDown={() => { setMode('edit') }}
+											//onMouseDown={() => { setMode('edit') }}
+											onChange={() => { setMode('edit') }}
 											checked={mode === 'edit'}										
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletModeEdit">{t('Edit')}</label>
@@ -353,7 +355,8 @@ const InletPanel = observer(() => {
 											type="radio"
 											name="inletMode"
 											id="inletModeMove"
-											onMouseDown={() => { setMode('move') }}
+											//onMouseDown={() => { setMode('move') }}
+											onChange={() => { setMode('move') }}
 											checked={mode === 'move'}											
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletModeMove">{t('Move')}</label>
@@ -375,7 +378,9 @@ const InletPanel = observer(() => {
 											id="inletTypeStraight"
 											disabled={mode !== 'set'}
 											checked={type === 'Straight'}
-											onMouseDown={()=>{ setNewInlet('Straight')}}
+											//onMouseDown={()=>{ setNewInlet('Straight')}}
+											onChange={()=>{ setNewInlet('Straight')}}
+
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeStraight">
 											<div>{t('Straight')}</div>
@@ -389,7 +394,8 @@ const InletPanel = observer(() => {
 											id="inletTypeDirect"
 											disabled={mode !== 'set'}
 											checked={type === 'Direct'}
-											onMouseDown={()=>{ setNewInlet('Direct')}}
+											//onMouseDown={()=>{ setNewInlet('Direct')}}
+											onChange={()=>{ setNewInlet('Direct')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeDirect">
 											<div>{t('Direct')}</div>
@@ -403,7 +409,8 @@ const InletPanel = observer(() => {
 											id="inletTypeHook"
 											disabled={mode !== 'set'}
 											checked={type === 'Hook'}
-											onMouseDown={()=>{ setNewInlet('Hook')}}
+											//onMouseDown={()=>{ setNewInlet('Hook')}}
+											onChange={()=>{ setNewInlet('Hook')}}
 
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeHook">
@@ -418,7 +425,8 @@ const InletPanel = observer(() => {
 											id="inletTypeTangent"
 											disabled={mode !== 'set'}
 											checked={type === 'Tangent'}
-											onMouseDown={()=>{ setNewInlet('Tangent')}}
+											//onMouseDown={()=>{ setNewInlet('Tangent')}}
+											onChange={()=>{ setNewInlet('Tangent')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="inletTypeTangent">
 											<div>{t('Tangent')}</div>

@@ -344,7 +344,7 @@ cursor: url('./img/cursor_plus.cur'), auto !important;
 
 /* Preloade */
 
-@import url(http://weloveiconfonts.com/api/?family=entypo);
+/* @import url(http://weloveiconfonts.com/api/?family=entypo); */
 
 .core {
   background: #cedce0;
@@ -1503,4 +1503,12 @@ top:var(--hEdge);
   fill: none;
   marker-start: url(#dotRed);
   marker-end: url(#dotRed);
+}
+
+
+.panel_info_text {
+  color: black;
+  background: #9e9e9e;
+  width: 3em;
+  text-align: center;
 }

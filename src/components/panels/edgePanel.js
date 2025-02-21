@@ -6,6 +6,7 @@ import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import util from '../../utils/util.js';
+import inlet from '../../scripts/inlet.js';
 
 
 const EdgePanel = observer(() => {
@@ -21,11 +22,10 @@ const EdgePanel = observer(() => {
 	const [RX, setRX]= useState('')
 	const [RY, setRY]= useState('')
 
-
-
-
 	useEffect(()=>{
 		console.log ('useEffedct selectedEdge')
+		console.log (selectedEdge)
+
 		if (!selectedEdge) {
 			setLL('')
 			setRX('')
@@ -46,6 +46,98 @@ const EdgePanel = observer(() => {
 		}
 
 	},[selectedEdge, selectedEdgePath ])
+
+	const toArc = () => {
+		let cid = selectedEdge.cid;
+		let newPath = svgStore.getElementByCidAndClass(cid, 'contour', 'path');
+		let updPath = util.normPath(newPath);
+		let segment = selectedEdge.edge.segIndex;
+	
+		console.log('segment ' + segment);
+		console.log(updPath);
+	
+		if (segment < 1) {
+			console.error("Невозможно преобразовать в дугу: недостаточно точек");
+			return;
+		}
+	
+		let prevSegment = updPath[segment - 1];
+		let currSegment = updPath[segment];
+	
+		let prevX = prevSegment[prevSegment.length - 2];
+		let prevY = prevSegment[prevSegment.length - 1];
+		let currX = currSegment[currSegment.length - 2];
+		let currY = currSegment[currSegment.length - 1];
+	
+		let dx = currX - prevX;
+		let dy = currY - prevY;
+		let distance = Math.sqrt(dx * dx + dy * dy);
+	
+		let rx = distance / 2;
+		let ry = distance / 2;
+	
+		updPath[segment] = ['A', rx, ry, 0, 0, 1, currX, currY];
+	
+		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 });
+		inlet.applyNewPaths(res);
+	};
+	
+
+	const toLine = () =>{
+		let cid = selectedEdge.cid
+		let newPath =  svgStore.getElementByCidAndClass(cid, 'contour', 'path')
+		let updPath = util.normPath (newPath)
+		let segment = selectedEdge.edge.segIndex
+		updPath[segment] = ['L', updPath[segment][6], updPath[segment][7]]
+		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',',  ' '), {angle: 0, x:0, y:0} )
+		inlet.applyNewPaths( res )			
+	}
+
+
+	const arcFlag = () => {
+		let cid = selectedEdge.cid;
+		let newPath = svgStore.getElementByCidAndClass(cid, 'contour', 'path');
+		let updPath = util.normPath(newPath);
+		let segment = selectedEdge.edge.segIndex;
+	
+		console.log('segment ' + segment);
+		console.log(updPath);
+	
+		if (!updPath[segment] || updPath[segment][0] !== 'A') {
+			console.error("Выбранный сегмент не является дугой");
+			return;
+		}
+	
+		let arcSegment = updPath[segment];
+	
+		// Меняем large-arc-flag (4-й параметр, индекс 4) с 0 на 1 и наоборот
+		arcSegment[4] = arcSegment[4] === 0 ? 1 : 0;
+	
+		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 });
+		inlet.applyNewPaths(res);
+	};
+
+
+	const sweepFlag = () => {
+		let cid = selectedEdge.cid;
+		let newPath = svgStore.getElementByCidAndClass(cid, 'contour', 'path');
+		let updPath = util.normPath(newPath);
+		let segment = selectedEdge.edge.segIndex;
+	
+		if (!updPath[segment] || updPath[segment][0] !== 'A') {
+			console.error("Выбранный сегмент не является дугой");
+			return;
+		}
+	
+		let arcSegment = updPath[segment];
+	
+		// Меняем sweep-flag (5-й параметр, индекс 5) с 0 на 1 и наоборот
+		arcSegment[5] = arcSegment[5] === 0 ? 1 : 0;
+	
+		let res = inlet.getNewInletOutlet(cid, 'contour', 'path', updPath.join(' ').replaceAll(',', ' '), { angle: 0, x: 0, y: 0 });
+		inlet.applyNewPaths(res);
+	};
+	
  
 	const panelInfo = [
 		{
@@ -61,15 +153,17 @@ const EdgePanel = observer(() => {
 										<div className="d-flex align-items-center justify-content-center">
 											<div className="d-flex align-items-center justify-content-around">
 												<div>{t('Length')}:</div>
-												<div>
-													{ LL }
+												<div 
+													className='panel_info_text ms-1'
+												>
+													{LL}
 												</div>
 												<div className='ms-1'>{t('mm')}</div>
 												<div className="ms-2 d-none">{t('angle')}</div>
 												<div></div>
 												<button
 													className="btn btn-secondary btn-sm to_arc ms-2"
-													onMouseDown={() => { }}
+													onMouseDown={ toArc }
 												>
 													{t('To arc')}
 												</button>
@@ -88,7 +182,11 @@ const EdgePanel = observer(() => {
 						  <div className="d-flex align-items-center justify-content-around">
 							<div className="d-flex align-items-center">
 							  <div>rx</div>
-							  <div>{RX} </div>							
+							  <div
+							  	contentEditable={true} 
+							  	suppressContentEditableWarning={true}
+								className='panel_info_text  ms-1'
+							  >{RX} </div>							
 							  <div>{t('mm')}</div>
 							</div>
 							<input
@@ -101,14 +199,18 @@ const EdgePanel = observer(() => {
 							/>
 							<div className="d-flex align-items-center">
 							  <div className="">ry</div>
-							  <div>{RY} </div>							
+							  <div
+							  	contentEditable={true} 
+							  	suppressContentEditableWarning={true}
+								className='panel_info_text  ms-1'
+							  >{RY} </div>							
 							  <div className="me-2">mm</div>
-							  <div className="form-check form-switch ms-4 me-2">
+							  <div className="form-check form-switch ms-2 me-2">
 								<input
 								  className="form-check-input"
 								  type="checkbox"
 								  id="arcFlag2"
-								  //onchange="edge.arcFlag(this)"
+								  onChange={ arcFlag }
 								/>
 							  </div>
 							  <div className="form-check form-switch mx-2">
@@ -116,11 +218,11 @@ const EdgePanel = observer(() => {
 								  className="form-check-input"
 								  type="checkbox"
 								  id="arcFlag3"
-								  //onchange="edge.arcFlag(this)"
+								  onChange={ sweepFlag }
 								/>
 							  </div>
 							</div>
-							<div className="ms-2 d-none">Угол</div>
+							{/* <div className="ms-2 d-none">Угол</div>
 							<input
 							  className="mx-2 popup_input d-none"
 							  id="edge_angle"
@@ -129,7 +231,7 @@ const EdgePanel = observer(() => {
 							  min={1}
 							  max={10000}
 							  step={1}
-							/>
+							/> */}
 							<div>
 							  <div className="d-flex">
 								<button className="btn btn-sm btn-secondary">{t('Apply')}</button>
@@ -139,7 +241,7 @@ const EdgePanel = observer(() => {
 						</div>
 						<div className="d-flex align-items-center justify-content-center">
 						  <div className="d-flex align-items-center justify-content-around">
-							<div style={{ marginRight: 28 }}>Save points</div>
+							<div style={{ marginRight: 28 }}>{t('Save points')}</div>
 							<div className="form-check form-switch mx-2">
 							  <input
 								className="form-check-input"
@@ -152,7 +254,7 @@ const EdgePanel = observer(() => {
 						  <div>
 							<button
 							  className="btn btn-secondary btn-sm to_line ms-2"
-							  //onmousedown="edge.convertToThis(this)"
+							  onMouseDown={ toLine }
 							>
 							  {t('To line')}
 							</button>

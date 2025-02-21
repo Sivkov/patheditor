@@ -306,7 +306,8 @@ const OutletPanel = observer(() => {
 											type="radio"
 											name="outletMode"
 											id="outletModeSet"
-											onMouseDown={() => { setMode('set') }}
+											//onMouseDown={() => { setMode('set') }}
+											onChange={() => { setMode('set') }}
 											checked={mode === 'set'}
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletModeSet">{t('Set')}</label>
@@ -317,7 +318,8 @@ const OutletPanel = observer(() => {
 											type="radio"
 											name="outletMode"
 											id="outletModeEdit"
-											onMouseDown={() => { setMode('edit') }}
+											//onMouseDown={() => { setMode('edit') }}
+											onChange={() => { setMode('edit') }}
 											checked={mode === 'edit'}
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletModeEdit">{t('Edit')}</label>
@@ -339,7 +341,8 @@ const OutletPanel = observer(() => {
 											id="outletTypeStraight"
 											disabled={mode !== 'set'}
 											checked={type === 'Straight'}
-											onMouseDown={()=>{ setNewOutlet('Straight')}}
+											//onMouseDown={()=>{ setNewOutlet('Straight')}}
+											onChange={()=>{ setNewOutlet('Straight')}}
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletTypeStraight">
 											<div>
@@ -355,7 +358,9 @@ const OutletPanel = observer(() => {
 											id="outletTypeDirect"
 											disabled={mode !== 'set'}
 											checked={type === 'Direct'}
-											onMouseDown={()=>{ setNewOutlet('Direct')}}
+											//onMouseDown={()=>{ setNewOutlet('Direct')}}
+											onChange={()=>{ setNewOutlet('Direct')}}
+
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletTypeDirect">
 											<div>{t('Direct')}</div>
@@ -369,7 +374,9 @@ const OutletPanel = observer(() => {
 											id="outletTypeHook"
 											disabled={mode !== 'set'}
 											checked={type === 'Hook'}
-											onMouseDown={()=>{ setNewOutlet('Hook')}}
+											//onMouseDown={()=>{ setNewOutlet('Hook')}}
+											onChange={()=>{ setNewOutlet('Hook')}}
+
 										/>
 										<label className="form-check-label mx-1" htmlFor="outletTypeHook">
 											<div>{t('Hook')}</div>
@@ -383,8 +390,11 @@ const OutletPanel = observer(() => {
 											id="outletTypeTangent"
 											disabled={mode !== 'set'}
 											checked={type === 'Tangent'}
-											onMouseDown={()=>{ setNewOutlet('Tangent')}}
+											//onMouseDown={()=>{ setNewOutlet('Tangent')}}
+											onChange={()=>{ setNewOutlet('Tangent')}}
+
 										/>
+
 										<label className="form-check-label mx-1" htmlFor="outletTypeTangent">
 											<div>{t('Tangent')}</div>
 										</label>
