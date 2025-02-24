@@ -1,4 +1,6 @@
 const CONSTANTS = {
+	textSize:11.88,
+	textKerning:1,
 	defaultInletIntend: 1,
 	defaultInletLength: 5,
     contourTypes:['engraving', 'inner', 'outer'],

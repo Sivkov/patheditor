@@ -54,9 +54,7 @@ const SimpleReturnComponent = observer(() => {
 			console.log ('Create text element')
 			let coords ={x:e.clientX, y:e.clientY}
 			svgStore.addTextElement ( coords )
-			svgStore.setTextFocus( !svgStore.textFocus)
-			// создать курсор и поместить его на поле
-			//поместит фокус в textarea;
+ 			svgStore.setTextFocus( true )
 			
 		}
 	}

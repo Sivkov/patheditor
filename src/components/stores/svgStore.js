@@ -331,11 +331,13 @@ class SvgStore {
 		const newElement = {
 			path: "",
 			cid: maxCid + 1,
-			class: "contour inner engraving macro2 closed0 noOutlet skeletonText",
+			class: "contour inner engraving macro2 closed0 noOutlet skeletonText currentText",
 			path: '', 
 			stroke: 'lime',
 			strokeWidth: 0.2,
-			coords:  coords
+			coords:  coords,
+			kerning: CONSTANTS.textKerning,
+			textSize: CONSTANTS.textSize,
 		};
 	
 		console.log("Adding new TEXT element with new cid:", newElement);

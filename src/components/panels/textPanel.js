@@ -14,22 +14,29 @@ import GOST from '../../constants/gost.js';
 
 const TextPanel = observer(() => {
 	const { t } = useTranslation();
+	const {	textFocus} = svgStore;
 	const textareaRef = useRef(null);
-	const {
-		
-		textFocus
-	} = svgStore;
 
+	useEffect(() => {
+		if (textareaRef.current) {
+		  	if (textFocus) {
+			
+				console.log("Handle focus", textFocus);
+				const cursorPosition = textareaRef.current.value.length;
+				textareaRef.current.setSelectionRange(cursorPosition, cursorPosition);
+				//TODO при смене значения textFocus в сторе не успевает уйти фокус и курсор не ставиться. Так что пока так.
+				setTimeout(()=>{
 
-	useEffect(()=>{
-		handleFocus ()
-	},
-	[textFocus])
+					textareaRef.current.focus();
+					textareaRef.current.click();
 
-    const handleFocus = () => {
-        textareaRef.current?.focus();		
-		textareaRef.current.textContent = textareaRef.current.textContent+ ' чxxx'		
-    };
+				},100)
+			
+			} else {
+				textareaRef.current.value = ''
+			}
+		}
+	  }, [textFocus]); 
 
 	const panelInfo = 
 		  {
@@ -39,63 +46,62 @@ const TextPanel = observer(() => {
 				<div className="d-flex flex-column">
 					<table className="table mb-0">
 						<tbody>
-						<tr>
-							<td className="mx-2">
-							<div className="d-flex align-items-center justify-content-center">
-								<div className="d-flex align-items-center ">
-								<div>
-									<Icon icon="fluent:text-font-16-regular" width="20" height="20"  style={{color:'white'}} />
-								</div>
-								<input
-									className="mx-2 text-center"
-									id="textSize"
-									type="number"
-									min={1}
-									max={100}
-									step="0.5"
-									defaultValue="11.88"
-								/>
-								<div>{t('mm')}</div>
-								</div>
-								<div className="d-flex align-items-center ms-4">
-								<div htmlFor="textKerning">
-									<Icon icon="carbon:text-kerning" width="24" height="24"  style={{color: 'white'}} />
-								</div>
-								<input
-									className="mx-2 text-center"
-									id="textKerning"
-									type="number"
-									placeholder={100}
-									min="0.1"
-									max={100}
-									step="0.1"
-									defaultValue={1}
-								/>
-								<div>{t('mm')}</div>
-								</div>
-							</div>
-							</td>
-						</tr>
-						<tr>
-							<td>
-							<div className="d-flex justify-content-around">
-								<div className="mt-2">
-								<textarea 
-									id="textarea" 
-									rows={4} 
-									cols={40} 
-									defaultValue={""}
-									ref={textareaRef}
-								 />
-								<br />
-								</div>
-							</div>
-							</td>
-						</tr>
+							<tr>
+								<td className="mx-2">
+									<div className="d-flex align-items-center justify-content-center">
+										<div className="d-flex align-items-center ">
+										<div>
+											<Icon icon="fluent:text-font-16-regular" width="20" height="20"  style={{color:'white'}} />
+										</div>
+										<input
+											className="mx-2 text-center"
+											id="textSize"
+											type="number"
+											min={1}
+											max={100}
+											step="0.5"
+											defaultValue="11.88"
+										/>
+										<div>{t('mm')}</div>
+										</div>
+										<div className="d-flex align-items-center ms-4">
+										<div htmlFor="textKerning">
+											<Icon icon="carbon:text-kerning" width="24" height="24"  style={{color: 'white'}} />
+										</div>
+										<input
+											className="mx-2 text-center"
+											id="textKerning"
+											type="number"
+											placeholder={100}
+											min="0.1"
+											max={100}
+											step="0.1"
+											defaultValue={1}
+										/>
+										<div>{t('mm')}</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div className="d-flex justify-content-around">
+										<div className="mt-2">
+										<textarea 
+											ref={textareaRef} 
+											id="textarea" 
+											rows={4} 
+											cols={40}
+										/>
+										<br />
+										</div>
+									</div>
+								</td>
+							</tr>
 						</tbody>
 					</table>
-					</div>
-				)
+				</div>
+			)
 }    
 	
 return (
