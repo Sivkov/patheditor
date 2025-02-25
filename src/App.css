@@ -1512,3 +1512,10 @@ top:var(--hEdge);
   width: 3em;
   text-align: center;
 }
+
+.contour.skeletonText {
+  marker: none;
+  marker-end: none;
+  marker-mid: none;
+  marker-start: none;
+}

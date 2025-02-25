@@ -1,8 +1,9 @@
 const CONSTANTS = {
-	textSize:11.88,
+	fontSize:11.88,
 	textKerning:1,
 	defaultInletIntend: 1,
 	defaultInletLength: 5,
+	defaultStringInterval:18,
     contourTypes:['engraving', 'inner', 'outer'],
     operatingModes:['macro0', 'macro1','macro2', 'macro3', 'macro4', 'macro5', ],
     piercingModes: {'normal':0, 'without_time':-1, 'pulse':1},

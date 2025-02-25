@@ -34,8 +34,17 @@ class SvgStore {
 			selectedInletPath: computed,
 			selectedOutletPath: computed,			
 			selectedEdgePath: computed,
+			selectedText: computed,
         });
     }
+
+	get selectedText () {
+		const text = this.svgData.code.find(element => element.class.includes('selectedText')  && element.class.includes('contour'));
+		if (!text) {
+			return null;
+		}
+		return text
+	}
 
 	get selectedInletPath () {
 		let cid = this.selected.cid
@@ -327,20 +336,27 @@ class SvgStore {
 		const maxCid = this.svgData.code.length > 0 
 			? Math.max(...this.svgData.code.map(el => el.cid)) 
 			: 0;
-	
-		const newElement = {
-			path: "",
+
+			coords = Util.convertScreenCoordsToSvgCoords( coords.x, coords.y )
+			const newElement = {
+			path: '',
 			cid: maxCid + 1,
-			class: "contour inner engraving macro2 closed0 noOutlet skeletonText currentText",
+			class: 'contour inner engraving macro2 closed0 noOutlet skeletonText selectedText',
 			path: '', 
 			stroke: 'lime',
 			strokeWidth: 0.2,
 			coords:  coords,
 			kerning: CONSTANTS.textKerning,
-			textSize: CONSTANTS.textSize,
+			fontSize: CONSTANTS.fontSize,
+			text: '',
+			rotate:0,
+			rotatePoint:{},
+			cursor:{start:0, end:0},
+			scaleX:1,
+			scaleY:1,
 		};
 	
-		console.log("Adding new TEXT element with new cid:", newElement);
+		//console.log("Adding new TEXT element with new cid:", newElement);
 		this.svgData.code.push(newElement); 
 	}
 	
