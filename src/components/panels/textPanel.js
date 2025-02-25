@@ -53,6 +53,10 @@ const TextPanel = observer(() => {
 	}
 
 	const onKeyUp =(e)=>{
+		if (!selectedText) {
+			textareaRef.current.value=''
+			return
+		}
 		console.log ("Added key  " + e.code)
 		if (e.code  === "Backspace") {
 			textCompare () 
@@ -74,32 +78,33 @@ const TextPanel = observer(() => {
 		}		
 	}
 
-	const textCompare =()=>{
+	const  textCompare =  ()=>{
 		if (!selectedText) return;
 		console.log ('textCompare')
 
-        if (selectedText.text === textareaRef.current.value) {
-			insertLetter(selectedText.text[selectedText.text.length-1])
-			return
-		}  else {
-
-            /*let selectedTextWithoutLast = selectedText.text.slice(0, -1);
-            let currentTextWithoutLast = textareaRef.current.value.slice(0, -1);
-
- 			if ( currentTextWithoutLast === selectedText.text) {
-				insertLetter( areaText[areaText.length-1] )
+		let updatePath= ''
+		svgStore.updateElementValue(selectedText.cid, 'contour', 'path', '' )
+		let string = 0
+		let stringBox=''
+		let index = 0
+		textareaRef.current.value.split('').forEach((a, ii) => {
+			if (a ==='\n') {
+				string++
+				index=0
+				stringBox=''
 			} else {
-				areaText.map(a => insertLetter(a));
-			} 
-
-            if (selectedTextWithoutLast === textareaRef.current.value) {
-                deleteLastLetter()
-		        return
-			} */
-		} 
+				let res = insertLetter(a, index, ii, updatePath, string, stringBox);
+				updatePath+=res
+				stringBox+=res
+				index++
+			}
+		});
+		svgStore.updateElementValue(selectedText.cid, 'contour', 'path', updatePath  )
+          
+	 
 	}
 
-	const insertLetter =(letter)=>{
+	const insertLetter = (letter,index, ii, updatePath, string, stringBox)=>{
 		console.log (letter)
 		if (!selectedText) return;
 
@@ -112,25 +117,39 @@ const TextPanel = observer(() => {
 		} 
 
 		let scale = selectedText.fontSize/CONSTANTS.fontSize
-		let scaleX = 1
-		let scaleY = 1 
-		let strings = 0
+		let scaleX = selectedText.scaleX
+		let scaleY = selectedText.scaleY 
 
 		let letterBox  = SVGPathCommander.getPathBBox(addingLetter)
-		let textBox = SVGPathCommander.getPathBBox(selectedText.path)
-		let translateX = selectedText.coords.x + textBox.width - letterBox.x + 1
-		let translateY = ((selectedText.coords.y-letterBox.height-letterBox.y+correction*scale*scaleY+CONSTANTS.defaultStringInterval*strings*scale*scaleY))
-
-        
-
-		if (selectedText.text.length > 1) {
-			translateX =  textBox.x2  + CONSTANTS.textKerning - letterBox.x
+		let textBox = SVGPathCommander.getPathBBox(stringBox)
+		let translateX 
+		let spaceK = 1
+		if (ii) {
+			let spaceCount = 0;
+			let i = ii - 1; 
+		
+			while (i >= 0 && selectedText.text[i] === ' ') {
+				spaceCount++;
+				i--; 
+			}
+		
+			if (spaceCount > 0) {
+				console.log(`Да у нас пробелы, господа! Количество: ${spaceCount}`);
+				spaceK = 5 * spaceCount; // Умножаем на количество пробелов
+			}
 		}
+		
+		let translateY = ((selectedText.coords.y-letterBox.height-letterBox.y+correction*scale*scaleY+CONSTANTS.defaultStringInterval*string*scale*scaleY))
 
+		if (index === 0 &&  spaceK===1 ) {
+			translateX = selectedText.coords.x + textBox.width - letterBox.x
+		} else {
+			translateX =  textBox.x2  + CONSTANTS.textKerning * spaceK - letterBox.x
+		}
+ 	
 		let addingLetterPath = util.applyTransform(addingLetter, scale, scale, translateX, translateY,{angle: 0, x:0, y:0})
-		console.log ( addingLetterPath )
-		let updatePath =  selectedText.path + addingLetterPath
-		svgStore.updateElementValue(selectedText.cid, 'contour', 'path', updatePath  )
+		return addingLetterPath
+		
       
 		
 		

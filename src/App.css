@@ -22,6 +22,7 @@
   --bEdge: 26px;
   --sizeSortedPlanItemY:50px;    
   --sizeSortedPlanItemX:100px;    
+  --textAreaFontSize:36pt;
   --sizePlanX:50;   
   --sizePlanY:50;  
 }
@@ -1519,3 +1520,14 @@ top:var(--hEdge);
   marker-mid: none;
   marker-start: none;
 }
+
+
+#textarea {
+  font-family: 'Gost Type A';  
+  resize: both;
+  width:90%;
+  max-width:90%;
+  font-size: var(--textAreaFontSize);
+
+}
+
