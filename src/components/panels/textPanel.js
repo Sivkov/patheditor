@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import GOST from '../../constants/gost.js';
 import { toJS } from "mobx";
 import CONSTANTS from '../../constants/constants.js';
-import svgPath from 'svgpath';
 
 
 const TextPanel = observer(() => {
@@ -44,10 +43,6 @@ const TextPanel = observer(() => {
 		console.log ('Current TEXT  ', toJS(selectedText))
 	},[ selectedText ])	
 
-	
-	const deleteLastLetter =()=>{
-	}
-
 	const addCursor = ()=>{
 		console.log ('addCursor')
 	}
@@ -57,7 +52,7 @@ const TextPanel = observer(() => {
 			textareaRef.current.value=''
 			return
 		}
-		console.log ("Added key  " + e.code)
+		//console.log ("Added key  " + e.code)
 		if (e.code  === "Backspace") {
 			textCompare () 
 		} else if (e.code  === "ArrowUp") {
@@ -73,39 +68,83 @@ const TextPanel = observer(() => {
 		} else {
 			let shortCuts= ['z','a','v','c','x','Z','A','V','C','X']
 			if (e.ctrlKey && shortCuts.includes (e.code) ) return;			
-			svgStore.updateElementValue(selectedText.cid, 'contour', 'text', textareaRef.current.value )
 			textCompare () 
 		}		
 	}
 
 	const  textCompare =  ()=>{
 		if (!selectedText) return;
-		console.log ('textCompare')
+		const selectedTextValue = selectedText.text; // Текст из selectedText
+		const textareaValue = textareaRef.current.value; // Текст из textarea
 
-		let updatePath= ''
-		svgStore.updateElementValue(selectedText.cid, 'contour', 'path', '' )
-		let string = 0
-		let stringBox=''
-		let index = 0
-		textareaRef.current.value.split('').forEach((a, ii) => {
-			if (a ==='\n') {
-				string++
-				index=0
-				stringBox=''
-			} else {
-				let res = insertLetter(a, index, ii, updatePath, string, stringBox);
-				updatePath+=res
-				stringBox+=res
-				index++
+		if (selectedTextValue === textareaValue) {
+			//false
+		} else if (selectedTextValue === textareaValue.slice(0,-1)) {
+			
+			//console.log('add last letter')			
+ 			const lastLetter = textareaValue[textareaValue.length - 1];
+			const string = selectedTextValue.split('\n').reverse()[0] 
+			const index = string.length
+			const stringNum = selectedTextValue.split('\n').length-1
+			const paths = selectedText.path.split(/(?=M)/)
+			let pathsInLastString =0
+			string.split('').map( a=>{
+				if (GOST.hasOwnProperty(a)) {
+					let mm = (GOST[a].match(/M/gm)||'').length
+					pathsInLastString += mm
+				}
+			})
+
+			const stringBox = (string && pathsInLastString) ? paths.slice( -pathsInLastString ).join('') : ''
+			let res = insertLetter(lastLetter, index, textareaValue.length - 1, stringNum, stringBox)||'';
+			svgStore.updateElementValue(selectedText.cid, 'contour', 'path', selectedText.path + res  )      
+
+		} else if (selectedTextValue.slice(0,-1) === textareaValue) {
+
+			console.log('delete last letter')
+			const lastLetter = selectedTextValue[selectedTextValue.length - 1];
+			const pathsInLetter = GOST[lastLetter] ? ( GOST[lastLetter].match(/M/gm)||'' ).length : 0
+
+			let paths = selectedText.path.split(/(?=M)/);
+			// это если энтер то 0 и нечего удадлять не надо!)))
+			if (pathsInLetter) {
+
+				if (pathsInLetter >= paths.length) {
+					paths = ''; // Удаляем все пути
+				} else {
+					paths = paths.slice(0, -pathsInLetter).join(''); // Удаляем последние n путей
+				}
+				svgStore.updateElementValue(selectedText.cid, 'contour', 'path', paths);
 			}
-		});
-		svgStore.updateElementValue(selectedText.cid, 'contour', 'path', updatePath  )
-          
-	 
+
+		} else {
+			console.log('Перерисовываем все заново !!')
+			let updatePath= ''
+			//svgStore.updateElementValue(selectedText.cid, 'contour', 'path', '' )
+			let string = 0
+			let stringBox = ''
+			let index = 0
+			textareaValue.split('').forEach((a, ii) => {
+				if (a ==='\n') {
+					string++
+					index = 0
+					stringBox = ''
+				} else {
+					let res = insertLetter(a, index, ii, string, stringBox)||'';
+					updatePath += res
+					stringBox += res
+					index++;
+				}
+			});
+			svgStore.updateElementValue(selectedText.cid, 'contour', 'path', updatePath  )      
+
+		}
+		svgStore.updateElementValue(selectedText.cid, 'contour', 'text', textareaRef.current.value )
+   
 	}
 
-	const insertLetter = (letter,index, ii, updatePath, string, stringBox)=>{
-		console.log (letter)
+ 	const insertLetter = (letter,index, ii, string, stringBox)=>{
+
 		if (!selectedText) return;
 
 		if (!GOST.hasOwnProperty(letter)) return;
@@ -128,14 +167,14 @@ const TextPanel = observer(() => {
 			let spaceCount = 0;
 			let i = ii - 1; 
 		
-			while (i >= 0 && selectedText.text[i] === ' ') {
+			while (i >= 0 && textareaRef.current.value[i] === ' ') {
 				spaceCount++;
 				i--; 
 			}
 		
 			if (spaceCount > 0) {
 				console.log(`Да у нас пробелы, господа! Количество: ${spaceCount}`);
-				spaceK = 5 * spaceCount; // Умножаем на количество пробелов
+				spaceK = 5 * spaceCount; 
 			}
 		}
 		
@@ -143,17 +182,16 @@ const TextPanel = observer(() => {
 
 		if (index === 0 &&  spaceK===1 ) {
 			translateX = selectedText.coords.x + textBox.width - letterBox.x
+		//случай если строка начиается с пробелов
+		} else if ( index - spaceK/5 === 0) {	
+			translateX = selectedText.coords.x + textBox.width - letterBox.x + CONSTANTS.textKerning * spaceK
 		} else {
 			translateX =  textBox.x2  + CONSTANTS.textKerning * spaceK - letterBox.x
 		}
  	
 		let addingLetterPath = util.applyTransform(addingLetter, scale, scale, translateX, translateY,{angle: 0, x:0, y:0})
-		return addingLetterPath
-		
-      
-		
-		
-	}
+		return addingLetterPath		
+	} 
 
 	const panelInfo = 
 		  {
@@ -177,9 +215,8 @@ const TextPanel = observer(() => {
 											min={1}
 											max={100}
 											step="0.5"
-											defaultValue="11.88"
-
 										/>
+										{selectedText ? selectedText.fontSize : CONSTANTS.fontSize}
 										<div>{t('mm')}</div>
 										</div>
 										<div className="d-flex align-items-center ms-4">
@@ -190,12 +227,11 @@ const TextPanel = observer(() => {
 											className="mx-2 text-center"
 											id="textKerning"
 											type="number"
-											placeholder={100}
-											min="0.1"
+ 											min={0.1}
 											max={100}
 											step="0.1"
-											defaultValue={1}
 										/>
+										{selectedText ? selectedText.textKerning : CONSTANTS.textKerning}
 										<div>{t('mm')}</div>
 										</div>
 									</div>
