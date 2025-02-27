@@ -49,13 +49,26 @@ const SimpleReturnComponent = observer(() => {
 					}				
 				}
 			}
-		} else if ((e.button === 0 && editorStore.mode === 'text')) {
-
-			console.log ('Create text element')
-			let coords ={x:e.clientX, y:e.clientY}
-			svgStore.addTextElement ( coords )
- 			svgStore.setTextFocus( true )
+		} else if (e.button === 0 && editorStore.mode === 'text') {
 			
+			console.log ('пиу пиу')
+
+			if (e.currentTarget.classList.contains('skeletonText')) {
+				let cid = Number(e.currentTarget.getAttribute('data-cid'));
+				if (typeof cid === 'number') {
+					svgStore.setTextFocus (false)
+					let text = svgStore.getElementByCidAndClass (cid, 'contour')
+					let newClass= text.class + ' selectedText'
+					svgStore.updateElementValue( cid, 'contour', 'class', newClass)
+					svgStore.setTextFocus (true)
+				}			
+
+			} else {
+				console.log ('Create text element')
+				let coords ={x:e.clientX, y:e.clientY}
+				svgStore.addTextElement ( coords )
+				svgStore.setTextFocus( true )
+			}		
 		}
 	}
 

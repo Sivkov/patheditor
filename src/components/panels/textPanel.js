@@ -41,7 +41,9 @@ const TextPanel = observer(() => {
 	}, [textFocus]); 
 
 	useEffect(()=>{
-		console.log ('Current TEXT  ', toJS(selectedText))
+		if (selectedText) {
+			textareaRef.current.value = selectedText.text
+		}
 	},[ selectedText ])	
 
 	const addCursor =()=>{
@@ -211,46 +213,11 @@ const TextPanel = observer(() => {
 		let val = Number(e.target.value);
 		if (typeof val === "number" && val > 0) {
 			console.log ('setFontSize')
-			let scale = val / selectedText.fontSize;
 			svgStore.updateElementValue(selectedText.cid, "contour", "fontSize", val);
 			svgStore.updateElementValue(selectedText.cid, "contour", "text", "");
 			textCompare()
 		}
-}
-
-
-/* 	const setFontSize = (e) => {
-		let val = Number(e.target.value);
-		if (typeof val === "number" && val > 0) {
-			let scale = val / selectedText.fontSize;
-	
-			// Исправленные координаты
-			let translateX = selectedText.coords.x * (1 - scale);
-			let translateY = selectedText.coords.y * (1 - scale);
-	
-			// Обновляем свойства элемента
-			svgStore.updateElementValue(selectedText.cid, "contour", "fontSize", val);
-			//svgStore.updateElementValue(selectedText.cid, "contour", "kerning", selectedText.kerning * scale);
-			//svgStore.updateElementValue(selectedText.cid, "contour", "scaleX", 1);
-			//svgStore.updateElementValue(selectedText.cid, "contour", "scaleY", 1);
-			svgStore.updateElementValue(selectedText.cid, "contour", "text", '');
-			textCompare()
-	
-			// Применяем трансформацию
-			 let addingLetterPath = util.applyTransform(
-				selectedText.path,
-				scale,
-				scale,
-				translateX,
-				translateY,
-				{ angle: 0, x: 0, y: 0 }
-			);
-	
-			svgStore.updateElementValue(selectedText.cid, "contour", "path", addingLetterPath); 
-		}
-	}; */
-	
-
+	}
 
 	const panelInfo = 
 		  {

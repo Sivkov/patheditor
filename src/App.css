@@ -1531,3 +1531,7 @@ top:var(--hEdge);
 
 }
 
+.skeletonText.selectedText path {
+  stroke: yellow;
+  stroke-width: 0.5;
+}

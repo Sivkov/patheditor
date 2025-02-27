@@ -185,7 +185,12 @@ class SvgStore {
 
 	setTextFocus (val) {
 		this.textFocus = val
-	}
+		if (!val) {
+			this.svgData.code.forEach(element => {
+				element.class = element.class.replace(/\bselectedText\b/, "").trim();
+			});
+		}
+	}	
 	
 	setSelectedEdge ( val ) {
 		this.selectedEdge = val
@@ -362,7 +367,7 @@ class SvgStore {
 			path: '',
 			cid: maxCid + 1,
 			class: 'contour inner engraving macro2 closed0 noOutlet skeletonText selectedText',
-			path: '', 
+            selected: false,
 			stroke: 'lime',
 			strokeWidth: 0.2,
 			coords:  coords,
