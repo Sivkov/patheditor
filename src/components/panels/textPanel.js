@@ -80,9 +80,9 @@ const TextPanel = observer(() => {
 
 		if (selectedTextValue === textareaValue) {
 			//false
-		} else if (selectedTextValue === textareaValue.slice(0,-1)) {
+		} else if (selectedTextValue === textareaValue.slice(0,-1) && selectedTextValue.length) {
 			
-			//console.log('add last letter')			
+			console.log('add last letter')			
  			const lastLetter = textareaValue[textareaValue.length - 1];
 			const string = selectedTextValue.split('\n').reverse()[0] 
 			const index = string.length
@@ -157,8 +157,11 @@ const TextPanel = observer(() => {
 		} 
 
 		let scale = selectedText.fontSize/CONSTANTS.fontSize
-		let scaleX = 1//selectedText.scaleX
-		let scaleY = 1//selectedText.scaleY 
+		let scaleX = selectedText.scaleX
+		let scaleY = selectedText.scaleY 
+		addingLetter = util.applyTransform(addingLetter, scale, scale, 0, 0,{angle: 0, x:0, y:0})
+		//addingLetter = util.applyTransform(addingLetter, scaleX, scaleY, 0, 0,{angle: 0, x:0, y:0})
+
 
 		let letterBox  = SVGPathCommander.getPathBBox(addingLetter)
 		let textBox = SVGPathCommander.getPathBBox(stringBox)
@@ -174,7 +177,6 @@ const TextPanel = observer(() => {
 			}
 		
 			if (spaceCount > 0) {
-				console.log(`Да у нас пробелы, господа! Количество: ${spaceCount}`);
 				spaceK = 5 * spaceCount; 
 			}
 		}
@@ -189,8 +191,9 @@ const TextPanel = observer(() => {
 		} else {
 			translateX =  textBox.x2  + selectedText.kerning * spaceK - letterBox.x
 		}
- 	
-		let addingLetterPath = util.applyTransform(addingLetter, scale, scale, translateX, translateY,{angle: 0, x:0, y:0})
+		
+		let addingLetterPath /* = util.applyTransform(addingLetter, scale, scale, 0, 0,{angle: 0, x:0, y:0})
+		addingLetterPath  */= util.applyTransform(addingLetter, 1, 1, translateX, translateY,{angle: 0, x:0, y:0})
 		return addingLetterPath		
 	} 
 
