@@ -6,6 +6,7 @@ import CONSTANTS from "../../constants/constants";
 import Util from "../../utils/util";
 
 class SvgStore {
+	svgParams = { width: 0, height: 0 };
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
 	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
 	safeMode = {mode: false, intend: CONSTANTS.defaultInletIntend}
@@ -20,6 +21,25 @@ class SvgStore {
 	guidesMode = true;
 	selectedEdge = false;
 	textFocus =false;
+	matrix =  { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+	groupMatrix =  { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }
+	offset =  {x:0,y:0}
+	rectParams =  {x:0, y:0, width:0, heigh:0};
+	gridState =  {
+		xsGrid: {
+			visibility: "visible",
+			fill: "var(--gridColorFill)",
+  		},
+		smallGrid: {
+			visibility: "visible",
+			fill: "none",
+ 		},
+		grid: {
+			visibility: "visible",
+			fill: "none",
+		},
+	};
+	
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -465,6 +485,31 @@ class SvgStore {
 	setCopiedCid (val) {
 		this.copiedCid = val
 	}
+
+	setMatrix  (val) {
+		Object.assign(this.matrix, val)
+	}
+
+	setGroupMatrix (val) {
+		Object.assign(this.groupMatrix,  val)
+	}
+	
+	setOffset (val) {
+		Object.assign(this.offset, val)
+	}
+
+	setRectParams (val) {
+		Object.assign(this.rectParams,val)
+	}
+
+	setGridState(val) {
+		Object.assign(this.gridState, val);
+	}
+
+	setSvgParams(val) {
+        Object.assign(this.svgParams, val);
+    } 
+
 }
 
 const svgStore = new SvgStore();

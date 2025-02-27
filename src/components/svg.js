@@ -6,15 +6,27 @@ import SelectedPointOnEdge from './selectedPointOnEdge.js';
 import SelectedPointOnPath from './selectedPointOnPath.js';
 import SelectedEdge from './selectedEdge.js';
 import Guides from './guides.js'
+import svgStore from './stores/svgStore.js';
+import { observer } from 'mobx-react-lite';
 
 
-const SvgComponent = ({ matrix, gmatrix, gridState, svgParams, rectParams}) => {
+const SvgComponent = observer (() => {
+
+    const {
+        matrix,  
+        groupMatrix,
+        rectParams,
+        gridState,
+        svgParams,
+
+    } = svgStore
+
+
     const matrixM = `${matrix.a} ${matrix.b} ${matrix.c} ${matrix.d} ${matrix.e} ${matrix.f}`;
-    const matrixG = `${gmatrix.a} ${gmatrix.b} ${gmatrix.c} ${gmatrix.d} ${gmatrix.e} ${gmatrix.f}`;
+    const matrixG = `${groupMatrix.a} ${groupMatrix.b} ${groupMatrix.c} ${groupMatrix.d} ${groupMatrix.e} ${groupMatrix.f}`;
 	const widthSVG = svgParams.width
 	const heightSVG = svgParams.height
 
-    //console.log  ('rectParams: '+JSON.stringify(rectParams))
     return (
         <svg
             id="svg"
@@ -114,6 +126,6 @@ const SvgComponent = ({ matrix, gmatrix, gridState, svgParams, rectParams}) => {
             </g>
         </svg>
     );
-};
+});
 
 export default SvgComponent;
