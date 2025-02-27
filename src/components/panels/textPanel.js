@@ -4,14 +4,13 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
 import svgStore from "../stores/svgStore.js";
 import { useEffect, useRef } from 'react';
-import SVGPathCommander from 'svg-path-commander';
 import util from '../../utils/util.js';
-import { addToLog } from './../../scripts/addToLog.js';
+//import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
 import GOST from '../../constants/gost.js';
-import { toJS } from "mobx";
+//import { toJS } from "mobx";
 import CONSTANTS from '../../constants/constants.js';
-import svgPath from 'svgpath';
+
 
 
 const TextPanel = observer(() => {
@@ -163,10 +162,10 @@ const TextPanel = observer(() => {
 		let scaleY = selectedText.scaleY 
 		addingLetter = util.applyTransform(addingLetter, scale, scale, 0, 0,{angle: 0, x:0, y:0})
 		//addingLetter = util.applyTransform(addingLetter, scaleX, scaleY, 0, 0,{angle: 0, x:0, y:0})
-
-
-		let letterBox  = SVGPathCommander.getPathBBox(addingLetter)
-		let textBox = SVGPathCommander.getPathBBox(stringBox)
+		//let letterBox  = SVGPathCommander.getPathBBox(addingLetter)
+		//let textBox = SVGPathCommander.getPathBBox(stringBox)
+		let letterBox = util.fakeBox(addingLetter)
+		let textBox = util.fakeBox(stringBox)
 		let translateX 
 		let spaceK = 1
 		if (ii) {

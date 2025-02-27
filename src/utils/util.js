@@ -1632,6 +1632,21 @@ class Util {
 		});
         return edgeSearchResult;
     }
+
+	static fakeBox (paths) {
+        var fakePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        fakePath.setAttribute("d", paths);
+        fakePath.setAttribute("id", 'fakePath');
+		var svg = document.getElementById("svg")
+        svg.appendChild(fakePath);
+        let stringBox =  document.querySelector('#fakePath').getBBox();
+        stringBox.x2 = stringBox.x + stringBox.width
+        stringBox.y2 = stringBox.y + stringBox.height
+        stringBox.сy = stringBox.y + stringBox.height*0.5
+        stringBox.сx = stringBox.x + stringBox.width*0.5
+		document.querySelector('#fakePath').remove()
+        return stringBox
+    }
 }
 
 export default Util;

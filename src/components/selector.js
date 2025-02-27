@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import svgStore from "./stores/svgStore.js";
 import editorStore from "./stores/editorStore.js";
-import SVGPathCommander from 'svg-path-commander';
 import Util from "../utils/util.js";
 import inlet from "../scripts/inlet.js";
 import { useEffect, useState } from "react";
@@ -19,7 +18,8 @@ const Selector = observer(() => {
 		} else {
 			setVisibility(true)
 			if (!inMove) {
-				const box = SVGPathCommander.getPathBBox(selectedPath);
+				//const box = SVGPathCommander.getPathBBox(selectedPath);
+				const box = Util.fakeBox(selectedPath);
 				//console.log (box)
 				svgStore.setSelectorCoords({ x: box.x, y: box.y, width: box.width, height: box.height })
 			}		
@@ -42,7 +42,8 @@ const Selector = observer(() => {
 		part.dif.x = selectorCoords.x +selectorCoords.width*0.5 - part.start.x
 		part.dif.y = selectorCoords.y - part.start.y
 
-		const cbox = SVGPathCommander.getPathBBox(selectedPath);
+		//const cbox = SVGPathCommander.getPathBBox(selectedPath);
+		const cbox = Util.fakeBox(selectedPath);
 		part.initialRectLeft = cbox.x;
         part.initialRectTop = cbox.y;
 		part.initialHeight = cbox.height
