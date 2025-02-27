@@ -1,6 +1,6 @@
 const CONSTANTS = {
 	fontSize:11.88,
-	textKerning:1,
+	kerning:1,
 	defaultInletIntend: 1,
 	defaultInletLength: 5,
 	defaultStringInterval:18,

@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import GOST from '../../constants/gost.js';
 import { toJS } from "mobx";
 import CONSTANTS from '../../constants/constants.js';
+import svgPath from 'svgpath';
 
 
 const TextPanel = observer(() => {
@@ -43,7 +44,7 @@ const TextPanel = observer(() => {
 		console.log ('Current TEXT  ', toJS(selectedText))
 	},[ selectedText ])	
 
-	const addCursor = ()=>{
+	const addCursor =()=>{
 		console.log ('addCursor')
 	}
 
@@ -72,7 +73,7 @@ const TextPanel = observer(() => {
 		}		
 	}
 
-	const  textCompare =  ()=>{
+	const  textCompare =()=>{
 		if (!selectedText) return;
 		const selectedTextValue = selectedText.text; // Текст из selectedText
 		const textareaValue = textareaRef.current.value; // Текст из textarea
@@ -156,8 +157,8 @@ const TextPanel = observer(() => {
 		} 
 
 		let scale = selectedText.fontSize/CONSTANTS.fontSize
-		let scaleX = selectedText.scaleX
-		let scaleY = selectedText.scaleY 
+		let scaleX = 1//selectedText.scaleX
+		let scaleY = 1//selectedText.scaleY 
 
 		let letterBox  = SVGPathCommander.getPathBBox(addingLetter)
 		let textBox = SVGPathCommander.getPathBBox(stringBox)
@@ -184,14 +185,69 @@ const TextPanel = observer(() => {
 			translateX = selectedText.coords.x + textBox.width - letterBox.x
 		//случай если строка начиается с пробелов
 		} else if ( index - spaceK/5 === 0) {	
-			translateX = selectedText.coords.x + textBox.width - letterBox.x + CONSTANTS.textKerning * spaceK
+			translateX = selectedText.coords.x + textBox.width - letterBox.x + selectedText.kerning * spaceK
 		} else {
-			translateX =  textBox.x2  + CONSTANTS.textKerning * spaceK - letterBox.x
+			translateX =  textBox.x2  + selectedText.kerning * spaceK - letterBox.x
 		}
  	
 		let addingLetterPath = util.applyTransform(addingLetter, scale, scale, translateX, translateY,{angle: 0, x:0, y:0})
 		return addingLetterPath		
 	} 
+
+	const setTextKerining =(e)=> {
+		let val = Number(e.target.value);
+		if (typeof val === "number" && val > 0) {
+			console.log ('setTextKerining')
+			svgStore.updateElementValue(selectedText.cid, "contour", "kerning", val);
+			svgStore.updateElementValue(selectedText.cid, "contour", "text", '');
+			textCompare()
+		}
+	}
+
+	const setFontSize =(e)=> {
+		let val = Number(e.target.value);
+		if (typeof val === "number" && val > 0) {
+			console.log ('setFontSize')
+			let scale = val / selectedText.fontSize;
+			svgStore.updateElementValue(selectedText.cid, "contour", "fontSize", val);
+			svgStore.updateElementValue(selectedText.cid, "contour", "text", "");
+			textCompare()
+		}
+}
+
+
+/* 	const setFontSize = (e) => {
+		let val = Number(e.target.value);
+		if (typeof val === "number" && val > 0) {
+			let scale = val / selectedText.fontSize;
+	
+			// Исправленные координаты
+			let translateX = selectedText.coords.x * (1 - scale);
+			let translateY = selectedText.coords.y * (1 - scale);
+	
+			// Обновляем свойства элемента
+			svgStore.updateElementValue(selectedText.cid, "contour", "fontSize", val);
+			//svgStore.updateElementValue(selectedText.cid, "contour", "kerning", selectedText.kerning * scale);
+			//svgStore.updateElementValue(selectedText.cid, "contour", "scaleX", 1);
+			//svgStore.updateElementValue(selectedText.cid, "contour", "scaleY", 1);
+			svgStore.updateElementValue(selectedText.cid, "contour", "text", '');
+			textCompare()
+	
+			// Применяем трансформацию
+			 let addingLetterPath = util.applyTransform(
+				selectedText.path,
+				scale,
+				scale,
+				translateX,
+				translateY,
+				{ angle: 0, x: 0, y: 0 }
+			);
+	
+			svgStore.updateElementValue(selectedText.cid, "contour", "path", addingLetterPath); 
+		}
+	}; */
+	
+
 
 	const panelInfo = 
 		  {
@@ -214,24 +270,26 @@ const TextPanel = observer(() => {
 											type="number"
 											min={1}
 											max={100}
-											step="0.5"
+											step={0.5}
+											onChange={ setFontSize }
+											value={selectedText ? selectedText.fontSize : CONSTANTS.fontSize}
 										/>
-										{selectedText ? selectedText.fontSize : CONSTANTS.fontSize}
 										<div>{t('mm')}</div>
 										</div>
 										<div className="d-flex align-items-center ms-4">
-										<div htmlFor="textKerning">
+										<div htmlFor="kerning">
 											<Icon icon="carbon:text-kerning" width="24" height="24"  style={{color: 'white'}} />
 										</div>
 										<input
 											className="mx-2 text-center"
-											id="textKerning"
+											id="kerning"
 											type="number"
  											min={0.1}
 											max={100}
-											step="0.1"
+											step={0.1}
+											onChange={ setTextKerining }
+											value={selectedText ? selectedText.kerning : CONSTANTS.kerning}
 										/>
-										{selectedText ? selectedText.textKerning : CONSTANTS.textKerning}
 										<div>{t('mm')}</div>
 										</div>
 									</div>

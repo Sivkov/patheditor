@@ -366,7 +366,7 @@ class SvgStore {
 			stroke: 'lime',
 			strokeWidth: 0.2,
 			coords:  coords,
-			kerning: CONSTANTS.textKerning,
+			kerning: CONSTANTS.kerning,
 			fontSize: CONSTANTS.fontSize,
 			text: '',
 			rotate:0,
