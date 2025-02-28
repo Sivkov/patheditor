@@ -281,7 +281,15 @@ class Util {
         } */
 
 		let newPath = this.applyTransform(path,t.scaleX, t.scaleY, t.translateX, t.translateY, t.rotate, t.update, t.element)
-		return newPath
+		let resp ={
+			newPath: newPath,
+			scaleX:t.scaleX,
+			scaleY:t.scaleY,
+			translateX:t.translateX,
+			translateY:t.translateY,
+			rotate: t.rotate
+		}
+		return resp;
         
     }
 

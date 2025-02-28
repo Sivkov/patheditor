@@ -431,6 +431,16 @@ class SvgStore {
 		}
 	}
 
+	updateElementValues(cid, className, updates) {
+		const element = this.svgData.code.find(
+			(el) => el.cid === cid && el.class.includes(className)
+		);
+	
+		if (element) {
+			Object.assign(element, updates);
+		}
+	}
+
 	setContourSelected(cid) {
 		console.log('setContourSelected ' + cid)
  		this.svgData.code.forEach((el, i, arr)=>{

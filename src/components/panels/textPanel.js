@@ -3,6 +3,7 @@ import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
 import svgStore from "../stores/svgStore.js";
+import panelStore from '../stores/panelStore.js';
 import { useEffect, useRef } from 'react';
 import util from '../../utils/util.js';
 //import { addToLog } from './../../scripts/addToLog.js';
@@ -17,27 +18,47 @@ const TextPanel = observer(() => {
 	const { t } = useTranslation();
 	const {	textFocus, selectedText } = svgStore;
 	const textareaRef = useRef(null);
+	const {positions} = panelStore
 
 	useEffect(() => {
 		if (textareaRef.current) {
 		  	if (textFocus) {
 			
 				console.log("Handle focus", textFocus);
-				const cursorPosition = textareaRef.current.value.length;
-				textareaRef.current.setSelectionRange(cursorPosition, cursorPosition);
+				miniTextPanel(false)
 				//TODO при смене значения textFocus в сторе не успевает уйти фокус и курсор не ставиться. Так что пока так.
 				setTimeout(()=>{
 
 					textareaRef.current.focus();
 					textareaRef.current.click();
+					const cursorPosition = textareaRef.current.value.length;
+					textareaRef.current.setSelectionRange(cursorPosition, cursorPosition);
+
 
 				},100)
 			
 			} else {
 				textareaRef.current.value = ''
+				miniTextPanel(true)				
 			}
 		}
 	}, [textFocus]); 
+
+	const miniTextPanel =(val)=> {
+		let id = 'textPopup'
+		if (positions[id].mini !== val) {
+			let position = {
+				style:{
+					width: positions[id].style.width,
+					height:positions[id].style.height,
+					top:   positions[id].style.top,
+					left:  positions[id].style.left				
+				}
+			}
+			position.mini = val
+			panelStore.setPosition(id, position)
+		}
+	}
 
 	useEffect(()=>{
 		if (selectedText) {
@@ -160,7 +181,7 @@ const TextPanel = observer(() => {
 		let scale = selectedText.fontSize/CONSTANTS.fontSize
 		let scaleX = selectedText.scaleX
 		let scaleY = selectedText.scaleY 
-		addingLetter = util.applyTransform(addingLetter, scale, scale, 0, 0,{angle: 0, x:0, y:0})
+		addingLetter = util.applyTransform(addingLetter, scale*scaleX, scale*scaleY, 0, 0,{angle: 0, x:0, y:0})
 		//addingLetter = util.applyTransform(addingLetter, scaleX, scaleY, 0, 0,{angle: 0, x:0, y:0})
 		//let letterBox  = SVGPathCommander.getPathBBox(addingLetter)
 		//let textBox = SVGPathCommander.getPathBBox(stringBox)
@@ -188,9 +209,9 @@ const TextPanel = observer(() => {
 			translateX = selectedText.coords.x + textBox.width - letterBox.x
 		//случай если строка начиается с пробелов
 		} else if ( index - spaceK/5 === 0) {	
-			translateX = selectedText.coords.x + textBox.width - letterBox.x + selectedText.kerning * spaceK
+			translateX = selectedText.coords.x + textBox.width - letterBox.x + selectedText.kerning * spaceK* scaleX
 		} else {
-			translateX =  textBox.x2  + selectedText.kerning * spaceK - letterBox.x
+			translateX =  textBox.x2  + selectedText.kerning * spaceK * scaleX - letterBox.x
 		}
 		
 		let addingLetterPath /* = util.applyTransform(addingLetter, scale, scale, 0, 0,{angle: 0, x:0, y:0})

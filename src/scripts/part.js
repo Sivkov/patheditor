@@ -1,7 +1,7 @@
 import axios from 'axios';
 import util from '../utils/util';
 import CONSTANTS from '../constants/constants.js';
-import SVGPathCommander from 'svg-path-commander';
+
 
 
 class Part {
@@ -83,7 +83,7 @@ class Part {
         if ( window.location.href.includes('parteditor')) {   
             ncpLines = ncpCode.code
         } else {
-            ncpLines = CONSTANTS.code1
+            ncpLines = CONSTANTS.code3
         }
      
         let currentX, currentY
@@ -366,7 +366,8 @@ class Part {
 		for (let i = 0; i < inners.length; i++) {
             let id1= inners[i].cid
             let p1 =  inners[i].path
-            let rect1 = SVGPathCommander.getPathBBox (p1)
+            //let rect1 = SVGPathCommander.getPathBBox (p1)
+            let rect1 = util.fakeBox (p1)
 
    
             for (let j =i+1; j < inners.length; j++) {
@@ -374,7 +375,8 @@ class Part {
                 if (id1 !== id2) {
 
                    let p2 =  inners[j].path 
-                   let rect2 = SVGPathCommander.getPathBBox (p2)
+                   //let rect2 = SVGPathCommander.getPathBBox (p2)
+                   let rect2 = util.fakeBox (p2)
                    let collisionAABB = Part.intersectsAABB(rect1, rect2)    
                     if (  collisionAABB  ) {   
                             

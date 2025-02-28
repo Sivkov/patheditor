@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import svgStore from "../stores/svgStore.js";
 import { useEffect, useState, useRef } from 'react';
 import SVGPathCommander from 'svg-path-commander';
-import Util from '../../utils/util.js';
+import util from '../../utils/util.js';
 //import { toJS } from "mobx";
 import inlet from '../../scripts/inlet.js';
 import { addToLog } from './../../scripts/addToLog.js';
@@ -125,8 +125,8 @@ const ContourPanel = observer(() => {
 
 		const box = SVGPathCommander.getPathBBox(path);
 		if (box) {
-			let w = Util.round(box.width, 3)
-			let h= Util.round(box.height, 3)
+			let w = util.round(box.width, 3)
+			let h= util.round(box.height, 3)
 			setWH({w,h})
 
 		}
@@ -147,7 +147,7 @@ const ContourPanel = observer(() => {
 			y=box.y2
 		}
 
-		if(activeCooord) setActiveCoord({x:Util.round(x, 3),y:Util.round(y, 3)})	
+		if(activeCooord) setActiveCoord({x:util.round(x, 3),y:util.round(y, 3)})	
 	}
 
 	const captureInput = (event) => {
@@ -180,6 +180,8 @@ const ContourPanel = observer(() => {
 		let val = Number(e.currentTarget.textContent)
 		let path = svgStore.getSelectedElement('path') 
 		let cid =  svgStore.getSelectedElement('cid') 
+		let classes = svgStore.getElementByCidAndClass ( cid, 'contour', 'class')
+
 		//TODO нижнюю строку убрать и далее при вращении относительно любой точке
 		// кроме центра необходимо учитывать смещение относительно высоты ширины
 		 
@@ -197,15 +199,41 @@ const ContourPanel = observer(() => {
 		if (e.key === 'Enter' || e.key === 'Return' || e.key === 'Tab') {
 			
 			if (e.key === 'Enter') e.preventDefault();			
-			let newPath = Util.transformContour(path, id, val, params)
+			let updPathParams = util.transformContour(path, id, val, params)
+			let newPath = updPathParams.newPath 
 			newPath = SVGPathCommander.normalizePath( newPath ).toString().replaceAll(',', ' ')
+			let res;
 			if(id === 'contourRotateValue') {
-				let res = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath, {angle: angle, x:activeCooord.x, y:activeCooord.y} )
+				res = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath, {angle: angle, x:activeCooord.x, y:activeCooord.y} )
 				inlet.applyNewPaths( res )			
 			} else {
-				let res = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath )
+				res = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath )
 				inlet.applyNewPaths( res )			
 			};
+			//UPDATE SKELETON TEXT PARAMS
+			if ( classes && classes.includes('skeletonText') && res) {
+				console.log ("skeletonText Detected updPathParams "+ JSON.stringify(updPathParams))
+				let box = util.fakeBox( updPathParams.newPath )
+
+				let textStart = {}//svgStore.getElementByCidAndClass( cid, 'contour', 'coords')
+				let scaleX = svgStore.getElementByCidAndClass( cid, 'contour', 'scaleX')
+				let scaleY = svgStore.getElementByCidAndClass( cid, 'contour', 'scaleY')
+				let kerning = svgStore.getElementByCidAndClass( cid, 'contour', 'kerning')
+				let fontSize = svgStore.getElementByCidAndClass( cid, 'contour', 'fontSize')
+
+				scaleX *= updPathParams.scaleX
+				scaleY *= updPathParams.scaleY
+
+				textStart.x = box.x - kerning * scaleX
+				textStart.y = box.y + fontSize * scaleY
+				let newStart = {x: textStart.x , y: textStart.y}
+
+				svgStore.updateElementValues(cid, 'contour', {
+					coords: newStart,
+					scaleX: textStart.x,
+					scaleY: textStart.y
+				});		
+			}
 		}	
 	}
 
@@ -218,7 +246,7 @@ const ContourPanel = observer(() => {
 		let outerPath = svgStore.getOuterElement('path')
 		let outerPathParams = SVGPathCommander.getPathBBox(outerPath)
 		let innerPathParams = SVGPathCommander.getPathBBox(path)
-		if ( classes.includes('outer')) {
+		if (classes && classes.includes('outer')) {
 			return;
 		}
 		if (direction === 'left' ) {
@@ -234,11 +262,21 @@ const ContourPanel = observer(() => {
 		} else if (direction === 'bottom') {
 			yDif = outerPathParams.y2 - innerPathParams.y2
 		} 
-		console.log (xDif, yDif)
-		newPath = Util.applyTransform(path, 1, 1, xDif, yDif, {angle: angle, x:0, y:0})
+		newPath = util.applyTransform(path, 1, 1, xDif, yDif, {angle: angle, x:0, y:0})
 		let resp = inlet.getNewInletOutlet(cid, 'contour', 'path', newPath )
-		inlet.applyNewPaths ( resp )
-
+		let res = inlet.applyNewPaths ( resp )
+		//UPDATE SKELETON TEXT PARAMS
+		if ( classes && classes.includes('skeletonText') && res) {
+			console.log ('Двигаем блок текста')
+			let textStart=  svgStore.getElementByCidAndClass( cid, 'contour', 'coords')
+			console.log ("skeletonText Detected in point "+ JSON.stringify(textStart))
+			let newStart = {
+				x: textStart.x + xDif, 
+				y: textStart.y + yDif
+			}
+			svgStore.updateElementValue(cid, 'contour', 'coords', newStart)			
+			console.log ("skeletonText new start from   "+ JSON.stringify(newStart))
+		}
 	} 
 
 	const panelInfo = [

@@ -177,6 +177,32 @@ const Selector = observer(() => {
 				part.initialRectLeft = newCoords.x
 				part.initialRectTop = newCoords.y	
 		}
+
+		//UPDATE SKELETON TEXT PARAMS
+		let classes =  svgStore.getSelectedElement('class')
+		if ( classes && classes.includes('skeletonText') && result) {
+			let box = Util.fakeBox(  newPath )
+
+			let textStart = {}
+			let curScaleX = svgStore.getElementByCidAndClass( cid, 'contour', 'scaleX')
+			let curScaleY = svgStore.getElementByCidAndClass( cid, 'contour', 'scaleY')
+			let kerning = svgStore.getElementByCidAndClass( cid, 'contour', 'kerning')
+			let fontSize = svgStore.getElementByCidAndClass( cid, 'contour', 'fontSize')
+
+			curScaleX *= scaleX
+			curScaleY *= scaleY
+
+			textStart.x = box.x - kerning * curScaleX
+			textStart.y = box.y + fontSize * curScaleY
+			let newStart = {x: textStart.x , y: textStart.y}
+
+			svgStore.updateElementValues(cid, 'contour', {
+				coords: newStart,
+				scaleX: curScaleX,
+				scaleY: curScaleY
+			});
+					
+		}
 	};
 
 	const handleMouseUp = (e) => {

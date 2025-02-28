@@ -2157,6 +2157,7 @@ class Inlet {
             if ( paths.hasOwnProperty('outlet')) svgStore.updateElementValue ( cid, 'outlet', 'path', outlet );
 		    if ( paths.hasOwnProperty('inlet')) svgStore.updateElementValue ( cid, 'inlet', 'path', inlet );
             if ( paths.hasOwnProperty('log')) addToLog(log)
+            return true
         }
     }   
 }
