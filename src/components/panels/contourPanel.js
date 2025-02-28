@@ -218,17 +218,18 @@ const ContourPanel = observer(() => {
 				let scaleY = svgStore.getElementByCidAndClass( cid, 'contour', 'scaleY')
 
 				let fakePath = 'M '+textStart.x +' '+textStart.y
-				let fuckPath = util.applyTransform (fakePath, updPathParams.scaleX, updPathParams.scaleY, updPathParams.translateX, updPathParams.translateY)
+				let fuckPath = util.applyTransform (fakePath, updPathParams.scaleX, updPathParams.scaleY, updPathParams.translateX, updPathParams.translateY, {angle: angle, x:activeCooord.x, y:activeCooord.y})
 				fuckPath = SVGPathCommander.normalizePath( fuckPath )
 				let newStart = { x: fuckPath[0][1], y: fuckPath[0][2] };
 
 				scaleX *= updPathParams.scaleX
 				scaleY *= updPathParams.scaleY
-				
+
 				svgStore.updateElementValues(cid, 'contour', {
 					coords: newStart,
 					scaleX: scaleX,
-					scaleY: scaleY
+					scaleY: scaleY,
+					angle: angle,					
 				});		
 			}
 		}	
@@ -264,15 +265,13 @@ const ContourPanel = observer(() => {
 		let res = inlet.applyNewPaths ( resp )
 		//UPDATE SKELETON TEXT PARAMS
 		if ( classes && classes.includes('skeletonText') && res) {
-			console.log ('Двигаем блок текста')
+			//console.log ('Двигаем блок текста')
 			let textStart=  svgStore.getElementByCidAndClass( cid, 'contour', 'coords')
-			console.log ("skeletonText Detected in point "+ JSON.stringify(textStart))
 			let newStart = {
 				x: textStart.x + xDif, 
 				y: textStart.y + yDif
 			}
 			svgStore.updateElementValue(cid, 'contour', 'coords', newStart)			
-			console.log ("skeletonText new start from   "+ JSON.stringify(newStart))
 		}
 	} 
 

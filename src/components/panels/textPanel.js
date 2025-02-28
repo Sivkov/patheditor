@@ -102,7 +102,8 @@ const TextPanel = observer(() => {
 
 		if (selectedTextValue === textareaValue) {
 			//false
-		} else if (selectedTextValue === textareaValue.slice(0,-1) && selectedTextValue.length) {
+			// это если текст вращали то по 1 букве уже не добавить
+		} else if (selectedTextValue === textareaValue.slice(0,-1) && selectedTextValue.length  && typeof selectedText.angle !== 'number') {
 			
 			console.log('add last letter')			
  			const lastLetter = textareaValue[textareaValue.length - 1];
@@ -159,7 +160,9 @@ const TextPanel = observer(() => {
 					index++;
 				}
 			});
-			svgStore.updateElementValue(selectedText.cid, 'contour', 'path', updatePath  )      
+			svgStore.updateElementValues(selectedText.cid, 'contour', 
+				{'path':updatePath, angle:false}  
+			)      
 
 		}
 		svgStore.updateElementValue(selectedText.cid, 'contour', 'text', textareaRef.current.value )
@@ -214,27 +217,24 @@ const TextPanel = observer(() => {
 			translateX =  textBox.x2  + selectedText.kerning * spaceK * scaleX - letterBox.x
 		}
 		
-		let addingLetterPath /* = util.applyTransform(addingLetter, scale, scale, 0, 0,{angle: 0, x:0, y:0})
-		addingLetterPath  */= util.applyTransform(addingLetter, 1, 1, translateX, translateY,{angle: 0, x:0, y:0})
+		let addingLetterPath = util.applyTransform(addingLetter, 1, 1, translateX, translateY,{angle: 0, x:0, y:0})
 		return addingLetterPath		
 	} 
 
 	const setTextKerining =(e)=> {
 		let val = Number(e.target.value);
-		if (typeof val === "number" && val > 0) {
+		if (selectedText && typeof val === "number" && val > 0) {
 			console.log ('setTextKerining')
-			svgStore.updateElementValue(selectedText.cid, "contour", "kerning", val);
-			svgStore.updateElementValue(selectedText.cid, "contour", "text", '');
+			svgStore.updateElementValues(selectedText.cid, "contour", {"kerning":val, "text":''});
 			textCompare()
 		}
 	}
 
 	const setFontSize =(e)=> {
 		let val = Number(e.target.value);
-		if (typeof val === "number" && val > 0) {
+		if (selectedText && typeof val === "number" && val > 0) {
 			console.log ('setFontSize')
-			svgStore.updateElementValue(selectedText.cid, "contour", "fontSize", val);
-			svgStore.updateElementValue(selectedText.cid, "contour", "text", "");
+			svgStore.updateElementValues(selectedText.cid, "contour", {"fontSize":val, "text":""});
 			textCompare()
 		}
 	}

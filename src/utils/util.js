@@ -294,18 +294,13 @@ class Util {
     }
 
     static applyTransform(path, scaleX, scaleY, translateX, translateY, rotate={angle: 0, x:0, y:0}, update = true, element =false, updatePanels=true) {
-        //console.log(arguments)
-        //const mybigPathBBox = SVGPathCommander.getPathBBox(path);
-        //const mybigPathBBox = text.fakeBox(path);
-        //$('#inletModeSet').trigger('click')
         var transformed = svgPath(path)
             .scale(scaleX, scaleY)
             .translate(translateX, translateY)
-            .rotate(rotate.angle, rotate.x /*+ mybigPathBBox.width * 0.5*/, rotate.y /*+ mybigPathBBox.height * 0.5*/)
+            .rotate( rotate.angle, rotate.x, rotate.y )
             .toString();
         
 		return transformed
-     
     }
 
 	static 	pathToPolyline(path, segments = 1) {

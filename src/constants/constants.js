@@ -12,7 +12,7 @@ const CONSTANTS = {
 			mini: true,
 			style: {
 				top: 40,
-				left: 15,
+				left: 12,
 				width: 350,
 				height: 300,
 			}
