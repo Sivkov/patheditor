@@ -5,6 +5,7 @@ import Util from "../utils/util.js";
 import inlet from "../scripts/inlet.js";
 import { useEffect, useState } from "react";
 import { addToLog } from './../scripts/addToLog.js';
+import SVGPathCommander from "svg-path-commander";
 
 const Selector = observer(() => {
 
@@ -181,27 +182,22 @@ const Selector = observer(() => {
 		//UPDATE SKELETON TEXT PARAMS
 		let classes =  svgStore.getSelectedElement('class')
 		if ( classes && classes.includes('skeletonText') && result) {
-			let box = Util.fakeBox(  newPath )
-
-			let textStart = {}
+			let textStart=  svgStore.getElementByCidAndClass( cid, 'contour', 'coords')
 			let curScaleX = svgStore.getElementByCidAndClass( cid, 'contour', 'scaleX')
 			let curScaleY = svgStore.getElementByCidAndClass( cid, 'contour', 'scaleY')
-			let kerning = svgStore.getElementByCidAndClass( cid, 'contour', 'kerning')
-			let fontSize = svgStore.getElementByCidAndClass( cid, 'contour', 'fontSize')
-
 			curScaleX *= scaleX
 			curScaleY *= scaleY
 
-			textStart.x = box.x - kerning * curScaleX
-			textStart.y = box.y + fontSize * curScaleY
-			let newStart = {x: textStart.x , y: textStart.y}
-
+			let fakePath = 'M '+textStart.x +' '+textStart.y
+			let fuckPath = Util.applyTransform (fakePath, scaleX, scaleY, translateX, translateY)
+			fuckPath = SVGPathCommander.normalizePath( fuckPath )
+			let newStart = { x: fuckPath[0][1], y: fuckPath[0][2] };
+			
 			svgStore.updateElementValues(cid, 'contour', {
 				coords: newStart,
 				scaleX: curScaleX,
 				scaleY: curScaleY
-			});
-					
+			});					
 		}
 	};
 

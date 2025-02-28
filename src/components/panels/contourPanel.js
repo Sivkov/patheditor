@@ -212,26 +212,23 @@ const ContourPanel = observer(() => {
 			};
 			//UPDATE SKELETON TEXT PARAMS
 			if ( classes && classes.includes('skeletonText') && res) {
-				console.log ("skeletonText Detected updPathParams "+ JSON.stringify(updPathParams))
-				let box = util.fakeBox( updPathParams.newPath )
 
-				let textStart = {}//svgStore.getElementByCidAndClass( cid, 'contour', 'coords')
+				let textStart = svgStore.getElementByCidAndClass( cid, 'contour', 'coords')
 				let scaleX = svgStore.getElementByCidAndClass( cid, 'contour', 'scaleX')
 				let scaleY = svgStore.getElementByCidAndClass( cid, 'contour', 'scaleY')
-				let kerning = svgStore.getElementByCidAndClass( cid, 'contour', 'kerning')
-				let fontSize = svgStore.getElementByCidAndClass( cid, 'contour', 'fontSize')
+
+				let fakePath = 'M '+textStart.x +' '+textStart.y
+				let fuckPath = util.applyTransform (fakePath, updPathParams.scaleX, updPathParams.scaleY, updPathParams.translateX, updPathParams.translateY)
+				fuckPath = SVGPathCommander.normalizePath( fuckPath )
+				let newStart = { x: fuckPath[0][1], y: fuckPath[0][2] };
 
 				scaleX *= updPathParams.scaleX
 				scaleY *= updPathParams.scaleY
-
-				textStart.x = box.x - kerning * scaleX
-				textStart.y = box.y + fontSize * scaleY
-				let newStart = {x: textStart.x , y: textStart.y}
-
+				
 				svgStore.updateElementValues(cid, 'contour', {
 					coords: newStart,
-					scaleX: textStart.x,
-					scaleY: textStart.y
+					scaleX: scaleX,
+					scaleY: scaleY
 				});		
 			}
 		}	
