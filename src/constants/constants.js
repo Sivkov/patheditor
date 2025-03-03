@@ -4,6 +4,7 @@ const CONSTANTS = {
 	defaultInletIntend: 1,
 	defaultInletLength: 5,
 	defaultStringInterval:18,
+	defaultJointSize: 0.2,
     contourTypes:['engraving', 'inner', 'outer'],
     operatingModes:['macro0', 'macro1','macro2', 'macro3', 'macro4', 'macro5', ],
     piercingModes: {'normal':0, 'without_time':-1, 'pulse':1},
@@ -93,6 +94,15 @@ const CONSTANTS = {
 			mini: true,
 			style: {
 				top: 280,
+				left: 12,
+				width: 350,
+				height: 120,
+			}
+		},
+		jointPopup: {
+			mini: true,
+			style: {
+				top: 320,
 				left: 12,
 				width: 350,
 				height: 120,

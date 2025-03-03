@@ -1535,3 +1535,9 @@ top:var(--hEdge);
   stroke: yellow;
   stroke-width: 0.5;
 }
+
+.joint path{
+  stroke-width: 0.5;
+  stroke: white;
+
+}

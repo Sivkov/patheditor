@@ -9,7 +9,7 @@ import OutletPanel from './outletPanel';
 import PointPanel from './pointPanel ';
 import EdgePanel from './edgePanel';
 import TextPanel from './textPanel';
-
+import JointPanel from './jointPanel';
 
 const Panels =  () => {
 
@@ -25,6 +25,7 @@ const Panels =  () => {
 			<PointPanel />
 			<EdgePanel />
 			<TextPanel />
+			<JointPanel />
 		</>
 	);
 };
