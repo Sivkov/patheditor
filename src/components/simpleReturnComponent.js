@@ -13,8 +13,6 @@ const SimpleReturnComponent = observer(() => {
 
 	const {
 		selectedCid,
-		//selectedPath,
-		//selectedInletPath
 	} = svgStore;
 
 	useEffect(() => {
@@ -51,7 +49,7 @@ const SimpleReturnComponent = observer(() => {
 			}
 		} else if (e.button === 0 && editorStore.mode === 'text') {
 			
-			console.log ('пиу пиу')
+			//console.log ('пиу пиу')
 
 			if (e.currentTarget.classList.contains('skeletonText')) {
 				let cid = Number(e.currentTarget.getAttribute('data-cid'));

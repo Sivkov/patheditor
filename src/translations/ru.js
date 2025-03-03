@@ -420,7 +420,8 @@ let ru = {
     "Added new point to path":"Добавлена точка к пути",
     "Point deleted from path":"Точка удалена",
     "Edge rounded":"Грань скруглена",
-    "Use guides":"Использовать направляющие",  
+    "Use guides":"Использовать направляющие",
+    "Text was changed":"Текст был изменен",  
   
     }
 

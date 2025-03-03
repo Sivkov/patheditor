@@ -6,10 +6,9 @@ import svgStore from "../stores/svgStore.js";
 import panelStore from '../stores/panelStore.js';
 import { useEffect, useRef } from 'react';
 import util from '../../utils/util.js';
-//import { addToLog } from './../../scripts/addToLog.js';
+import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
 import GOST from '../../constants/gost.js';
-//import { toJS } from "mobx";
 import CONSTANTS from '../../constants/constants.js';
 
 
@@ -24,7 +23,7 @@ const TextPanel = observer(() => {
 		if (textareaRef.current) {
 		  	if (textFocus) {
 			
-				console.log("Handle focus", textFocus);
+				//console.log("Handle focus", textFocus);
 				miniTextPanel(false)
 				//TODO при смене значения textFocus в сторе не успевает уйти фокус и курсор не ставиться. Так что пока так.
 				setTimeout(()=>{
@@ -105,7 +104,7 @@ const TextPanel = observer(() => {
 			// это если текст вращали то по 1 букве уже не добавить
 		} else if (selectedTextValue === textareaValue.slice(0,-1) && selectedTextValue.length  && typeof selectedText.angle !== 'number') {
 			
-			console.log('add last letter')			
+			//console.log('add last letter')			
  			const lastLetter = textareaValue[textareaValue.length - 1];
 			const string = selectedTextValue.split('\n').reverse()[0] 
 			const index = string.length
@@ -121,11 +120,12 @@ const TextPanel = observer(() => {
 
 			const stringBox = (string && pathsInLastString) ? paths.slice( -pathsInLastString ).join('') : ''
 			let res = insertLetter(lastLetter, index, textareaValue.length - 1, stringNum, stringBox)||'';
-			svgStore.updateElementValue(selectedText.cid, 'contour', 'path', selectedText.path + res  )      
+			svgStore.updateElementValue(selectedText.cid, 'contour', 'path', selectedText.path + res  )   
+			addToLog("Text was changed")   
 
 		} else if (selectedTextValue.slice(0,-1) === textareaValue) {
 
-			console.log('delete last letter')
+			//console.log('delete last letter')
 			const lastLetter = selectedTextValue[selectedTextValue.length - 1];
 			const pathsInLetter = GOST[lastLetter] ? ( GOST[lastLetter].match(/M/gm)||'' ).length : 0
 
@@ -139,12 +139,12 @@ const TextPanel = observer(() => {
 					paths = paths.slice(0, -pathsInLetter).join(''); // Удаляем последние n путей
 				}
 				svgStore.updateElementValue(selectedText.cid, 'contour', 'path', paths);
+				addToLog("Text was changed")
 			}
 
 		} else {
-			console.log('Перерисовываем все заново !!')
+			//console.log('Перерисовываем все заново !!')
 			let updatePath= ''
-			//svgStore.updateElementValue(selectedText.cid, 'contour', 'path', '' )
 			let string = 0
 			let stringBox = ''
 			let index = 0
@@ -162,7 +162,8 @@ const TextPanel = observer(() => {
 			});
 			svgStore.updateElementValues(selectedText.cid, 'contour', 
 				{'path':updatePath, angle:false}  
-			)      
+			)  
+			addToLog("Text was changed")   
 
 		}
 		svgStore.updateElementValue(selectedText.cid, 'contour', 'text', textareaRef.current.value )
