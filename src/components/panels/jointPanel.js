@@ -1,27 +1,74 @@
  import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
-import svgStore from "../stores/svgStore.js";
- import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import util from '../../utils/util.js';
 //import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
-import GOST from '../../constants/gost.js';
-//import { toJS } from "mobx";
+ //import { toJS } from "mobx";
 import CONSTANTS from '../../constants/constants.js';
 import { addToLog } from '../../scripts/addToLog.js';
+import jointStore from '../stores/jointStore.js';
+import svgStore from '../stores/svgStore.js';
 
 
 
 
 const JointPanel = observer(() => {
 	const { t } = useTranslation();
+	const { jointsForSelectedCid } = jointStore
 	const { selectedCid } = svgStore
+	const jointQuantity = useRef(null);
+	const jointDistance = useRef(null);
 
-	const setNewJointQuantity =()=> {}
-	const setNewJointQuantityD =()=> {}
-	const setJointAtEnd =()=> {}
-	const removeJointAtEnd =()=> {}
+	const setJointQuantity =(e)=> {
+		if (jointsForSelectedCid) {
+			if ( jointsForSelectedCid.quantity) {
+				jointStore.updJointVal( selectedCid, 'quantity', false ); 
+			} else {
+				let val = +jointQuantity.current.value
+				jointStore.updJointVal( selectedCid, 'quantity', val ); 
+			}
+		} else {
+			let val = +jointQuantity.current.value
+			jointStore.updJointVal( selectedCid, 'quantity', val); 
+		}
+	}
+
+	const setNewJointQuantity =()=> {
+		let val = +jointQuantity.current.value
+		jointStore.updJointVal( selectedCid, 'quantity',val ); 
+	}
+
+	const setNewJointDistance =()=> {
+		let val = +jointDistance.current.value
+		jointStore.updJointVal( selectedCid, 'distance',val ); 
+
+	}
+
+	const updJointAtEnd = (e) => {
+ 		if (jointsForSelectedCid) {
+			if (jointsForSelectedCid.atEnd) {
+				jointStore.updJointVal(selectedCid, 'atEnd', false)
+			} else {
+				jointStore.updJointVal(selectedCid, 'atEnd', true)
+			}
+		} else {
+			jointStore.updJointVal(selectedCid, 'atEnd', true)
+		}
+	};
+
+
+
+	const setJointDistance =(e)=> {
+		if (jointsForSelectedCid && jointsForSelectedCid.distance) {
+			jointStore.updJointVal( selectedCid, 'distance',!Boolean(jointsForSelectedCid && jointsForSelectedCid.distance) ); 
+		} else {
+			let val = +jointDistance.current.value
+			jointStore.updJointVal( selectedCid, 'distance', val ); 
+		}
+	}
+
 	const addingJointMode =()=>{}
 	const removeJointMode =()=>{}
 	const detectJointsClasses =()=>{}
@@ -30,7 +77,7 @@ const JointPanel = observer(() => {
 	const panelInfo = 
 		  {
 			id: 'jointPopup',
-			fa: (<><i class="fa-solid fa-xmark me-2" /><div>{t('Joint')}</div></>),
+			fa: (<><i className="fa-solid fa-xmark me-2" /><div>{t('Joint')}</div></>),
 			content:  (
 	<div className="d-flex flex-column">
 		<table className="table">
@@ -63,8 +110,14 @@ const JointPanel = observer(() => {
 									<div>
 										<div className="d-flex align-items-baseline">
 											<div className="form-check text-left ms-4">
-												<input className="form-check-input mt-0 mt-0 popup-input" type="checkbox"
-													name="jointAuto" id="jointAutoDistributedD" />
+												<input 
+													className="form-check-input mt-0 mt-0 popup-input" 
+													type="checkbox"
+													name="jointAuto" 
+													id="jointAutoDistributedD" 
+													checked={!!jointsForSelectedCid?.distance} 
+													onChange={ setJointDistance }												
+												/>
 												<label className="form-check-label" htmlFor="jointAutoDistributedD">
 													<div>
 														{t('Distance ')}
@@ -72,16 +125,31 @@ const JointPanel = observer(() => {
 												</label>
 											</div>
 											<div className="d-flex align-items-center">
-												<input className="ms-3 popup_input me-1" style={{ width: 50,
-													textAlign: "center" }} id="jointQuantityD" type="number" min={10}
-													step={1} defaultValue={50} />
+												<input className="ms-3 popup_input me-1" 
+													style={{ width: 50,
+													textAlign: "center" }} 
+													id="jointQuantityD" 
+													type="number" 
+													min={10}
+													step={1} 
+													defaultValue={50} 
+													value={ jointsForSelectedCid && jointsForSelectedCid.distance ? jointsForSelectedCid.distance : 50}
+													onChange={ setNewJointDistance }
+													ref={jointDistance}
+												/>
 												{t('mm')}
 											</div>
 										</div>
 										<div className="d-flex align-items-baseline">
 											<div className="form-check text-left ms-4">
-												<input className="form-check-input mt-0 mt-0 popup-input" type="checkbox"
-													name="jointAuto" id="jointAutoDistributed" />
+												<input 
+													className="form-check-input mt-0 mt-0 popup-input" 
+													type="checkbox"
+													name="jointAuto" 
+													id="jointAutoDistributed" 
+													checked={!!jointsForSelectedCid?.quantity} 
+													onChange={(e) => setJointQuantity(e.target.checked ? 1 : 0)}
+												/>												
 												<label className="form-check-label" htmlFor="jointAutoDistributed">
 													<div>
 														{t('Quantity')}
@@ -89,15 +157,31 @@ const JointPanel = observer(() => {
 												</label>
 											</div>
 											<div className="d-flex align-items-center">
-												<input className="ms-3 popup_input me-1" style={{ width: 50,
-													textAlign: "center" }} id="jointQuantity" type="number" min={1} step={1}
-													defaultValue={1} />
+												<input className="ms-3 popup_input me-1" 
+													style={{ width: 50,
+													textAlign: "center" }} 
+													id="jointQuantity" 
+													type="number" 
+													min={1} 
+													step={1}
+													defaultValue={1} 
+													onChange={ setNewJointQuantity }
+													ref={jointQuantity}
+													value={ jointsForSelectedCid &&  jointsForSelectedCid.quantity ? jointsForSelectedCid.quantity : 1}
+												/>
 												{t('pcs')}
 											</div>
 										</div>
 										<div className="form-check text-left ms-4">
-											<input className="form-check-input mt-0" type="checkbox" name="jointAuto"
-												id="jointAutoToEnd" />
+											<input className="form-check-input mt-0" 
+												type="checkbox" 
+												name="jointAuto"
+												id="jointAutoToEnd"
+												onChange={ updJointAtEnd } 
+												//checked = { jointsForSelectedCid &&  jointsForSelectedCid.atEnd}
+												checked={!!jointsForSelectedCid?.atEnd} 
+
+												/>
 											<label className="form-check-label" htmlFor="jointAutoToEnd">
 												<div>
 													{t('toEnd')}
@@ -123,7 +207,10 @@ const JointPanel = observer(() => {
 										<div className="form-check text-left ms-4">
 											<input
 												className="btn_tool btn_remove_joint form-check-input mt-0 btn_joint_mode"
-												type="radio" name="jointManual" id="jointManualRemove" />
+												type="radio" 
+												name="jointManual" 
+												id="jointManualRemove" 
+												/>
 											<label className="btn_tool btn_remove_joint form-check-label"
 												htmlFor="jointManualRemove">
 												<div>
@@ -145,7 +232,8 @@ const JointPanel = observer(() => {
 												defaultValue={CONSTANTS.defaultJointSize} 
 												min={0} 
 												max={5} 
-												step="0.1" />
+												step="0.1" 
+												/>
 											<label className="form-check-label" htmlFor="jointManualAdd">
 												<div>{t('mm')}</div>
 											</label>
