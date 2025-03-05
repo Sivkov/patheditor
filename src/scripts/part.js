@@ -4,6 +4,7 @@ import CONSTANTS from '../constants/constants.js';
 
 
 
+
 class Part {
     constructor() {
         this.primaryTimeout = false
@@ -78,19 +79,20 @@ class Part {
     
     static ncpToSvg(ncpCode, number) {
         let svg = []
+        let joints = []
         let ncpLines;
         console.log ('ncp to svg') 
         if ( window.location.href.includes('parteditor')) {   
             ncpLines = ncpCode.code
         } else {
-            ncpLines = CONSTANTS.code3
+            ncpLines = CONSTANTS.code6
         }
      
         let currentX, currentY
         let path = 'closed'
         let mode = ''
         let cid;
-        let jointContainerOpen = false;
+        //let jointContainerOpen = false;
         for (const line of ncpLines) {
             if (line.includes('(<Part id="')) {
                 Part.width = +util.getAttributeValue(line, 'originx')
@@ -259,25 +261,20 @@ class Part {
                 }
             } else if (line.includes('</Contour')) {
                 path = 'closed'
-                jointContainerOpen = false
+                //jointContainerOpen = false
 
             } else if (line.includes('(<Joint')){
-                /*let x = +util.getAttributeValue(line, 'x')
+                let x = +util.getAttributeValue(line, 'x')
                 let y = +util.getAttributeValue(line, 'y')
                 let dp = +util.getAttributeValue(line, 'dp');
-                let length = +util.getAttributeValue(line, 'length');
-                let path =  util.getJoint(x,y)
-                let uuid = util.uuid()
-                let jointClass = 'manual'
-                if (!jointContainerOpen){
-                    jointContainerOpen = true
-                    document.querySelector('#jointSize').value = length
-                    this.joints+=`<g data-cid="${cid}" fill="none" class="joint" stroke="white" stroke-width="0.5">`
-                }
-                this.joints=this.joints.replace(/<\/g>$/g,'')
-                this.joints+=`<path d="${path}" fill="none" id="${uuid}" class="joint ${jointClass}" data-dist="${dp}" data-length='${length}'></path>`
-                this.joints+=`</g>`;  */
+                let d = +util.getAttributeValue(line, 'd');
+                let d1 = +util.getAttributeValue(line, 'd1');
 
+                let length = +util.getAttributeValue(line, 'length');
+                //let path =  util.getJoint(x,y)
+                //let uuid = util.uuid()
+                let jj = { [`${cid}`] :{dp,length,x,y,d,d1}}
+                joints.push(jj)         
             } 
         }
         let que = ['outer', 'contour','engraving', 'inlet', 'outlet', 'joint'].reverse()
@@ -323,7 +320,13 @@ class Part {
         let pcode = util.getValueFromString(ncpLines[1], 'code', false).replaceAll('="', '').replaceAll('">)', '')
         let uuid = util.getValueFromString(ncpLines[2], 'uuid', false).replaceAll('="', '').replaceAll('">)', '')
 		//console.log (svg)        
-        return {width: Part.width, height: Part.height,code:svg, params:{ id: number, code: pcode, uuid: uuid}}        
+        return {
+            width: Part.width, 
+            height: Part.height,
+            code:svg, 
+            params:{ id: number, code: pcode, uuid: uuid},
+            joints:joints,
+        }        
     }
 
     static detectContourType (classes) {

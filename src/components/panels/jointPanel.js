@@ -172,21 +172,22 @@ const JointPanel = observer(() => {
 												{t('pcs')}
 											</div>
 										</div>
-										<div className="form-check text-left ms-4">
-											<input className="form-check-input mt-0" 
-												type="checkbox" 
-												name="jointAuto"
-												id="jointAutoToEnd"
-												onChange={ updJointAtEnd } 
-												//checked = { jointsForSelectedCid &&  jointsForSelectedCid.atEnd}
-												checked={!!jointsForSelectedCid?.atEnd} 
+										<div className="d-flex align-items-baseline mt-1">
+											<div className="form-check text-left ms-4">
+												<input className="form-check-input mt-0" 
+													type="checkbox" 
+													name="jointAuto"
+													id="jointAutoToEnd"
+													onChange={ updJointAtEnd } 
+													checked={!!jointsForSelectedCid?.atEnd} 
 
-												/>
-											<label className="form-check-label" htmlFor="jointAutoToEnd">
-												<div>
-													{t('toEnd')}
-												</div>
-											</label>
+													/>
+												<label className="form-check-label" htmlFor="jointAutoToEnd">
+													<div>
+														{t('toEnd')}
+													</div>
+												</label>
+											</div>
 										</div>
 									</div>
 								</div>

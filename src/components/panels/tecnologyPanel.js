@@ -5,11 +5,13 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import svgStore from '../stores/svgStore';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
+import jointStore from '../stores/jointStore';
 
 
 const TecnologyPanel =  observer(() => {
 	const { t } = useTranslation();
 	const { tecnology } = svgStore
+	const { jointPositions } = jointStore
 	const panelInfo = [
 		  {
 			id: 'contourModesPopup',
@@ -96,7 +98,7 @@ const TecnologyPanel =  observer(() => {
 					  <tr style={{ backgroundColor: '#212529' }}>
 						<td colSpan="2">{t('Tags')}</td>
 					  </tr>
-					  {tecnology.includes('joint') && (<tr>
+					  { jointPositions.length > 0 && (<tr>
 						<td>{t('Joint')}</td>
 						<td>
 						  <i className="fa-solid fa-xmark"></i>

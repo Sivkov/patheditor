@@ -3,6 +3,7 @@ import svgStore from "./stores/svgStore.js";
 import editorStore from "./stores/editorStore.js";
 import Part from "./../scripts/part";
 import React, { useEffect } from 'react';
+import jointStore from "./stores/jointStore.js";
 
 const SimpleReturnComponent = observer(() => {
 
@@ -25,6 +26,7 @@ const SimpleReturnComponent = observer(() => {
 				params: svg.params
 			};
 			svgStore.setSvgData(newSvgData);
+			jointStore.loadJoints (svg.joints)			
 		};
 		fetchData();
 
