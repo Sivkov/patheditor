@@ -422,7 +422,10 @@ let ru = {
     "Edge rounded":"Грань скруглена",
     "Use guides":"Использовать направляющие",
     "Text was changed":"Текст был изменен",  
-  
+    "Updated joints":"Перемычки обновлены",
+    "Added joint":"Перемычка добавлена",
+    "Removed joint":"Перемычка удалена",
+
     }
 
     export default ru;

@@ -13,8 +13,6 @@ import svgStore from '../stores/svgStore.js';
 import editorStore from '../stores/editorStore.js';
 
 
-
-
 const JointPanel = observer(() => {
 	const { t } = useTranslation();
 	const { jointsForSelectedCid } = jointStore
@@ -34,17 +32,19 @@ const JointPanel = observer(() => {
 			let val = +jointQuantity.current.value
 			jointStore.updJointVal( selectedCid, 'quantity', val); 
 		}
+		addToLog("Updated joints")
 	}
 
 	const setNewJointQuantity =()=> {
 		let val = +jointQuantity.current.value
 		jointStore.updJointVal( selectedCid, 'quantity',val ); 
+		addToLog("Updated joints")
 	}
 
 	const setNewJointDistance =()=> {
 		let val = +jointDistance.current.value
 		jointStore.updJointVal( selectedCid, 'distance',val ); 
-
+		addToLog("Updated joints")
 	}
 
 	const updJointAtEnd = (e) => {
@@ -57,9 +57,8 @@ const JointPanel = observer(() => {
 		} else {
 			jointStore.updJointVal(selectedCid, 'atEnd', true)
 		}
+		addToLog("Updated joints")
 	};
-
-
 
 	const setJointDistance =(e)=> {
 		if (jointsForSelectedCid && jointsForSelectedCid.distance) {
@@ -68,13 +67,10 @@ const JointPanel = observer(() => {
 			let val = +jointDistance.current.value
 			jointStore.updJointVal( selectedCid, 'distance', val ); 
 		}
+		addToLog("Updated joints")
 	}
 
-	const addingJointMode =()=>{}
-	const removeJointMode =()=>{}
-	const detectJointsClasses =()=>{}
-
-
+	
 	const panelInfo = 
 		  {
 			id: 'jointPopup',

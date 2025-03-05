@@ -30,6 +30,8 @@ const  SvgWrapper = observer (() => {
 
 	} =  svgStore
 
+	const { jointPositions } = jointStore
+
 	const { a, b, c, d, e, f } = matrix
 	const [wrapperClass, setWrapperClass] = useState('')
 	const inMoveRef = useRef(0); 
@@ -203,11 +205,27 @@ const  SvgWrapper = observer (() => {
  				}		
 			})
 			let manualDp = util.calculatePathPercentageOptimized (point.cid, point.x, point.y)
-			jointStore.updJointVal(point.cid, 'manual', manualDp);		
+			jointStore.updJointVal(point.cid, 'manual', manualDp);	
+			addToLog("Added joint")				
 			
 			
 		} else if (e.button === 0 && editorStore.mode === 'removeJoint') {
-			console.log ('Removing joint')
+
+			let coords = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);			
+			let min = Infinity
+			let nearest;
+
+			jointPositions.forEach((j)=>{
+				let distance = util.distance(coords.x, coords.y, j.x, j.y )
+				if (distance < min) {
+  					min=distance;
+					nearest= j; 					 					
+ 				}					
+			})
+			//console.log ("TRY TO DELETE THIS" + JSON.stringify(nearest))
+			if (nearest) jointStore.removeJoint( nearest )
+			addToLog("Removed joint")
+
 		} else if (e.button === 2) {
 
 			let selectedEdge = util.selectEdge(e)

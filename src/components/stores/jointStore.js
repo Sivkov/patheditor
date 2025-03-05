@@ -37,7 +37,7 @@ class JointStore {
 					let x = last[last.length - 2];
 					let y = last[last.length - 1];
 					let percent = 100
-					positions.push({ x, y, percent });
+					positions.push({ x, y, percent, cid, origin:'atEnd' });
 				}
 			}
 
@@ -47,7 +47,7 @@ class JointStore {
 					let segmentLength = (totalLength / numSegments) * i;
 					let { x, y } = SVGPathCommander.getPointAtLength(path, segmentLength); // Берём точку на пути
 					let percent = segmentLength / totalLength *100
-					positions.push({ x, y, percent });
+					positions.push({ x, y, percent, cid, origin:'quantity' });
 				}
 			}
 
@@ -56,7 +56,7 @@ class JointStore {
 					for (let length = step; length < totalLength; length += step) {
 					let { x, y } = SVGPathCommander.getPointAtLength(path, length);
 					let percent = length / totalLength *100
-					positions.push({ x, y, percent });
+					positions.push({ x, y, percent, cid, origin:'distance'});
 				}
 			}
 
@@ -65,7 +65,7 @@ class JointStore {
 					if (typeof percent === 'number' && percent >= 0 && percent <= 100) {
 						let lengthAtPercent = (totalLength * percent) / 100;
 						let { x, y } = SVGPathCommander.getPointAtLength(path, lengthAtPercent);
-						positions.push({ x, y, percent });
+						positions.push({ x, y, percent, cid, origin:'manual' });
 					}
 				});
 			}
@@ -195,7 +195,26 @@ class JointStore {
 			Object.assign(this.joints[cid], { [param]: val });
 		}		
 	}
- 
+
+	removeJoint(params) {
+		const { cid, percent, origin } = params;
+		if (origin === 'manual' && this.joints[cid]?.manual) {
+			let newVal = this.joints[cid].manual.filter(a => a !== percent);
+			this.updJointVal(cid, 'manual', newVal);
+		}
+
+		if (origin === 'atEnd' && this.joints[cid]?.manual) {
+			this.updJointVal(cid, 'atEnd', false);
+		}
+
+		if (origin === 'distance' && this.joints[cid]?.manual) {
+			this.updJointVal(cid, 'distance', false);
+		}
+
+		if (origin === 'quantity' && this.joints[cid]?.manual) {
+			this.updJointVal(cid, 'quantity', false);
+		}
+	}
 }
 
 const jointStore = new JointStore();
