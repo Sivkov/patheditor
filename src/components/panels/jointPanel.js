@@ -10,6 +10,7 @@ import CONSTANTS from '../../constants/constants.js';
 import { addToLog } from '../../scripts/addToLog.js';
 import jointStore from '../stores/jointStore.js';
 import svgStore from '../stores/svgStore.js';
+import editorStore from '../stores/editorStore.js';
 
 
 
@@ -179,8 +180,7 @@ const JointPanel = observer(() => {
 													name="jointAuto"
 													id="jointAutoToEnd"
 													onChange={ updJointAtEnd } 
-													checked={!!jointsForSelectedCid?.atEnd} 
-
+													checked={!!jointsForSelectedCid?.atEnd}
 													/>
 												<label className="form-check-label" htmlFor="jointAutoToEnd">
 													<div>
@@ -194,31 +194,43 @@ const JointPanel = observer(() => {
 								<div className="tab-pane" id="nav-jointManual" role="tabpanel"
 									aria-labelledby="nav-jointManual-tab">
 									<div>
-										<div className="form-check text-left ms-4" style={{ marginTop: 32 }}>
-											<input
-												className="btn_tool btn_add_joint form-check-input mt-0 mt-0 btn_joint_mode"
-												type="radio" name="jointManual" id="jointManualAdd" />
-											<label className="btn_tool btn_add_joint form-check-label"
-												htmlFor="jointManualAdd">
-												<div>
-													{t('Add joint')}
-												</div>
-											</label>
+										<div className="d-flex align-items-baseline mt-1">
+											<div className="form-check text-left ms-4" >
+												<input
+													className="btn_tool btn_add_joint form-check-input mt-0 mt-0 btn_joint_mode"
+													type="radio" 
+													name="jointManual" 
+													id="jointManualAdd" 
+													onChange={ ()=>{ editorStore.setMode('addJoint')}}												
+													checked = {editorStore.mode === 'addJoint'}
+													/>
+												<label className="btn_tool btn_add_joint form-check-label"
+													htmlFor="jointManualAdd">
+													<div>
+														{t('Add joint')}
+													</div>
+												</label>
+											</div>
 										</div>
-										<div className="form-check text-left ms-4">
-											<input
-												className="btn_tool btn_remove_joint form-check-input mt-0 btn_joint_mode"
-												type="radio" 
-												name="jointManual" 
-												id="jointManualRemove" 
-												/>
-											<label className="btn_tool btn_remove_joint form-check-label"
-												htmlFor="jointManualRemove">
-												<div>
-													{t('Remove joint')}
-												</div>
-											</label>
+										<div className="d-flex align-items-baseline mt-1">
+											<div className="form-check text-left ms-4">
+												<input
+													className="btn_tool btn_remove_joint form-check-input mt-0 btn_joint_mode"
+													type="radio" 
+													name="jointManual" 
+													id="jointManualRemove" 
+													onChange={ ()=>{ editorStore.setMode('removeJoint')}}												
+													checked = {editorStore.mode === 'removeJoint'}
+													/>
+												<label className="btn_tool btn_remove_joint form-check-label"
+													htmlFor="jointManualRemove">
+													<div>
+														{t('Remove joint')}
+													</div>
+												</label>
+											</div>
 										</div>
+										
 									</div>
 									<hr className="dropdown-divider" />
 								</div>
@@ -233,8 +245,8 @@ const JointPanel = observer(() => {
 												defaultValue={CONSTANTS.defaultJointSize} 
 												min={0} 
 												max={5} 
-												step="0.1" 
-												/>
+												step="0.1" 												
+											/>
 											<label className="form-check-label" htmlFor="jointManualAdd">
 												<div>{t('mm')}</div>
 											</label>

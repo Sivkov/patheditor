@@ -5,7 +5,7 @@ import arc from "../scripts/arc";
 import inside from 'point-in-polygon-hao'
 import ClipperLib from 'clipper-lib'
 import svgStore from "../components/stores/svgStore";
-import { toJS } from 'mobx'; 
+//import { toJS } from 'mobx'; 
 
 class Util {
 
@@ -1650,6 +1650,23 @@ class Util {
 		document.querySelector('#fakePath').remove()
         return stringBox
     }
-}
+
+	static 	calculatePathPercentageOptimized(cid, x, y, step = 1) {
+		let closestLength = 0;
+		let minDistance = Infinity;
+		var fakePath = document.querySelector(`.contour[data-cid="${cid}"] path`);
+ 		const pathLength = fakePath.getTotalLength(fakePath);
+		for (let length = 0; length <= pathLength; length += step) {
+			const point = fakePath.getPointAtLength(length);
+			const distance = Math.hypot(point.x - x, point.y - y);
+			if (distance < minDistance) {
+				minDistance = distance;
+				closestLength = length;
+			}
+		}
+ 		const percentage = (closestLength / pathLength) * 100;		
+		return Math.max(0, Math.min(100, percentage)); 
+	} 	
+} 
 
 export default Util;

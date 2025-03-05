@@ -10,6 +10,7 @@ import Part from '../scripts/part.js';
 import inlet from './../scripts/inlet.js'
 import svgStore from './stores/svgStore.js';
 import { addToLog } from '../scripts/addToLog.js';
+import jointStore from './stores/jointStore.js';
 
 
 var tch = {}
@@ -183,6 +184,30 @@ const  SvgWrapper = observer (() => {
 			})
 			svgStore.setSelectedPointOnPath(point)
 
+		} else if (e.button === 0 && editorStore.mode === 'addJoint') {
+
+			console.log ('Adding joint')
+			let contours = svgStore.getFiltered('contour')
+			let coords = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);			
+			let min = Infinity
+			let point;
+			contours.forEach((contour)=>{
+				let path = contour.path
+				let nearest = util.findNearestPointOnPath (path, { x: coords.x, y: coords.y })
+				let distance = util.distance(coords.x, coords.y, nearest.x, nearest.y )
+				if (distance < min) {
+					min=distance
+					point=nearest
+ 					point.path= contour.path
+					point.cid = contour.cid
+ 				}		
+			})
+			let manualDp = util.calculatePathPercentageOptimized (point.cid, point.x, point.y)
+			jointStore.updJointVal(point.cid, 'manual', manualDp);		
+			
+			
+		} else if (e.button === 0 && editorStore.mode === 'removeJoint') {
+			console.log ('Removing joint')
 		} else if (e.button === 2) {
 
 			let selectedEdge = util.selectEdge(e)
@@ -384,6 +409,10 @@ const  SvgWrapper = observer (() => {
 			setWrapperClass('cursorSelecPoint')
 		} else if (editorStore.mode === 'text') {
 			setWrapperClass('cursorText')
+		} else if (editorStore.mode === 'addJoint') {
+			setWrapperClass('cursorAddJoint')
+		} else if (editorStore.mode === 'removeJoint') {
+			setWrapperClass('cursorRemoveJoint')
 		} else {
 			setWrapperClass('cursorArrow')
 		}

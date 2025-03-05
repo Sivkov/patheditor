@@ -180,10 +180,7 @@ class JointStore {
 				this.updJointVal(Number(cid), 'manual', manualDp);
 			}
 		});
-	}
-	
-	
-	
+	}	
 	
 	
 	updJointVal(cid, param, val) {
@@ -191,7 +188,12 @@ class JointStore {
 		if (!this.joints[cid]) {
 			this.joints[cid] = {atEnd:false,distance:false,quantity:false,manual:[]}; 
 		}
-		Object.assign(this.joints[cid], { [param]: val });
+		if (param === 'manual' && !Array.isArray(val)) {
+			let newVal =[...this.joints[cid]['manual'], val]
+			Object.assign(this.joints[cid], { [param]: newVal });
+		} else {
+			Object.assign(this.joints[cid], { [param]: val });
+		}		
 	}
  
 }

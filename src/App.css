@@ -290,6 +290,14 @@ cursor: url('./img/cursor_plus.cur'), auto !important;
   cursor: default !important;
 }
 
+.cursorAddJoint {
+  cursor: crosshair !important;
+}
+
+.cursorRemoveJoint {
+  cursor: url('./img/cursor_minus.cur'), auto !important;
+}
+
 .hidden,
 .hiddenNotDeleted {
     display: none !important;
