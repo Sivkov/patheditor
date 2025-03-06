@@ -348,8 +348,8 @@ const  SvgWrapper = observer (() => {
 			let xdif = dif.x - center.x
 
 			let matrixN = { a: scale, b: 0, c: 0, d: scale, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }
-			//TDOD ЗДЕСЬ в некоторых случаях вылезает ошибка и матрица  получает неверные значения
-			//  потестить где баг есть!!!
+			//TODO ЗДЕСЬ в некоторых случаях вылезает ошибка и матрица  получает неверные значения
+			////TODOTODO//TDOD  потестить где баг есть!!!
 			//svgStore.setGroupMatrix (matrixN)
 
  			coordsStore.setNeedToFit(false)
