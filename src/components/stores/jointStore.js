@@ -148,10 +148,12 @@ class JointStore {
 				}
 			}
 
-			usedDpValues = new Set(dpValues.filter(a => testArray.includes(a)));	
-			dValues = dValues.filter((_, i) => !usedDpValues.has(dpValues[i]));	
-			this.updJointVal(Number(cid), 'quantity',  bestStep - 1);	
-	
+			if (bestStep) {
+				usedDpValues = new Set(dpValues.filter(a => testArray.includes(a)));	
+				dValues = dValues.filter((_, i) => !usedDpValues.has(dpValues[i]));	
+				this.updJointVal(Number(cid), 'quantity',  bestStep - 1);	
+			}
+
 			// === 3. manual только для оставшихся joints ===
 			let manualDp = dpValues.filter(dp => !usedDpValues.has(dp));
 			if (manualDp.length > 0) {
