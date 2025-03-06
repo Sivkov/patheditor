@@ -215,6 +215,10 @@ class JointStore {
 			this.updJointVal(cid, 'quantity', false);
 		}
 	}
+
+	setData (data) {
+		Object.assign(this.joints, data);
+	}
 }
 
 const jointStore = new JointStore();

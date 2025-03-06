@@ -4,9 +4,11 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';  
 import logStore from '../stores/logStore.js'; 
 import svgStore from "../stores/svgStore.js";
+import jointStore from "../stores/jointStore.js";
 import { useEffect, useState } from 'react';
 import log from './../../scripts/log.js'
 import { useTranslation } from 'react-i18next';
+import { addToLog } from '../../scripts/addToLog.js';
 
 
 const LogPanel = observer(() => {
@@ -15,13 +17,7 @@ const LogPanel = observer(() => {
 		log.initDatabase()
 			.then(() => {
 				console.log('Database initialized.');	
-				let now = new Date().getTime();
-				logStore.add({ time: now, action: 'Ready to work' });
-					let data = {
-					id: now,
-					svg: JSON.stringify(svgStore.svgData),
-				};
-				log.save(data);
+				addToLog('Ready to work')
 			})
 			.catch((error) => {
 				console.error('Error initializing database or saving data:', error);
@@ -41,8 +37,9 @@ const LogPanel = observer(() => {
 			const tpoint = Number(e.currentTarget.getAttribute('data-stamp'));
 			//console.log('Restore from', tpoint);
 			const data = await log.load(tpoint);	
- 			//console.log('Loaded data:', data);
+ 			console.log('Loaded data:', data);
 			let parsed = JSON.parse(data.svg)
+			let joints = JSON.parse(data.joints)
 			if (parsed ) {
 				const newSvgData = {
 					width: parsed.width,
@@ -51,6 +48,7 @@ const LogPanel = observer(() => {
 					params: parsed.params,
 				  };
 				svgStore.setSvgData(newSvgData)
+				jointStore.setData(joints)
 			}		
 			logStore.makeNoteActive(tpoint)	
 			

@@ -9,6 +9,7 @@ function openDatabase() {
                 const objectStore = db.createObjectStore('save', { keyPath: 'id', autoIncrement: true });
                 objectStore.createIndex('part', 'part', { unique: false });
                 objectStore.createIndex('svg', 'svg', { unique: false });
+                objectStore.createIndex('joints', 'joints', { unique: false });
                 console.log('Created "save" object store in IndexedDB.');
             }
         };

@@ -2,10 +2,8 @@ import { Icon } from '@iconify/react';
 import Panel from './panel.js';
 import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';  
-import logStore from '../stores/logStore.js'; 
 import svgStore from "../stores/svgStore.js";
 import editorStore from "../stores/editorStore.js";
-import log from './../../scripts/log.js';
 import inlet from './../../scripts/inlet.js'
 import ShapeModalComponent from '../shapeModalComponent.js';
 import { addToLog } from '../../scripts/addToLog.js';
@@ -16,13 +14,7 @@ const ToolsPanel = observer(() => {
 	const deleteContour =()=>{
 		if  (svgStore.getSelectedElement()){
 			svgStore.deleteSelected()
-			let now = new Date().getTime()
-			logStore.add ({time: now ,action:'Contour deleted'})
-			let data = {
-				id: now,
-				svg: JSON.stringify(svgStore.svgData)
-			}
-			log.save(data)		
+			addToLog('Contour deleted')
 		}
 	}
 
