@@ -42,10 +42,10 @@ class JointStore {
 			}
 
 			if (jointData.hasOwnProperty('quantity') && jointData.quantity) {
-				let numSegments = jointData.quantity + 1; // Количество отрезков
-				for (let i = 1; i < numSegments; i++) { // Пропускаем первую (начальную) и последнюю точки
+				let numSegments = jointData.quantity + 1;
+				for (let i = 1; i < numSegments; i++) { 
 					let segmentLength = (totalLength / numSegments) * i;
-					let { x, y } = SVGPathCommander.getPointAtLength(path, segmentLength); // Берём точку на пути
+					let { x, y } = SVGPathCommander.getPointAtLength(path, segmentLength); 
 					let percent = segmentLength / totalLength *100
 					positions.push({ x, y, percent, cid, origin:'quantity' });
 				}
@@ -78,45 +78,16 @@ class JointStore {
 		return this.joints[svgStore.selectedCid] || null;
 	}
 
-/* 	loadJoints(loaded) {
-		let cids = new Set();
-		let jointMap = {}; 
-	
-		loaded.forEach((elm) => {
-			for (let key in elm) {
-				cids.add(key);
-				if (!jointMap[key]) {
-					jointMap[key] = [];
-				}
-				jointMap[key].push(elm);
-			}
-		});
-	
- 		cids.forEach((cid) => {
-			console.log(jointMap[cid]);
-	
-			jointMap[cid].forEach(j => {
-				const { dp, d, d1 } = j[cid];
-
-				if (d1 !== 0 && Math.abs(dp - (d / d1) * 100) < 0.01) {
-					this.updJointVal(Number(cid), 'atEnd', true);
-				}
-			});
-		});
-	} */
-
 	loadJoints(loaded) {
 		let cids = new Set();
 		let jointMap = {};
-	
-		// Группируем данные по cid
 		loaded.forEach((elm) => {
 			for (let key in elm) {
 				cids.add(key);
 				if (!jointMap[key]) {
 					jointMap[key] = [];
 				}
-				jointMap[key].push(elm[key]); // Сохраняем только значения
+				jointMap[key].push(elm[key]);  
 			}
 		});
 	
@@ -126,53 +97,60 @@ class JointStore {
 	
 			let dpValues = [];
 			let dValues = []; // Сюда собираем все d (расстояния)
-			
+	
 			jointMap[cid].forEach(j => {
-				const { dp, d, d1 } = j;
-	
+				const { dp, d, d1 } = j;	
 				// Проверяем atEnd
-				if (d1 !== 0 && Math.abs(dp - (d / d1) * 100) < 0.01) {
+				if (d1 !== 0 && Math.abs(Math.round(dp) - Math.round((d / d1) * 100)) < 1) {
 					this.updJointVal(Number(cid), 'atEnd', true);
+				} else {
+					dpValues.push(Math.round(dp * 100) / 100);
+					dValues.push(Math.round(d * 100) / 100);
 				}
-	
-				dpValues.push(dp);
-				dValues.push(d);
 			});
 	
-			let foundRule = false;
 			let usedDpValues = new Set();
-			let usedDValues = new Set();
-	
-			// === 1. Определяем quantity (шаг по dp) ===
-			if (dpValues.length > 1) {
-				dpValues.sort((a, b) => a - b);
-				let step = dpValues[1] - dpValues[0];
-				let isConsistent = dpValues.every((val, i, arr) => 
-					i === 0 || Math.abs(val - arr[i - 1] - step) < 0.01
-				);
-	
-				if (isConsistent && 100 % step === 0) {
-					this.updJointVal(Number(cid), 'quantity', (100 / step) - 1);
-					foundRule = true;
-					usedDpValues = new Set(dpValues);
-				}
-			}
+			let usedDValues = new Set();	
 	
 			// === 2. Определяем distance (шаг по d) только если quantity НЕ найден ===
-			if (!foundRule && dValues.length > 1) {
+			if (dValues.length > 1) {
 				dValues.sort((a, b) => a - b);
-				let minStep = dValues[1] - dValues[0];
+				for (let i = 0; i < dValues.length; i++) {
+					let testArray = [];
+					let dist = dValues[i];
+					let ii = 1;
+					while (ii * dist <= dValues[dValues.length - 1]) {
+						testArray.push(Math.round(ii * dist * 100) / 100);
+						ii++;
+					}
 	
-				let isDistanceConsistent = dValues.every((val, i, arr) => 
-					i === 0 || Math.abs(val - arr[i - 1] - minStep) < 0.01
-				);
-	
-				if (isDistanceConsistent) {
-					this.updJointVal(Number(cid), 'distance', minStep);
-					foundRule = true;
-					usedDValues = new Set(dValues);
+					if (testArray.every(value => dValues.includes(value))) {
+						usedDValues = new Set(dValues.filter(a => testArray.includes(a)));
+						dpValues = dpValues.filter((dp, i) => !usedDValues.has(dValues[i]));
+						this.updJointVal(Number(cid), 'distance', dist);
+						break;
+					}
 				}
 			}
+
+			// 1. Проверяем все возможные шаги dp от 1 до 50
+			let bestStep = null;
+			let testArray;
+			//console.log ('dpValues  ' + JSON.stringify(dpValues))
+			for (let step = 50; step >= 2; step--) { // Двигаемся от 50 к 2
+				testArray = Array.from({ length: (100 / step) - 1 }, (_, ind) => Math.round((100/step)*(ind+1) *100) /100).filter(a => a<100)
+				//console.log('Step:', step, JSON.stringify(testArray));
+			
+				if (testArray.every(value => dpValues.includes(value))) {
+					//console.log ('BEST STEP:   '+ step)
+					bestStep = step;
+					break							
+				}
+			}
+
+			usedDpValues = new Set(dpValues.filter(a => testArray.includes(a)));	
+			dValues = dValues.filter((_, i) => !usedDpValues.has(dpValues[i]));	
+			this.updJointVal(Number(cid), 'quantity',  bestStep - 1);	
 	
 			// === 3. manual только для оставшихся joints ===
 			let manualDp = dpValues.filter(dp => !usedDpValues.has(dp));
@@ -180,8 +158,7 @@ class JointStore {
 				this.updJointVal(Number(cid), 'manual', manualDp);
 			}
 		});
-	}	
-	
+	} 
 	
 	updJointVal(cid, param, val) {
 		console.log(cid, param, val);
