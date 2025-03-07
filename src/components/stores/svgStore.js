@@ -183,6 +183,14 @@ class SvgStore {
 		}
 	}
 
+	reorderItems(oldIndex, newIndex) {
+		const items = this.getFiltered(["inner", "contour"]);
+		const [movedItem] = items.splice(oldIndex, 1);
+		items.splice(newIndex, 0, movedItem);
+		//ОБНОВЛЯЕМ
+		///this.updateFiltered(items); // Обновление данных в MobX
+	}
+
 	setTextFocus (val) {
 		this.textFocus = val
 		if (!val) {
@@ -467,15 +475,14 @@ class SvgStore {
 		return val ? outer[val] || null : outer;
 	}
 
-	getFiltered (filter ='contour') {	
-		const filtered = this.svgData.code.filter(element => element.class.includes( filter));
-		if (!filtered) {
-			return [];
-		}
-		//console.log ('filtered', toJS(filtered))
-		return filtered
+	getFiltered(filter = 'contour') {	
+		const filters = Array.isArray(filter) ? filter : [filter];
+	
+		return this.svgData.code.filter(element => 
+			filters.every(f => element.class.includes(f))
+		);
 	}
-
+	
 	deleteSelected () {
 		let selected = this.getSelectedElement()	
 		let cidSelected = selected.cid		
