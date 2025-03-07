@@ -21,6 +21,7 @@ const CutPanel = observer(() => {
 	const runCutQue = () => { }
 	const stopCutQue = () => { }
 	const [WH, setWH] = useState({w:100, h:100})
+	const [miniSvg, setMiniSvg] = useState({sizeX:50, sizeY:50})
 
 
 	const innerSort = useRef(null);
@@ -61,6 +62,56 @@ const CutPanel = observer(() => {
         return () => sortable.destroy();
     }, [inners]); 
 
+
+	const createCenteredSVGPath = (element) => {
+		if (!element || !element.path) return null;
+	  
+		const { path, cid, class: className } = element;
+		const classList = className || "";
+		const contour = classList.includes("inner") ? "inner" : "outer";
+		const cutlessElement = classList.includes("macro5");
+	  
+		const bbox = util.fakeBox(path);
+		if (!bbox) {
+		  console.error("Failed to calculate bounding box");
+		  return null;
+		}
+	  
+		const { x, y, width, height } = bbox;
+	  
+		const scaleX = miniSvg.sizeX / width;
+		const scaleY = miniSvg.sizeY / height;
+		const scale = Math.min(scaleX, scaleY);
+	  
+		const translateX = (miniSvg.sizeX - width * scale) / 2 - x * scale;
+		const translateY = (miniSvg.sizeY - height * scale) / 2 - y * scale;
+	  
+		return (
+		  <div
+			className={`grid-square ${cutlessElement ? "macro5" : ""}`}
+			data-cid={cid}
+			style={{
+			  width: `${WH?.w ?? 100}px`,
+			  height: `${WH?.h ?? 100}px`,
+			}}
+			onMouseOver = {mouseOver}
+			onMouseLeave = {mouseLeave}
+
+		  >
+			<svg
+			  width={miniSvg.sizeX}
+			  height={miniSvg.sizeY}
+			  fill={contour === "inner" ? "#fd7e14" : "none"}
+			  stroke={contour === "inner" ? "none" : "#fd7e14"}
+			  strokeWidth={contour === "inner" ? "0" : "1"}
+			>
+			  <path d={path} transform={`translate(${translateX}, ${translateY}) scale(${scale})`} />
+			</svg>
+		  </div>
+		);
+	  };
+	  
+
 	const resizeCutItem =(event)=> {
 		//
 		console.log ('resizeCutItem')
@@ -83,9 +134,23 @@ const CutPanel = observer(() => {
 			svgY = 100
 		}
         setWH({w:newValueX,h:newValueY})
-		//root.style.setProperty('--sizeX', svgX);
-		//root.style.setProperty('--sizeY', svgY);
+		setMiniSvg({sizeX:svgX,sizeY:svgY})
 	}
+
+	const mouseOver =(e)=>{
+		let target = e.currentTarget
+		let cid = +target.getAttribute("data-cid")
+		let newclass = svgStore.getElementByCidAndClass ( cid, 'contour', 'class') + " highLighted"
+		svgStore.updateElementValue(cid, 'contour', 'class', newclass)
+	}
+
+	const mouseLeave =(e)=>{
+		let target = e.currentTarget
+		let cid = +target.getAttribute("data-cid")
+		let newclass = svgStore.getElementByCidAndClass (cid, 'contour', 'class').replace(/highLighted/gm, '')
+		svgStore.updateElementValue(cid, 'contour', 'class',newclass)
+	}
+
 
 	const panelInfo =
 	{
@@ -203,17 +268,7 @@ const CutPanel = observer(() => {
 											<div className="gridWrapper">
 												<div id="engravingSort" ref={engSort}>
 												{engs.map((item, index) => (
-													<div
-													key={"S"+index} // или используйте уникальный идентификатор, например, item.id
-													className="grid-square"
-													style={{
-													  width: `${WH?.w || 100}px`, 
-													  height: `${WH?.h || 100}px`,
-													}}
-												  >
-												{`XXXm ${index}`}
-												  </div>
-													
+													createCenteredSVGPath(item)
 												))}
 												</div>
 											</div>
@@ -226,18 +281,8 @@ const CutPanel = observer(() => {
 										>
 											<div className="gridWrapper">
 												<div id="innerSort" ref={innerSort}>
-												{inners.map((item, index) => (
-													<div
-													key={index} // или используйте уникальный идентификатор, например, item.id
-													className="grid-square"
-													style={{
-													  width: `${WH?.w || 100}px`, 
-													  height: `${WH?.h || 100}px`,
-													}}
-												  >
-												{`XXXm ${index}`}
-												  </div>
-													
+												{inners.map((item, index) => (													
+													createCenteredSVGPath(item)
 												))}
 												</div>
 											</div>
@@ -259,97 +304,3 @@ const CutPanel = observer(() => {
 })
 
 export default CutPanel;
-
-
-
-function updateSortableList() {
-	document.querySelector('#innerSort').innerHTML = ''
-	document.querySelector('#engravingSort').innerHTML = ''
-	let contours = document.querySelectorAll('.contour[data-cid]:not(.outer)')
-	contours.forEach(element => {
-		let cid = +element.getAttribute('data-cid')
-		let path = element.querySelector('path')
-		let contourType = element.classList.contains('engraving') ? 'engraving' : 'inner'
-		let cutlessElement = element.classList.contains('macro5')
-		if (path) {
-			let d = path.getAttribute('d')
-			if (d) this.createCenteredSVGPath(d, cid, contourType, cutlessElement);
-		}
-	})
-
-	var grid = document.getElementById('engravingSort');
-	new Sortable(grid, {
-		animation: 75,
-		ghostClass: "sortable-ghost_item",
-		dragClass: "sortable-drag_item",  // Class name for the dragging item
-		onEnd: function () {
-			//panels.sortAsQueque()
-		},
-	});
-
-	var grid1 = document.getElementById('innerSort');
-	new Sortable(grid1, {
-		animation: 75,
-		ghostClass: "sortable-ghost_item",
-		dragClass: "sortable-drag_item",  // Class name for the dragging item
-		onEnd: function () {
-			//panels.sortAsQueque()
-		},
-	});
-}
-
-function createCenteredSVGPath(d, cid, contour = 'inner', cutlessElement) {
-	console.log(arguments)
-	var xmlns = "http://www.w3.org/2000/svg";
-	let miniPath = document.createElementNS(xmlns, 'path');
-	miniPath.setAttribute('d', d);
-
-	let bbox = document.querySelector(`.contour[data-cid="${cid}"]`).getBBox();
-	let minX = bbox.x;
-	let minY = bbox.y;
-	let width = bbox.width;
-	let height = bbox.height;
-
-	let svg = document.createElementNS(xmlns, 'svg');
-	var root = document.documentElement;
-	var rootStyles = getComputedStyle(root);
-	var sizeX = rootStyles.getPropertyValue('--sizeX').trim();
-	var sizeY = rootStyles.getPropertyValue('--sizeY').trim();
-
-	svg.setAttribute('width', sizeX);
-	svg.setAttribute('height', sizeY);
-
-	if (contour === 'inner') {
-		svg.setAttribute('fill', "#fd7e14");
-	} else {
-		svg.setAttribute('fill', "none");
-		svg.setAttribute('stroke', "#fd7e14");
-		svg.setAttribute('stroke-width', "1");
-	}
-
-	// Центрируем путь в SVG
-	let scaleX = sizeX / width;
-	let scaleY = sizeY / height;
-	let scale = Math.min(scaleX, scaleY);
-
-	// Рассчитываем новые координаты для центрирования и масштабирования
-	let translateX = (sizeX - width * scale) / 2 - minX * scale;
-	let translateY = (sizeY - height * scale) / 2 - minY * scale;
-
-
-	miniPath.setAttribute('transform', `translate(${translateX}, ${translateY}) scale(${scale})`);
-	svg.appendChild(miniPath);
-
-	// Создаем элемент div и добавляем SVG внутрь него
-	let div = document.createElement('div');
-	div.setAttribute('class', `grid-square ${cutlessElement ? 'macro5' : ''}`);
-	div.setAttribute('data-cid', cid);
-	div.appendChild(svg);
-
-	// Добавляем div в DOM
-	/* if (contour === 'inner'){
-		document.querySelector('#innerSort').appendChild(div);
-	} else {
-		document.querySelector('#engravingSort').appendChild(div);	
-	} */
-}

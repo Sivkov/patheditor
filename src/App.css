@@ -1596,3 +1596,7 @@ top:var(--hEdge);
 .sortable-chosen {
   background-color: orangered; 
 }
+
+.highLighted {
+  filter: brightness(2) hue-rotate(180deg) drop-shadow(1px 1px 50px #333);
+}
