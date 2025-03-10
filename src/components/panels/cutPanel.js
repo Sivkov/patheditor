@@ -140,15 +140,11 @@ const CutPanel = observer(() => {
 	const mouseOver =(e)=>{
 		let target = e.currentTarget
 		let cid = +target.getAttribute("data-cid")
-		let newclass = svgStore.getElementByCidAndClass ( cid, 'contour', 'class') + " highLighted"
-		svgStore.updateElementValue(cid, 'contour', 'class', newclass)
+		svgStore.setHighLighted(cid)
 	}
 
 	const mouseLeave =(e)=>{
-		let target = e.currentTarget
-		let cid = +target.getAttribute("data-cid")
-		let newclass = svgStore.getElementByCidAndClass (cid, 'contour', 'class').replace(/highLighted/gm, '')
-		svgStore.updateElementValue(cid, 'contour', 'class',newclass)
+		svgStore.setHighLighted( false )
 	}
 
 

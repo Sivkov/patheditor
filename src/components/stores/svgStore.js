@@ -6,6 +6,7 @@ import CONSTANTS from "../../constants/constants";
 import Util from "../../utils/util";
 
 class SvgStore {
+	highLighted= false;
 	svgParams = { width: 0, height: 0 };
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
 	selectorCoords ={ x: 0, y: 0, width: 0, height: 0 }
@@ -530,6 +531,10 @@ class SvgStore {
 
 	setSvgParams(val) {
         Object.assign(this.svgParams, val);
+    } 
+
+	setHighLighted(val) {
+        this.highLighted = +val;
     } 
 
 }

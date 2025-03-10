@@ -9,6 +9,7 @@ import Guides from './guides.js'
 import svgStore from './stores/svgStore.js';
 import { observer } from 'mobx-react-lite';
 import Joints from './joints.js';
+import HighLighted from './highlighted.js';
 
 
 const SvgComponent = observer (() => {
@@ -123,6 +124,7 @@ const SvgComponent = observer (() => {
                        <Joints />
                        <SelectedPointOnPath/>
                        <SelectedEdge/>
+                       <HighLighted />
                     </g>
                 </g>
             </g>
