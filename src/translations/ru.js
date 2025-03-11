@@ -425,7 +425,7 @@ let ru = {
     "Updated joints":"Перемычки обновлены",
     "Added joint":"Перемычка добавлена",
     "Removed joint":"Перемычка удалена",
-    "Cutting order was changed":"Порядок резки изменен"
+    "Cut order was changed":"Порядок резки изменен"
 
     }
 

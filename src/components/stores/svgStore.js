@@ -56,20 +56,20 @@ class SvgStore {
 			selectedOutletPath: computed,			
 			selectedEdgePath: computed,
 			selectedText: computed,
-			inners: computed,
+			//inners: computed,
 
         });
     }
 
-	get inners () {
+/* 	get inners () {
 		let res = this.getFiltered(["inner", "contour"])
 		console.log (JSON.stringify(res))
 		return res
 	}
-
-	get engs () {
+ */
+/* 	get engs () {
 		return this.getFiltered(["engraving", "contour"])
-	} 
+	}  */
 
 
 	get selectedText () {
@@ -197,62 +197,29 @@ class SvgStore {
 		}
 	}
  
-/*  	reorderItems(newOrder, classes) {
-		// Создаем копию исходного массива
-		const originalArray = [...this.svgData.code];	
-		const startingIndex = originalArray.findIndex(item =>
-			item.class && classes.every(cls => item.class.includes(cls))
-		);
-		  
-
-		for (let i in newOrder) {
-			let item = newOrder[i]
-			originalArray[item.index+startingIndex]= this.getElementByCidAndClass( item.cid, 'contour')
-		}
-		//console.log ("Нет изменений ?? " + (JSON.stringify(originalArray) === JSON.stringify(this.svgData.code)))
-		console.log ((originalArray))
-
-		// Обновляем исходный массив
-		this.svgData.code = originalArray;			
-	
-	}  */
-
-
- 	reorderItems(newOrder, classes) {
-		// Создаем копию исходного массива
+	reorderItems(newOrder, oldOrder) {
+		// Создаём копию оригинального массива
 		const originalArray = [...this.svgData.code];
-	
-		// Фильтруем элементы, имеющие указанные классы
-		const filteredItems = originalArray.filter(item =>
-			item.class && classes.every(cls => item.class.includes(cls))
+	  
+		// Создаём массив индексов элементов oldOrder в originalArray
+		const indices = oldOrder.map(item =>
+		  originalArray.findIndex(orig => orig.cid === item.cid && orig.class === item.class)
 		);
-	
-		// Создаем новый массив для переставленных элементов
-		const reorderedItems = new Array(filteredItems.length);
-	
-		// Переставляем элементы в соответствии с newOrder
-		newOrder.forEach(order => {
-			const item = this.getElementByCidAndClass(order.cid, classes[0]);
-			if (item) {
-				reorderedItems[order.index] = item;
-			} else {
-				console.warn(`Элемент с cid ${order.cid} не найден.`);
-			}
+	  
+		// Создаём новый массив, упорядоченный в соответствии с newOrder
+		const reorderedItems = newOrder.map(newItem =>
+		  oldOrder.find(oldItem => oldItem.cid === newItem.cid)
+		);
+	  
+		// Вставляем элементы в originalArray на соответствующие позиции
+		indices.forEach((index, i) => {
+		  originalArray[index] = reorderedItems[i];
 		});
-	
-		// Создаем новый массив, заменяя элементы с указанными классами на переставленные
-		let reorderIndex = 0;
-		const newArray = originalArray.map(item => {
-			if (item.class && classes.every(cls => item.class.includes(cls))) {
-				return reorderedItems[reorderIndex++];
-			}
-			return item;
-		});
-	
-		// Обновляем исходный массив
-		newArray.map((a,index) => console.log('index   '+ index+'  cid  '+ a.cid))
-		this.svgData.code = newArray;
-	} 
+	  
+		// Обновляем массив в состоянии
+		this.svgData.code = originalArray;
+	  }
+	  
 	
 	
 	setTextFocus (val) {

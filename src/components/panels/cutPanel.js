@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { addToLog } from '../../scripts/addToLog.js';
 import svgStore from '../stores/svgStore.js';
 import { Icon } from '@iconify/react';
-import Sortable from 'sortablejs';
+import { ReactSortable } from "react-sortablejs";
 
 
 
@@ -19,64 +19,13 @@ const CutPanel = observer(() => {
 	const [WH, setWH] = useState({w:50, h:50})
 	const [miniSvg, setMiniSvg] = useState({sizeX:25, sizeY:25})
 
+	const inners = svgStore.getFiltered(["inner",    "contour"])
+	const engs  =  svgStore.getFiltered(["engraving","contour"])
 
-	const innerSort = useRef(null);
-	const engSort = useRef(null);
-	const {inners , engs } = svgStore
-
-
-	useEffect(() => {
-        if (!engSort.current) return;
-
-        const sortable1 = new Sortable(engSort.current, {
-            animation: 75,
-            ghostClass: "sortable-ghost_item",
-            dragClass: "sortable-drag_item",
-            onEnd: (evt) => {
-				const items = evt.to.children;
-				const newOrder = Array.from(items).map((item, index) => {
-					return {
-						index: index, 
-						cid: Number( item.dataset.cid ), 
-					};
-				});
-				console.log(newOrder);
-				svgStore.reorderItems(newOrder, ["contour", "engraving"])				
-				addToLog("Cutting order was changed")
-				
-            },
-        });
-
-        return () => sortable1.destroy();
-    }, []); 
-
-
-
-    useEffect(() => {
-        if (!innerSort.current) return;
-        const sortable = new Sortable(innerSort.current, {
-            animation: 75,
-            ghostClass: "sortable-ghost_item",
-            dragClass: "sortable-drag_item",
-			onEnd: (evt) => {
-				const items = evt.to.children;
-				const newOrder = Array.from(items).map((item, index) => {
-					return {
-						index: index, 
-						cid: Number( item.dataset.cid ), 
-					};
-				});
-				console.log(newOrder);
-				svgStore.reorderItems(newOrder, ['contour', 'inner'])
-				addToLog("Cutting order was changed")
-			},
-        });
-        //return () => sortable.destroy();
-    }, []); 
 
 
 	const createCenteredSVGPath = (element, index) => {
-		console.log ('createCenteredSVGPath '+ element.cid)
+		//console.log ('createCenteredSVGPath '+ element.cid)
 		if (!element || !element.path) return null;
 	  
 		const { path, cid, class: className } = element;
@@ -109,7 +58,7 @@ const CutPanel = observer(() => {
 			}}
 			onMouseOver = {mouseOver}
 			onMouseLeave = {mouseLeave}
-			key={index**2}
+			key={cid}
 
 		  >
 			<svg
@@ -123,7 +72,7 @@ const CutPanel = observer(() => {
 			</svg>
 		  </div>
 		);
-	  };
+	};
 	  
 
 	const resizeCutItem =(event)=> {
@@ -161,6 +110,20 @@ const CutPanel = observer(() => {
 		svgStore.setHighLighted( false )
 	}
 
+	const setList =(e) =>{
+		if (e.length && inners.length) {
+			svgStore.reorderItems (e, inners)		
+			addToLog("Cut order was changed")
+		}
+		
+	}
+
+	const setListEngs =(e) =>{
+		if (e.length && engs.length) {
+			svgStore.reorderItems (e, engs)
+			addToLog("Cut order was changed")	
+		}	
+	}
 
 	const panelInfo =
 	{
@@ -276,10 +239,23 @@ const CutPanel = observer(() => {
 											aria-labelledby="nav-engraving-tab"
 										>
 											<div className="gridWrapper">
-												<div id="engravingSort" ref={engSort}>
-											 	{engs.map((item, index) => (
-													createCenteredSVGPath(item, index)
-												))} 
+												<div id="engravingSort">
+												<ReactSortable
+													dragClass="sortableDrag"
+													filter=".addImageButtonContainer"
+													list={engs}
+													setList={setListEngs}
+													animation={75}
+													easing="ease-out"
+													className='d-flex flex-row flex-wrap'
+													>
+													{engs.map((item, index) => (
+
+														createCenteredSVGPath(item, index)
+														
+													))}
+												</ReactSortable>
+											 	
 												</div>
 											</div>
 										</div>
@@ -290,11 +266,24 @@ const CutPanel = observer(() => {
 											aria-labelledby="nav-inner-tab"
 										>
 											<div className="gridWrapper">
-												<div id="innerSort" ref={innerSort}>
-												{inners.map((item, index) => (													
-													createCenteredSVGPath(item, index)
-												))}
-												</div>
+												<div id="innerSort">
+												<ReactSortable
+													dragClass="sortableDrag"
+													filter=".addImageButtonContainer"
+													list={inners}
+													setList={setList}
+													animation={75}
+													easing="ease-out"
+													className='d-flex flex-row flex-wrap'
+													>
+													{inners.map((item, index) => (
+														
+														createCenteredSVGPath(item, index)
+														
+													))}
+												</ReactSortable>
+
+	 											</div> 
 											</div>
 										</div>
 									</div>
