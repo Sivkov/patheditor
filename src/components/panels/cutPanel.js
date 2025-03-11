@@ -1,13 +1,9 @@
 import Panel from './panel.js';
-//import '@fortawesome/fontawesome-free/css/all.css'
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 import util from '../../utils/util.js';
-//import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
-import CONSTANTS from '../../constants/constants.js';
 import { addToLog } from '../../scripts/addToLog.js';
-import jointStore from '../stores/jointStore.js';
 import svgStore from '../stores/svgStore.js';
 import { Icon } from '@iconify/react';
 import Sortable from 'sortablejs';
@@ -20,14 +16,13 @@ const CutPanel = observer(() => {
 	const speed = () => { }
 	const runCutQue = () => { }
 	const stopCutQue = () => { }
-	const [WH, setWH] = useState({w:100, h:100})
-	const [miniSvg, setMiniSvg] = useState({sizeX:50, sizeY:50})
+	const [WH, setWH] = useState({w:50, h:50})
+	const [miniSvg, setMiniSvg] = useState({sizeX:25, sizeY:25})
 
 
 	const innerSort = useRef(null);
 	const engSort = useRef(null);
-	const inners = svgStore.getFiltered(["inner", "contour"]);
-	const engs = svgStore.getFiltered('engraving', 'contour')
+	const {inners , engs } = svgStore
 
 
 	useEffect(() => {
@@ -38,32 +33,50 @@ const CutPanel = observer(() => {
             ghostClass: "sortable-ghost_item",
             dragClass: "sortable-drag_item",
             onEnd: (evt) => {
-                //svgStore.reorderItems(evt.oldIndex, evt.newIndex); 
+				const items = evt.to.children;
+				const newOrder = Array.from(items).map((item, index) => {
+					return {
+						index: index, 
+						cid: Number( item.dataset.cid ), 
+					};
+				});
+				console.log(newOrder);
+				svgStore.reorderItems(newOrder, ["contour", "engraving"])				
+				addToLog("Cutting order was changed")
+				
             },
         });
 
         return () => sortable1.destroy();
-    }, [engs]); 
+    }, []); 
 
 
 
     useEffect(() => {
         if (!innerSort.current) return;
-
         const sortable = new Sortable(innerSort.current, {
             animation: 75,
             ghostClass: "sortable-ghost_item",
             dragClass: "sortable-drag_item",
-            onEnd: (evt) => {
-                //svgStore.reorderItems(evt.oldIndex, evt.newIndex); 
-            },
+			onEnd: (evt) => {
+				const items = evt.to.children;
+				const newOrder = Array.from(items).map((item, index) => {
+					return {
+						index: index, 
+						cid: Number( item.dataset.cid ), 
+					};
+				});
+				console.log(newOrder);
+				svgStore.reorderItems(newOrder, ['contour', 'inner'])
+				addToLog("Cutting order was changed")
+			},
         });
+        //return () => sortable.destroy();
+    }, []); 
 
-        return () => sortable.destroy();
-    }, [inners]); 
 
-
-	const createCenteredSVGPath = (element) => {
+	const createCenteredSVGPath = (element, index) => {
+		console.log ('createCenteredSVGPath '+ element.cid)
 		if (!element || !element.path) return null;
 	  
 		const { path, cid, class: className } = element;
@@ -96,6 +109,7 @@ const CutPanel = observer(() => {
 			}}
 			onMouseOver = {mouseOver}
 			onMouseLeave = {mouseLeave}
+			key={index**2}
 
 		  >
 			<svg
@@ -263,9 +277,9 @@ const CutPanel = observer(() => {
 										>
 											<div className="gridWrapper">
 												<div id="engravingSort" ref={engSort}>
-												{engs.map((item, index) => (
-													createCenteredSVGPath(item)
-												))}
+											 	{engs.map((item, index) => (
+													createCenteredSVGPath(item, index)
+												))} 
 												</div>
 											</div>
 										</div>
@@ -278,7 +292,7 @@ const CutPanel = observer(() => {
 											<div className="gridWrapper">
 												<div id="innerSort" ref={innerSort}>
 												{inners.map((item, index) => (													
-													createCenteredSVGPath(item)
+													createCenteredSVGPath(item, index)
 												))}
 												</div>
 											</div>

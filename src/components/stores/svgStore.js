@@ -56,8 +56,21 @@ class SvgStore {
 			selectedOutletPath: computed,			
 			selectedEdgePath: computed,
 			selectedText: computed,
+			inners: computed,
+
         });
     }
+
+	get inners () {
+		let res = this.getFiltered(["inner", "contour"])
+		console.log (JSON.stringify(res))
+		return res
+	}
+
+	get engs () {
+		return this.getFiltered(["engraving", "contour"])
+	} 
+
 
 	get selectedText () {
 		const text = this.svgData.code.find(element => element.class.includes('selectedText')  && element.class.includes('contour'));
@@ -183,15 +196,65 @@ class SvgStore {
 			return '';
 		}
 	}
+ 
+/*  	reorderItems(newOrder, classes) {
+		// Создаем копию исходного массива
+		const originalArray = [...this.svgData.code];	
+		const startingIndex = originalArray.findIndex(item =>
+			item.class && classes.every(cls => item.class.includes(cls))
+		);
+		  
 
-	reorderItems(oldIndex, newIndex) {
-		const items = this.getFiltered(["inner", "contour"]);
-		const [movedItem] = items.splice(oldIndex, 1);
-		items.splice(newIndex, 0, movedItem);
-		//ОБНОВЛЯЕМ
-		///this.updateFiltered(items); // Обновление данных в MobX
-	}
+		for (let i in newOrder) {
+			let item = newOrder[i]
+			originalArray[item.index+startingIndex]= this.getElementByCidAndClass( item.cid, 'contour')
+		}
+		//console.log ("Нет изменений ?? " + (JSON.stringify(originalArray) === JSON.stringify(this.svgData.code)))
+		console.log ((originalArray))
 
+		// Обновляем исходный массив
+		this.svgData.code = originalArray;			
+	
+	}  */
+
+
+ 	reorderItems(newOrder, classes) {
+		// Создаем копию исходного массива
+		const originalArray = [...this.svgData.code];
+	
+		// Фильтруем элементы, имеющие указанные классы
+		const filteredItems = originalArray.filter(item =>
+			item.class && classes.every(cls => item.class.includes(cls))
+		);
+	
+		// Создаем новый массив для переставленных элементов
+		const reorderedItems = new Array(filteredItems.length);
+	
+		// Переставляем элементы в соответствии с newOrder
+		newOrder.forEach(order => {
+			const item = this.getElementByCidAndClass(order.cid, classes[0]);
+			if (item) {
+				reorderedItems[order.index] = item;
+			} else {
+				console.warn(`Элемент с cid ${order.cid} не найден.`);
+			}
+		});
+	
+		// Создаем новый массив, заменяя элементы с указанными классами на переставленные
+		let reorderIndex = 0;
+		const newArray = originalArray.map(item => {
+			if (item.class && classes.every(cls => item.class.includes(cls))) {
+				return reorderedItems[reorderIndex++];
+			}
+			return item;
+		});
+	
+		// Обновляем исходный массив
+		newArray.map((a,index) => console.log('index   '+ index+'  cid  '+ a.cid))
+		this.svgData.code = newArray;
+	} 
+	
+	
 	setTextFocus (val) {
 		this.textFocus = val
 		if (!val) {
@@ -534,7 +597,7 @@ class SvgStore {
     } 
 
 	setHighLighted(val) {
-        this.highLighted = +val;
+        this.highLighted = val;
     } 
 
 }
