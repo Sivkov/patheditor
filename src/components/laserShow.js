@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { reaction } from "mobx";
 import { observer } from "mobx-react-lite";
-import SVGPathCommander from "svg-path-commander";
 import svgStore from "./stores/svgStore";
 
 const LaserShow = observer(() => {
@@ -12,10 +10,8 @@ const LaserShow = observer(() => {
 
 	useEffect(()=>{
 		if ( laserShow.on) {
-			console.log ('show must go on')
 			runCutQue();
 		} else {
-			console.log ('Всем спасибо все свободны')
 			setPathData('')
 		}
 	}, [laserShow.on])
@@ -52,13 +48,15 @@ const LaserShow = observer(() => {
 	const runCutQue = () => {
 		
 		const path = getCommonPath()
+		const svgNS = "http://www.w3.org/2000/svg";
+		const ppath = document.createElementNS(svgNS, "path");
+		ppath.setAttribute("d", path);
+		const totalLength = Math.ceil(ppath.getTotalLength());
+
 		let i = 0.01;
-		const totalLength = Math.ceil(SVGPathCommander.getTotalLength(path));
 		const moveDonor = () => {
-			if (i >= totalLength) {
-				return;
-			}
-			const point = SVGPathCommander.getPointAtLength(path, i);
+			if (i >= totalLength) return;
+			const point = ppath.getPointAtLength( i );
 			setPathData((prevPathData) =>
 				prevPathData ?	`${prevPathData} ${point.x} ${point.y}` : `M ${point.x} ${point.y}`
 			);
