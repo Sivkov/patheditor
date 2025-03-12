@@ -24,9 +24,9 @@ const LaserShow = observer(() => {
 	const getCommonPath = () =>{
 		let commonPath =''
 		console.log ('getCommonPathgetCommonPathgetCommonPath')
-		const engs  =  svgStore.getFiltered(["engraving","contour"])
-		const inners = svgStore.getFiltered(["inner",    "contour"])
-		const outer  =  svgStore.getFiltered(["outer","contour"])
+		const engs  =  svgStore.getFiltered(["engraving","contour"], ['macro5'])
+		const inners = svgStore.getFiltered(["inner",    "contour"], ['macro5'])
+		const outer  =  svgStore.getFiltered(["outer","contour"], ['macro5'])
 		engs.forEach(e => commonPath+=(" "+ e.path))
 		inners.forEach(e => {
 			let inlet = svgStore.getElementByCidAndClass(e.cid, 'inlet', 'path')||''

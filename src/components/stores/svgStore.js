@@ -498,14 +498,15 @@ class SvgStore {
 		return val ? outer[val] || null : outer;
 	}
 
-	getFiltered(filter = 'contour') {	
+	getFiltered(filter = 'contour', exclude = []) {
 		const filters = Array.isArray(filter) ? filter : [filter];
-	
-		return this.svgData.code.filter(element => 
-			filters.every(f => element.class.includes(f))
+		const excludes = Array.isArray(exclude) ? exclude : [exclude];
+	  
+		return this.svgData.code.filter(element =>
+		  filters.every(f => element.class.includes(f)) &&
+		  !excludes.some(e => element.class.includes(e))
 		);
 	}
-	
 	deleteSelected () {
 		let selected = this.getSelectedElement()	
 		let cidSelected = selected.cid		
