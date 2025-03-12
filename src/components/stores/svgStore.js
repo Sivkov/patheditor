@@ -6,6 +6,7 @@ import CONSTANTS from "../../constants/constants";
 import Util from "../../utils/util";
 
 class SvgStore {
+	laserShow =  {};
 	highLighted= false;
 	svgParams = { width: 0, height: 0 };
 	svgData = { width: 0, height: 0, code: [], params:{id:'',uuid:'',pcode:''} }; // Хранилище объекта SVG
@@ -56,20 +57,11 @@ class SvgStore {
 			selectedOutletPath: computed,			
 			selectedEdgePath: computed,
 			selectedText: computed,
-			//inners: computed,
+			inners: computed,
 
         });
     }
 
-/* 	get inners () {
-		let res = this.getFiltered(["inner", "contour"])
-		console.log (JSON.stringify(res))
-		return res
-	}
- */
-/* 	get engs () {
-		return this.getFiltered(["engraving", "contour"])
-	}  */
 
 
 	get selectedText () {
@@ -566,6 +558,10 @@ class SvgStore {
 	setHighLighted(val) {
         this.highLighted = val;
     } 
+
+	setLaserShow (val) {
+		Object.assign(this.laserShow, val);
+	}
 
 }
 

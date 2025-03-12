@@ -13,16 +13,27 @@ import { ReactSortable } from "react-sortablejs";
 const CutPanel = observer(() => {
 
 	const { t } = useTranslation();
-	const speed = () => { }
-	const runCutQue = () => { }
-	const stopCutQue = () => { }
+	const [speed,setSpeed] = useState(50)
+	const runCutQue = () => {
+		svgStore.setLaserShow ( {on:true, speed:speed} )
+	}
+	const stopCutQue = () => { 
+		svgStore.setLaserShow ({on:false, speed:speed})
+	}
+	
+	const setShowSpeed =(e)=>{
+		let val = +e.currentTarget.value
+		svgStore.setLaserShow ( {on: svgStore.laserShow.on, speed:val})
+		setSpeed (val)
+	}
+
+	
 	const [WH, setWH] = useState({w:50, h:50})
 	const [miniSvg, setMiniSvg] = useState({sizeX:25, sizeY:25})
 
 	const inners = svgStore.getFiltered(["inner",    "contour"])
 	const engs  =  svgStore.getFiltered(["engraving","contour"])
-
-
+	
 
 	const createCenteredSVGPath = (element, index) => {
 		//console.log ('createCenteredSVGPath '+ element.cid)
@@ -138,14 +149,14 @@ const CutPanel = observer(() => {
 								<div className="d-flex align-items-center justify-content-evenly">
 									<div className="ms-2 w-25">
 										<input
-											type="range"
-											className="form-range"
-											id="speedPartShow"
-											step={1}
-											min={1}
-											max={100}
-											defaultValue={50}
-											onChange={speed}
+										type="range"
+										className="form-range"
+										id="speedPartShow"
+										step={1}
+										min={1}
+										max={100}
+										value={speed}
+										onChange={ setShowSpeed }
 										/>
 									</div>
 									<div className="ms-2">
