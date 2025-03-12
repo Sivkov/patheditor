@@ -16,24 +16,51 @@ const LaserShow = observer(() => {
 			runCutQue();
 		} else {
 			console.log ('Всем спасибо все свободны')
-			setPathData('M ')
+			setPathData('')
 		}
 	}, [laserShow.on])
 
 
+	const getCommonPath = () =>{
+		let commonPath =''
+		console.log ('getCommonPathgetCommonPathgetCommonPath')
+		const engs  =  svgStore.getFiltered(["engraving","contour"])
+		const inners = svgStore.getFiltered(["inner",    "contour"])
+		const outer  =  svgStore.getFiltered(["outer","contour"])
+		engs.forEach(e => commonPath+=(" "+ e.path))
+		inners.forEach(e => {
+			let inlet = svgStore.getElementByCidAndClass(e.cid, 'inlet', 'path')||''
+			commonPath+=(" "+ inlet)
+			commonPath+=(" "+ e.path)
+			let outlet = svgStore.getElementByCidAndClass(e.cid, 'outlet', 'path')||''
+			commonPath+=(" "+ outlet)
+
+		})
+
+		outer.forEach(e => {
+			let inlet = svgStore.getElementByCidAndClass(e.cid, 'inlet', 'path')||''
+			commonPath+=(" "+ inlet)
+			commonPath+=(" "+ e.path)
+			let outlet = svgStore.getElementByCidAndClass(e.cid, 'outlet','path')||''
+			commonPath+=(" "+ outlet)
+		})
+		return commonPath
+
+	}
+
+
 	const runCutQue = () => {
 		
-		const path = svgStore.getElementByCidAndClass(7, "contour", "path") || "";
-		let i = 0;
+		const path = getCommonPath()
+		let i = 0.01;
 		const totalLength = Math.ceil(SVGPathCommander.getTotalLength(path));
 		const moveDonor = () => {
 			if (i >= totalLength) {
 				return;
 			}
 			const point = SVGPathCommander.getPointAtLength(path, i);
-			console.log  ()
 			setPathData((prevPathData) =>
-				`${prevPathData} ${point.x} ${point.y}`
+				prevPathData ?	`${prevPathData} ${point.x} ${point.y}` : `M ${point.x} ${point.y}`
 			);
 			i += 1;
 			const speed = (100 - laserShow.speed);
@@ -41,12 +68,10 @@ const LaserShow = observer(() => {
 			if (laserShow.on) {
 				timerID = setTimeout(moveDonor, speed);
 			} else {
+				setPathData('')
 				clearTimeout( timerID )
-				setPathData('M ')
 			}
-			 
 		};
-
 		moveDonor();
 	};
 

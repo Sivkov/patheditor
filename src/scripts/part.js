@@ -85,7 +85,7 @@ class Part {
         if ( window.location.href.includes('parteditor')) {   
             ncpLines = ncpCode.code
         } else {
-            ncpLines = CONSTANTS.code6
+            ncpLines = CONSTANTS.code2
         }
      
         let currentX, currentY

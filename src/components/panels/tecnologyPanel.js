@@ -61,7 +61,7 @@ const TecnologyPanel =  observer(() => {
 						</td>
 					  </tr>)}
 					  {tecnology.includes('macro5') && (<tr>
-						<td className="w-50">{t('uncut contour')}</td>
+						<td className="w-50">{t('Uncut contour')}</td>
 						<td className="w-50">
 						  <div className="operating_mode__wrappper">
 							<div className="operating_mode macro5"></div>
