@@ -8,12 +8,6 @@ const SelectedEdge = observer(() => {
 		selectedEdgePath,
 	} = svgStore
 
-	const onMouseUp =()=>{		 
-	}
-
-	const onMouseDown =()=>{
-	}
-
 	return (
 		<path
 			d={selectedEdgePath}

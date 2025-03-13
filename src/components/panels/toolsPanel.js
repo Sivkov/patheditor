@@ -25,6 +25,7 @@ const ToolsPanel = observer(() => {
 		svgStore.setContourSelected(false)
 		svgStore.setSelectedEdge(false)
 		svgStore.setTextFocus(false)
+		svgStore.setLaserShow ({on:false, speed:svgStore.laserShow.speed})
 	}
 
 	const copyContour =()=>{

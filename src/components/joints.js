@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import jointStore from "./stores/jointStore";
 import { observer } from "mobx-react-lite";
 

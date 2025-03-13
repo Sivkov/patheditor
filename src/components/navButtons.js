@@ -6,6 +6,7 @@ import CONSTANTS from '../constants/constants';
 import { Icon } from '@iconify/react';
 import LanguageSwitcher from './languageSwitcher';
 import { useTranslation } from 'react-i18next';
+import Part from '../scripts/part';
    
 
 const NavButtons = observer(() => {
@@ -24,6 +25,9 @@ const NavButtons = observer(() => {
 		coordStore.setNeedToFit(true)
 	}
 
+	const save = () =>{
+		Part.createSgn()
+	}
 
 	return (
 	<>
@@ -32,9 +36,24 @@ const NavButtons = observer(() => {
 				className="nav-link dropdown-toggle"
 				href="#"
  				role="button"
+				id="viewsDropdown1"
+ 				data-bs-toggle="dropdown"
+				aria-expanded="false"
 			>
 				{t('Part')}
 			</a>
+			<ul className="dropdown-menu" aria-labelledby="viewsDropdown1">
+				<li>
+					<a className="dropdown-item" 
+						href="#" 
+						id="fit_to_page"
+						onClick={ save }					
+						>
+						<Icon icon="fluent:save-16-filled" className='me-2' width="18" height="18"/>
+						{t('Save')}
+					</a>
+				</li>
+			</ul>
 			<a
 				className="nav-link"
 				href="#"
