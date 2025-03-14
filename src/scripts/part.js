@@ -68,7 +68,7 @@ class Part {
         if ( window.location.href.includes('parteditor')) {   
             this.ncpLines = ncpCode.code
         } else {
-            this.ncpLines = CONSTANTS.code3
+            this.ncpLines = CONSTANTS.code4
         }
      
         let currentX, currentY
@@ -644,25 +644,29 @@ class Part {
                                 let midX = arcC.cx + r1 * Math.cos(midAngle);
                                 let midY = arcC.cy + r2 * Math.sin(midAngle);
                                 let OY = Part.prevY   
-                                console.log ('M '+ midX +' '+midY)
-                                 Part.prevY = midY
+                                Part.prevY = midY
                                 midY = util.round(this.height - midY, 6)
-                                this.nStr = direction + ' x' + midX + ' y' + midY + ' i' + util.round(arcC.cx - Part.prevX, 6) + ' j' + util.round(OY-arcC.cy, 6)
+                                this.nStr = direction + 
+                                    (midX !== Part.prevX ? ' x' + midX : '') + 
+                                    (midY !== OY ? ' y' + midY : '') + ' i' + util.round(arcC.cx - Part.prevX, 6) + ' j' + util.round(OY-arcC.cy, 6)
                                 arr.push(this.nStr)
                                 Part.prevX = midX 
                             } 
     
                             if (arcC) {
                                 let OY = Part.prevY   
+                                let OOY =util.round(this.height - OY, 6)  
                                 Part.prevY = y
                                 y = util.round(this.height - y, 6)
-                                 this.nStr = direction + ' x' + x + ' y' + y + ' i' + util.round(arcC.cx - Part.prevX, 6) + ' j' + util.round(OY-arcC.cy, 6)
+                                 this.nStr = direction +
+                                 (x !== Part.prevX ? ' x' + x : '') + 
+                                 (y !== OOY ? ' y' + y : '')  + ' i' + util.round(arcC.cx - Part.prevX, 6) + ' j' + util.round(OY-arcC.cy, 6)
                                 arr.push(this.nStr)
                                 Part.prevX = x
                             } 
                             if (!arcC) console.log ("NOOOO ARC!!!!");
                         } else {
-                            console.log("radiuses is not equal" + str)
+                            //console.log("radiuses is not equal" + str)
                             let newArcs = arc.converting ( 'M'+ Part.prevX +' '+ Part.prevY +' '+ str.join(' '))
                             newArcs = SVGPathCommander.normalizePath(newArcs)
                             newArcs.forEach((seg)=>{               
@@ -705,7 +709,7 @@ class Part {
     }
 
     static formatNumbers(arr) {
-        return arr.map(str => str.replace(/0\./g, '.'));
+        return arr.map(line => line.replace(/([ij])(-?)0\./g, "$1$2."));
     }
     
     static   createSgn() {
