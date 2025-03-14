@@ -239,9 +239,10 @@ const JointPanel = observer(() => {
 												name="jointSize" 
 												id="jointSize"
 												defaultValue={CONSTANTS.defaultJointSize} 
-												min={0} 
+												min={0.1} 
 												max={5} 
-												step="0.1" 												
+												step="0.1" 	
+												onChange={ (e)=> { jointStore.setJointSize( +e.target.value > 0 ? +e.target.value : 0.1 )}}											
 											/>
 											<label className="form-check-label" htmlFor="jointManualAdd">
 												<div>{t('mm')}</div>

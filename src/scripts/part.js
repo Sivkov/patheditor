@@ -5,6 +5,7 @@ import svgStore from '../components/stores/svgStore.js';
 import SVGPathCommander from 'svg-path-commander';
 import arc from './arc.js';
 import svgPath from 'svgpath';
+import jointStore from '../components/stores/jointStore.js';
 
 
 class Part {
@@ -68,7 +69,8 @@ class Part {
         if ( window.location.href.includes('parteditor')) {   
             this.ncpLines = ncpCode.code
         } else {
-            this.ncpLines = CONSTANTS.code4
+            /////
+            this.ncpLines = CONSTANTS.code1
         }
      
         let currentX, currentY
@@ -741,7 +743,6 @@ class Part {
             let inlet = svgStore.getElementByCidAndClass (cid, 'inlet')||''
             let contour = svgStore.getElementByCidAndClass (cid, 'contour')||''
             let outlet = svgStore.getElementByCidAndClass(cid, 'outlet')
-
             let path
             if (inlet  && inlet.hasOwnProperty('path') && inlet.path.length ) {
                 path = inlet.path
@@ -788,54 +789,59 @@ class Part {
                 if (detectedCollision.indexOf(cid) > -1) {
                     this.macro = '5'//cutless
                 }
-                if (this.pathType === "engraving" || !inlet) this.sgn.push('(<slow>)');
+                if (this.pathType === "engraving" || (!inlet || !inlet?.path || !inlet.path.length)) {
+                    this.sgn.push('(<slow>)');
+                }
                 this.sgn.push(`(<Contour mode="${this.pathType}" contour_id="${index}" c_contour_id="${index}" pard_id="${this.pNumber-1}" macro="${this.macro}" closed="${openClosed}" overcut="0.000,0.000">)`)
-                /*let joints = document.querySelectorAll(`.joint[data-cid="${cid}"] path`)
+                let joints = jointStore.getJointsPositionsForCId(cid)
                 if (joints.length){
 
-                    let contourLength = $(`.contour[data-cid="${cid}"] path`)[0].getTotalLength()
+			        /*const svgNS = "http://www.w3.org/2000/svg";
+                    const ppath = document.createElementNS(svgNS, "path");
+		            ppath.setAttribute("d", path);
+		            const contourLength = Math.ceil(ppath.getTotalLength());*/
+                    let contourLength = SVGPathCommander.getTotalLength(path);
                     joints.forEach((joint)=>{
-                        let dist= +joint.getAttribute('data-dist')
-                        let path = joint.getAttribute('d')
+                        
+                        let type = CONSTANTS.defaultJointType
+                        let dist= joint.percent
+                        let path = contour.path
                         let d = contourLength /100 * dist
-                        let val = +document.querySelector('#jointSize').value 
-                        if (isNaN(val) || val <= 0) val = VALUES.defaultJointSize
+                        let val = jointStore.jointSize ? jointStore.jointSize : CONSTANTS.defaultJointSize
                         let d1 = d+val
-                        let nPath = SVGPathCommander.normalizePath(path)
-                        let x = nPath[0][1] 
-                        let y = nPath[0][2]
-                        let type = VALUES.defaultJointType			
+                        let x = joint.x
+                        let y = joint.y
     
-    
-                        if (joint.classList.contains('atEnd')) {
+                        if (joint.origin === 'atEnd') {
                             d = contourLength-val
                             d1 = contourLength
-                            let point = $(`.contour[data-cid="${cid}"] path`)[0].getPointAtLength(contourLength-val)
+                            let point = SVGPathCommander.getPointAtLength(path, contourLength-val)
                             x = point.x
                             y = point.y
                             dist = d/contourLength*100
                         }
+
                         //type микро или нано , text
                         //dp относительная длина от начала пути для парсинга в svg, %
                         //length длина джойнта, мм
                         //d абс значение от начала пути контура начало джойнта, мм
                         //d1 абс значение от начала пути контура конец джойнта, мм
-                        //x y - положение маркера джойнта что не пересчитывать значение при парсинге, мм
-                            if (d1 <= contourLength && d1 > 0) {
-                            this.sgn.push(`(<Joint type="${type}" dp="${dist}" length="${val}" d="${d}" d1="${d1}" x="${x}" y="${y}">)`)
+                        //x y - положение маркера джойнта что не пересчитывать значение при парсинге, мм/
+                        if (d1 <= contourLength && d1 > 0) {
+                            this.sgn.push(`(<Joint type="${type}" dp="${ util.round(joint.percent,6) }" length="${val}" d="${util.round(d,6)}" d1="${util.round(d1,6)}" x="${x}" y="${y}">)`)
                         }
-                   })              
-                } */
+                   })               
+                } 
 
                 let pathSegments = path.split("M");
                 pathSegments = pathSegments.filter(segment => segment.trim() !== "");
                 const pathsArray = pathSegments.map(segment => "M" + segment);
 
-                //путь только 1. Таков путь.
+                //путь только 1. Таков путь. 
                 if (pathsArray.length === 1) {
-                    path = SVGPathCommander.normalizePath(path).toString().replaceAll(',', ' ')//.replaceAll(',', ' ')
+                    path = SVGPathCommander.normalizePath(path).toString().replaceAll(',', ' ')
                     path = this.parsePath(path)                
-                    if (!inlet) {
+                    if ((!inlet || !inlet?.path || !inlet.path.length)) {
                         // если нет инлета то так;
                         let startWithoutInlet=path[0].replace('G1','G0')
                         path[0] = ('(<laser_on>)');
@@ -844,9 +850,9 @@ class Part {
                     this.sgn = [...this.sgn, ...path]
                     this.sgn.push("(<laser_off>)")        
                 } else {
-                //путей несколько
-                    // не удаляем первый элемент из блока надписи
-                    //pathsArray.splice(0,1)
+                // путей несколько
+                // не удаляем первый элемент из блока надписи
+                // pathsArray.splice(0,1)
                     pathsArray.forEach((subpath, ind) =>{
                         subpath = SVGPathCommander.normalizePath(subpath).toString().replaceAll(',', ' ')
                         subpath = this.parsePath(subpath)   
@@ -890,13 +896,12 @@ class Part {
         this.sgn = this.formatNumbers ( this.sgn )
         
         this.sgn.forEach((a,i) => {
-            //console.log (i+' '+ a + (a ===  this.ncpLines[i]))
              if ( a ===  this.ncpLines[i] ) {
-                console.log (i +'  ' +true)     
+                console.log (i + ' ' + true)     
             } else {
               //  console.log (a)
                 console.log (i+':  '+ a )
-                console.log ('  '+':  '+ this.ncpLines[i] )
+                console.log (" ".repeat( String(i).length)+':  '+ this.ncpLines[i] )
             } 
         })
         

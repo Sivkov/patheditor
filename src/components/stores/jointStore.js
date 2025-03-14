@@ -4,6 +4,7 @@ import SVGPathCommander from "svg-path-commander";
 
 class JointStore {
     joints = {};
+	jointSize = false
 
     constructor() {
         makeAutoObservable(this, {
@@ -198,6 +199,15 @@ class JointStore {
 	setData (data) {
 		Object.assign(this.joints, data);
 	}
+
+	getJointsPositionsForCId( cid ) {
+		return this.jointPositions.filter(position => position.cid === cid);
+	}
+
+	setJointSize (val) {
+		this.jointSize = val
+	}
+
 }
 
 const jointStore = new JointStore();

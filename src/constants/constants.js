@@ -1,6 +1,8 @@
 const CONSTANTS = {
 	fontSize:11.88,
 	kerning:1,
+	defaultJointType:"micro",
+	defaultJointSize: 0.2,
 	defaultInletIntend: 1,
 	defaultInletLength: 5,
 	defaultStringInterval:18,
@@ -118,7 +120,8 @@ const CONSTANTS = {
 			}
 		},
     },
-	code1:['(<Part id="3" offsetx="0.000" offsety="0.000" rotation="0.000" color="#17d0ed" part_id="3" originx="439.500000" originy="356.294006">)',
+	code1:[
+	'(<Part id="3" offsetx="0.000" offsety="0.000" rotation="0.000" color="#17d0ed" part_id="3" originx="439.500000" originy="356.294006">)',
 	'(<Part_attr code="108___10__1">)',
 	'(<Part_attr uuid="n3-0d495564-5623-4baa-b779-347a525b70d6">)',
 	'(<slow>)',
@@ -929,7 +932,8 @@ const CONSTANTS = {
 	`(</Contour part_id="3" contour_id="5" c_contour_id="5" >)`,
 	`(</Part id="3" part_id="3">)`,
 	],
-	code5:['(<Part id="1" offsetx="0.000" offsety="0.000" rotation="0.00" contour_id="1" originx="90.000000" originy="90.000000">)',
+	code5:[
+	'(<Part id="1" offsetx="0.000" offsety="0.000" rotation="0.00" contour_id="1" originx="90.000000" originy="90.000000">)',
 	'(<Part_attr code="aa5-1111111111111111-21">)',
 	'(<Part_attr uuid="n1-98d1943b-4157-4d74-a5f5-dcdaf55d0942">)',
 	'(<slow>)',
@@ -1008,7 +1012,8 @@ const CONSTANTS = {
 	'(<laser_off>)',
 	'(</Contour part_id="1" contour_id="5" c_contour_id="5" >)',
 	'(</Part id="1" part_id="1">)'],
-	code6:['(<Part id="2" offsetx="0.000" offsety="0.000" rotation="0.000" color="#2f57b5" part_id="2" originx="255.000000" originy="399.000000">)',
+	code6:[
+	'(<Part id="2" offsetx="0.000" offsety="0.000" rotation="0.000" color="#2f57b5" part_id="2" originx="255.000000" originy="399.000000">)',
 	'(<Part_attr code="12___10__2">)',
 	'(<Part_attr uuid="n2-d0170e56-3c47-411e-84de-813bb41a7245">)',
 	'(<slow>)',
