@@ -89,11 +89,11 @@ const  SvgWrapper = observer (() => {
 			f: comboMatrix.f
 		});
     
-     /*    // Применение трансформации к элементу SVG
+     	/*Применение трансформации к элементу SVG
         let transform = part.svg.createSVGTransform();
         transform.setMatrix(part.gTransform);
         part.group.transform.baseVal.initialize(transform);
-        part.updateRect() */
+        */
     }
  
 	const pointerdown_handler = (ev) => {

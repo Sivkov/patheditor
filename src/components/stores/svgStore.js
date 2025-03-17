@@ -6,7 +6,6 @@ import CONSTANTS from "../../constants/constants";
 import Util from "../../utils/util";
 
 class SvgStore {
-	partNumber = false
 	laserShow =  {};
 	highLighted= false;
 	svgParams = { width: 0, height: 0 };
@@ -554,11 +553,6 @@ class SvgStore {
 	setLaserShow (val) {
 		Object.assign(this.laserShow, val);
 	}
-
-	setPartNumber (val) {
-		this.partNumber = val
-	}
-
 }
 
 const svgStore = new SvgStore();

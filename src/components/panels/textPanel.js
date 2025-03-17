@@ -186,9 +186,6 @@ const TextPanel = observer(() => {
 		let scaleX = selectedText.scaleX
 		let scaleY = selectedText.scaleY 
 		addingLetter = util.applyTransform(addingLetter, scale*scaleX, scale*scaleY, 0, 0,{angle: 0, x:0, y:0})
-		//addingLetter = util.applyTransform(addingLetter, scaleX, scaleY, 0, 0,{angle: 0, x:0, y:0})
-		//let letterBox  = SVGPathCommander.getPathBBox(addingLetter)
-		//let textBox = SVGPathCommander.getPathBBox(stringBox)
 		let letterBox = util.fakeBox(addingLetter)
 		let textBox = util.fakeBox(stringBox)
 		let translateX 
