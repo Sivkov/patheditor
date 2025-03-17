@@ -489,7 +489,6 @@ class Part {
 		return inside;
 	};
 
-
     static insideShape(a, b) {
         let aHitArea = a.map( aa => aa[0])
         let bHitArea = b.map( bb => bb[0])
@@ -571,7 +570,6 @@ class Part {
         }
         return 0
     }
-
 
     static parsePath(path) {
         path = new svgPath(path).round(6).toString()
@@ -714,8 +712,8 @@ class Part {
         return arr.map(line => line.replace(/([ij])(-?)0\./g, "$1$2."));
     }
     
-    static   createSgn() {
-        this.pNumber = 7
+    static createSgn() {
+        this.pNumber = svgStore.partNumber||0
         let width = svgStore.svgData.width
         let height = svgStore.svgData.height
         this.sgn = []
@@ -764,7 +762,7 @@ class Part {
 
                 this.piercingMode = this.detectPiercingMode(inlet.class)
 
-                this.sgn.push(`(<Inlet mode="${this.inletOuterInner}" contour_id="${index}" c_contour_id="${index}" pard_id="${this.pNumber-1}" macro="${this.macro}" pulse="${this.piercingMode}">)`)
+                this.sgn.push(`(<Inlet mode="${this.inletOuterInner}" contour_id="${index}" c_contour_id="${index}" pard_id="${this.pNumber}" macro="${this.macro}" pulse="${this.piercingMode}">)`)
                 this.sgn = [...this.sgn, ...path]
             }
 
@@ -792,7 +790,7 @@ class Part {
                 if (this.pathType === "engraving" || (!inlet || !inlet?.path || !inlet.path.length)) {
                     this.sgn.push('(<slow>)');
                 }
-                this.sgn.push(`(<Contour mode="${this.pathType}" contour_id="${index}" c_contour_id="${index}" pard_id="${this.pNumber-1}" macro="${this.macro}" closed="${openClosed}" overcut="0.000,0.000">)`)
+                this.sgn.push(`(<Contour mode="${this.pathType}" contour_id="${index}" c_contour_id="${index}" pard_id="${this.pNumber}" macro="${this.macro}" closed="${openClosed}" overcut="0.000,0.000">)`)
                 let joints = jointStore.getJointsPositionsForCId(cid)
                 if (joints.length){
 
@@ -853,10 +851,11 @@ class Part {
                 // путей несколько
                 // не удаляем первый элемент из блока надписи
                 // pathsArray.splice(0,1)
+                //TODO неясно разделять ли эти пути
                     pathsArray.forEach((subpath, ind) =>{
                         subpath = SVGPathCommander.normalizePath(subpath).toString().replaceAll(',', ' ')
                         subpath = this.parsePath(subpath)   
-                        if ( contour.hasClass('skeletonText')) {
+                        if ( contour.class.includes('skeletonText')) {
                             let startWithoutInlet=subpath[0].replace('G1','G0')
                             subpath[0]=('(<laser_on>)')   
                             subpath.unshift(startWithoutInlet)
@@ -866,7 +865,7 @@ class Part {
                     })
                 }
 
-                this.sgn.push(`(</Contour part_id="${this.pNumber - 1}" contour_id="${index}" c_contour_id="${index}" >)`)
+                this.sgn.push(`(</Contour part_id="${this.pNumber}" contour_id="${index}" c_contour_id="${index}" >)`)
             }
 
             if (outlet && outlet.hasOwnProperty('path') && outlet.path.length ) {
@@ -887,7 +886,7 @@ class Part {
                 this.sgn.push(`(<Outlet mode="${this.outletOuterInner}" macro="${this.macro}" >)`)
                 this.sgn = [...this.sgn, ...path]
                 this.sgn.push("(<laser_off>)")
-                this.sgn.push(`(</Contour part_id="${this.pNumber - 1}" contour_id="${index}" c_contour_id="${index}" >)`)
+                this.sgn.push(`(</Contour part_id="${this.pNumber}" contour_id="${index}" c_contour_id="${index}" >)`)
             }
         })
         this.sgn.push(this.ncpLines[this.ncpLines.length - 1])

@@ -94,7 +94,7 @@ class JointStore {
 	
 		// Обрабатываем каждый уникальный cid
 		cids.forEach((cid) => {
-			console.log(`Обрабатываем cid: ${cid}`, jointMap[cid]);
+			//console.log(`Обрабатываем cid: ${cid}`, jointMap[cid]);
 	
 			let dpValues = [];
 			let dValues = []; // Сюда собираем все d (расстояния)
@@ -164,7 +164,7 @@ class JointStore {
 	} 
 	
 	updJointVal(cid, param, val) {
-		console.log(cid, param, val);
+		//console.log(cid, param, val);
 		if (!this.joints[cid]) {
 			this.joints[cid] = {atEnd:false,distance:false,quantity:false,manual:[]}; 
 		}

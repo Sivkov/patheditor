@@ -6,6 +6,7 @@ import CONSTANTS from "../../constants/constants";
 import Util from "../../utils/util";
 
 class SvgStore {
+	partNumber = false
 	laserShow =  {};
 	highLighted= false;
 	svgParams = { width: 0, height: 0 };
@@ -42,7 +43,6 @@ class SvgStore {
 		},
 	};
 	
-
 	constructor() {
 		makeAutoObservable(this, {
 			selectedCid: computed,
@@ -61,8 +61,6 @@ class SvgStore {
 
         });
     }
-
-
 
 	get selectedText () {
 		const text = this.svgData.code.find(element => element.class.includes('selectedText')  && element.class.includes('contour'));
@@ -188,7 +186,7 @@ class SvgStore {
 			return '';
 		}
 	}
- 
+
 	reorderItems(newOrder, oldOrder) {
 		// Создаём копию оригинального массива
 		const originalArray = [...this.svgData.code];
@@ -210,9 +208,7 @@ class SvgStore {
 	  
 		// Обновляем массив в состоянии
 		this.svgData.code = originalArray;
-	  }
-	  
-	
+	}
 	
 	setTextFocus (val) {
 		this.textFocus = val
@@ -358,7 +354,6 @@ class SvgStore {
 		);
 	}
 
-
 	addElementWithCid(cid) {
  		const elementsToCopy = this.svgData.code.filter(el => el.cid === cid);
 		
@@ -395,9 +390,9 @@ class SvgStore {
 
 			coords = Util.convertScreenCoordsToSvgCoords( coords.x, coords.y )
 			const newElement = {
-			path: '',
+			path: 'M0 0',
 			cid: maxCid + 1,
-			class: 'contour inner engraving macro2 closed0 noOutlet skeletonText selectedText',
+			class: 'contour engraving macro2 closed0 noOutlet skeletonText selectedText',
             selected: false,
 			stroke: 'lime',
 			strokeWidth: 0.2,
@@ -416,8 +411,6 @@ class SvgStore {
 		this.svgData.code.push(newElement); 
 	}
 	
-
-
 	addElementPath (path='', inletPath='', outletPath='') {
 		let maxCid = this.svgData.code.length > 0 
 		? Math.max(...this.svgData.code.map(el => el.cid)) 
@@ -449,10 +442,8 @@ class SvgStore {
 		};
 		this.svgData.code.push( contour, inlet, outlet);
 		this.setContourSelected(maxCid)
-
 	}
 	
-
 	updateElementValue(cid, className, val, newVal) {
 		const element = this.svgData.code.find(
 			(el) => el.cid === cid && el.class.includes(className)
@@ -562,6 +553,10 @@ class SvgStore {
 
 	setLaserShow (val) {
 		Object.assign(this.laserShow, val);
+	}
+
+	setPartNumber (val) {
+		this.partNumber = val
 	}
 
 }

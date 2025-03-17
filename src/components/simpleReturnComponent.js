@@ -11,6 +11,7 @@ const SimpleReturnComponent = observer(() => {
 	var searchParams = new URLSearchParams(url.search);
 	var handle = searchParams.get('handle') || 0;
 	var partNumber = searchParams.get('part') || 0;
+	svgStore.setPartNumber( partNumber )
 
 	const {
 		selectedCid,
