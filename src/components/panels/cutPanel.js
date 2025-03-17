@@ -37,12 +37,13 @@ const CutPanel = observer(() => {
 
 	const createCenteredSVGPath = (element, index) => {
 		//console.log ('createCenteredSVGPath '+ element.cid)
-		if (!element || !element.path) return null;
+		//if (!element || !element.path) return null;
 	  
-		const { path, cid, class: className } = element;
+		let { path, cid, class: className } = element;
 		const classList = className || "";
 		const contour = classList.includes("inner") ? "inner" : "outer";
 		const cutlessElement = classList.includes("macro5");
+		if (path.length === 0) path = 'M0 0'
 	  
 		const bbox = util.fakeBox(path);
 		if (!bbox) {

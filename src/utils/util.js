@@ -268,18 +268,7 @@ class Util {
                 if (angle) t.rotate={angle: angle, x:x, y:y}     
             }
         }
-      /*   if (!t.element) {
-            t.element = document.querySelector('.selectedContour');
-        } */
-
-/*         if (document.querySelector('#transformAll').checked  && $(t.element).hasClass('outer') ) {
-            document.querySelectorAll(".contour[data-cid]").forEach((element)=>{
-                this.applyTransform(t.scaleX, t.scaleY, t.translateX, t.translateY, t.rotate, t.update, element)
-            })
-        } else {
-            this.applyTransform(t.scaleX, t.scaleY, t.translateX, t.translateY, t.rotate, t.update, t.element)
-        } */
-
+      
 		let newPath = this.applyTransform(path,t.scaleX, t.scaleY, t.translateX, t.translateY, t.rotate, t.update, t.element)
 		let resp ={
 			newPath: newPath,

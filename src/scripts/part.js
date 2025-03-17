@@ -6,6 +6,7 @@ import SVGPathCommander from 'svg-path-commander';
 import arc from './arc.js';
 import svgPath from 'svgpath';
 import jointStore from '../components/stores/jointStore.js';
+import inlet from './inlet.js';
 
 
 class Part {
@@ -26,12 +27,22 @@ class Part {
         if (!param) return this.#params
         return this.#params[param];
     }
-
-    static updateRect() {
- 
-    }
       
     static normalizeIntends () {
+            let int = {x:Infinity,y:Infinity}
+            let outer = svgStore.getFiltered(['contour', 'outer'],)
+            let contours = svgStore.getFiltered(['contour'])
+            let eBox = util.fakeBox( outer[0].path );
+            int.x = eBox.x
+            int.y = eBox.y          
+    
+            if (int.x !== 0 || int.y!== 0) {
+                contours.forEach((element)=>{
+                    var newPath = util.applyTransform( element.path, 1, 1, -int.x, -int.y, {angle: 0, x:0, y:0})
+                    let resp = inlet.getNewInletOutlet( element.cid, 'contour', 'path', newPath )
+		            let res = inlet.applyNewPaths ( resp )
+                })  
+            }
     }
 
     static biggestCid() {
@@ -70,7 +81,7 @@ class Part {
             this.ncpLines = ncpCode.code
         } else {
             /////
-            this.ncpLines = CONSTANTS.code1
+            this.ncpLines = CONSTANTS.code2
         }
      
         let currentX, currentY
@@ -503,43 +514,113 @@ class Part {
 		}
 	}
 
-    /* static savePart(handle=false) {
-        this.partDetectCollision()
+    static async savePart() {
+        let contours = svgStore.getFiltered('contour')
+        this.partDetectCollision( contours )
         this.normalizeIntends()
         if (this.collisionDetected) {
             const ignoreColissions = document.getElementById('ignoreColissions').checked;
             if (!ignoreColissions) {
+                console.log ("Столкновения не дают сохраниться")
                 return
             }
         } 
 
-        let code =JSON.stringify({ "code": part.createSgn() })
-        console.log(code)
-        axios({
-            method: "Post",
-            url: "/editor/setpart?handle=" + Number(part.handle) + '&program_no=' + Number(part.pNumber),
-            data: code,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-        }).done(function (data) {
-            if (data && data.hasOwnProperty('status') && data.status === 'exception') {
-                util.messaging("Saving was failed by remote server!", true, true, 5000)    
+        var url = new URL(window.location.href);
+        var searchParams = new URLSearchParams(url.search);
+        var handle = searchParams.get('handle') || 0;
+        var partNumber = searchParams.get('part') || 0;
+        let code =JSON.stringify({ "code": this.createSgn() })
+    
+        //console.log(code)
+        
+        try {
+            const response = await axios.post(
+              `/editor/setpart?handle=${handle}&program_no=${partNumber}`,
+              code,
+              {
+                headers: {
+                  'Content-Type': 'application/json; charset=utf-8',
+                },
+              }
+            );
+        
+            const data = response.data;
+        
+            if (data?.status === 'exception') {
+              console.log('Saving was failed by remote server!');
             }
-
-            if (data && data.hasOwnProperty('status') && data.status === 'success') {
-                util.messaging("Part successfully saved!")
+        
+            if (data?.status === 'success') {
+              console.log('Part successfully saved!');
             }
-            if ( handle ) {
-                setTimeout(()=>{
-                    setTimeout(()=>{part.cleanHandle(handle)}, 500)
-                }, 1000)
-            }
-        }).fail((e) => {
-            util.messaging("Error!", true, false)
-        })
+        
+            /*if (handle) {
+              setTimeout(() => {
+                   Part.cleanHandle(handle); 
+               }, 1500);
+            } */
+          } catch (error) {
+            console.log('Error:', error);
+          }
     }
-    */
 
+    async cleanHandle(action='none') {
+        switch (action) {
+            case 'reload':
+              window.location.reload(); 
+              break;
+            case 'exit':
+              window.location.href = "./main.html";
+              break;
+            case 'tasks':
+              window.location.href = "./tasks.html?hide_close=0";
+              break;
+            case 'planEditor':
+              const url = new URL(window.location.href);
+              const searchParams = url.searchParams;
+              let filename = searchParams.get('filename');
+              if (filename) {
+                window.location.href = './editor.html?filename=' + encodeURIComponent(filename);
+              } else if (sessionStorage.getItem('file')) {
+                window.location.href = './editor.html?filename=' + encodeURIComponent(sessionStorage.getItem('file'));
+              } else {
+                window.location.href = './editor.html';
+              }
+              break;
+            default:
+              console.warn('Unknown action:', action);
+        }
+        /*
+		console.log("CLEANING HANDLE!!!")
+	    $.ajax({
+            url: '/editor/close?handle=' + part.handle,
+            method: 'GET',				 
+		}).done(() => {
+			console.log("All requests completed successfully");
+ 			part.handle=''
+			if (action==='reload') {
+				location.reload()			
+			}else if (action==='exit') {
+				window.location.href = "./main.html";
+			} else if (action==='tasks') {
+				window.location.href = "./tasks.html?hide_close=0";
+			} else if (action==='planEditor') {       
+
+                const url = new URL(location.href);
+                const searchParams = url.searchParams;
+                let filename = searchParams.get('filename')
+                if (filename){
+                    window.location.href='./editor.html?filename='+encodeURI(filename);
+                } else if ( sessionStorage.getItem('file') && sessionStorage.getItem('file') !== null ) {
+                    window.location.href='./editor.html?filename='+encodeURI(sessionStorage.getItem('file'));
+                }else{
+                    window.location.href='./editor.html';
+                }
+			}
+		});	*/ 
+	}
+  
     static detectMacroValue (classes) {
         if ( classes.includes("macro0")){
             return 0
@@ -713,7 +794,7 @@ class Part {
     }
     
     static createSgn() {
-        this.pNumber = svgStore.partNumber||0
+        this.pNumber = svgStore.partNumber?.partNumber||0
         let width = svgStore.svgData.width
         let height = svgStore.svgData.height
         this.sgn = []
@@ -721,7 +802,7 @@ class Part {
         let str = this.ncpLines[0].replace(/originx\=\"[\d.]{1,}/, replacer)
         replacer = 'originy="' + height
         str = str.replace(/originy\=\"[\d.]{1,}/, replacer)
-        let detectedCollision = this.partDetectCollision(true)
+        //let detectedCollision = this.partDetectCollision(true)
 
         this.sgn.push(str)
         this.sgn.push(this.ncpLines[1])
@@ -736,6 +817,7 @@ class Part {
         engs.map(a => cutQue.push(a.cid))
         inner.map(a=> cutQue.push(a.cid))
         outer.map(a=> cutQue.push(a.cid))
+        let indexCid = 0
 
         cutQue.forEach((cid, index) => {
             let inlet = svgStore.getElementByCidAndClass (cid, 'inlet')||''
@@ -756,13 +838,13 @@ class Part {
                 }
                 this.macro = this.detectMacroValue(inlet.class)
 
-                if (detectedCollision.indexOf(cid) > -1) {
+                /* if (detectedCollision.indexOf(cid) > -1) {
                     this.macro = '5'//cutless
-                }
+                } */
 
                 this.piercingMode = this.detectPiercingMode(inlet.class)
 
-                this.sgn.push(`(<Inlet mode="${this.inletOuterInner}" contour_id="${index}" c_contour_id="${index}" pard_id="${this.pNumber}" macro="${this.macro}" pulse="${this.piercingMode}">)`)
+                this.sgn.push(`(<Inlet mode="${this.inletOuterInner}" contour_id="${indexCid}" c_contour_id="${indexCid}" pard_id="${this.pNumber}" macro="${this.macro}" pulse="${this.piercingMode}">)`)
                 this.sgn = [...this.sgn, ...path]
             }
 
@@ -784,20 +866,28 @@ class Part {
                 }
 
                 this.macro = this.detectMacroValue(contour.class)
-                if (detectedCollision.indexOf(cid) > -1) {
+               /*  if (detectedCollision.indexOf(cid) > -1) {
                     this.macro = '5'//cutless
-                }
-                if (this.pathType === "engraving" || (!inlet || !inlet?.path || !inlet.path.length)) {
-                    this.sgn.push('(<slow>)');
-                }
-                this.sgn.push(`(<Contour mode="${this.pathType}" contour_id="${index}" c_contour_id="${index}" pard_id="${this.pNumber}" macro="${this.macro}" closed="${openClosed}" overcut="0.000,0.000">)`)
-                let joints = jointStore.getJointsPositionsForCId(cid)
-                if (joints.length){
+                } */
+                
+                let pathSegments = path.split("M");
+                pathSegments = pathSegments.filter(segment => segment.trim() !== "");
+                const pathsArray = pathSegments.map(segment => "M" + segment);
 
-			        /*const svgNS = "http://www.w3.org/2000/svg";
+                //путь только 1. Таков путь. 
+                if (pathsArray.length === 1) {
+
+                    if (this.pathType === "engraving" || (!inlet || !inlet?.path || !inlet.path.length)) {
+                        this.sgn.push('(<slow>)');
+                    }
+                    this.sgn.push(`(<Contour mode="${this.pathType}" contour_id="${indexCid}" c_contour_id="${indexCid}" pard_id="${this.pNumber}" macro="${this.macro}" closed="${openClosed}" overcut="0.000,0.000">)`)
+                    let joints = jointStore.getJointsPositionsForCId(cid)
+                    if (joints.length){
+    
+                    /*const svgNS = "http://www.w3.org/2000/svg";
                     const ppath = document.createElementNS(svgNS, "path");
-		            ppath.setAttribute("d", path);
-		            const contourLength = Math.ceil(ppath.getTotalLength());*/
+                    ppath.setAttribute("d", path);
+                    const contourLength = Math.ceil(ppath.getTotalLength());*/
                     let contourLength = SVGPathCommander.getTotalLength(path);
                     joints.forEach((joint)=>{
                         
@@ -828,15 +918,8 @@ class Part {
                         if (d1 <= contourLength && d1 > 0) {
                             this.sgn.push(`(<Joint type="${type}" dp="${ util.round(joint.percent,6) }" length="${val}" d="${util.round(d,6)}" d1="${util.round(d1,6)}" x="${x}" y="${y}">)`)
                         }
-                   })               
-                } 
-
-                let pathSegments = path.split("M");
-                pathSegments = pathSegments.filter(segment => segment.trim() !== "");
-                const pathsArray = pathSegments.map(segment => "M" + segment);
-
-                //путь только 1. Таков путь. 
-                if (pathsArray.length === 1) {
+                    })               
+                    } 
                     path = SVGPathCommander.normalizePath(path).toString().replaceAll(',', ' ')
                     path = this.parsePath(path)                
                     if ((!inlet || !inlet?.path || !inlet.path.length)) {
@@ -846,13 +929,18 @@ class Part {
                         path.unshift(startWithoutInlet)
                     }                   
                     this.sgn = [...this.sgn, ...path]
-                    this.sgn.push("(<laser_off>)")        
+                    this.sgn.push("(<laser_off>)")  
+                    this.sgn.push(`(</Contour part_id="${this.pNumber}" contour_id="${indexCid}" c_contour_id="${indexCid}" >)`)
+                    indexCid++      
                 } else {
                 // путей несколько
-                // не удаляем первый элемент из блока надписи
                 // pathsArray.splice(0,1)
-                //TODO неясно разделять ли эти пути
+                    if (this.pathType === "engraving" || (!inlet || !inlet?.path || !inlet.path.length)) {
+                        this.sgn.push('(<slow>)');
+                    }
+                    //let joints = jointStore.getJointsPositionsForCId(cid)
                     pathsArray.forEach((subpath, ind) =>{
+                        this.sgn.push(`(<Contour mode="${this.pathType}" contour_id="${indexCid}" c_contour_id="${indexCid}" pard_id="${this.pNumber}" macro="${this.macro}" closed="${openClosed}" overcut="0.000,0.000">)`)
                         subpath = SVGPathCommander.normalizePath(subpath).toString().replaceAll(',', ' ')
                         subpath = this.parsePath(subpath)   
                         if ( contour.class.includes('skeletonText')) {
@@ -861,11 +949,12 @@ class Part {
                             subpath.unshift(startWithoutInlet)
                         }
                         this.sgn = [...this.sgn, ...subpath]
-                        this.sgn.push("(<laser_off>)")        
+                        this.sgn.push(`(<laser_off>)`)   
+                        this.sgn.push(`(</Contour part_id="${this.pNumber}" contour_id="${indexCid}" c_contour_id="${indexCid}" >)`)
+                        indexCid++
                     })
                 }
 
-                this.sgn.push(`(</Contour part_id="${this.pNumber}" contour_id="${index}" c_contour_id="${index}" >)`)
             }
 
             if (outlet && outlet.hasOwnProperty('path') && outlet.path.length ) {
@@ -878,30 +967,30 @@ class Part {
                     this.outletOuterInner = "inner"
                 }
                 this.macro = this.detectMacroValue(outlet.class)
-                if (detectedCollision.indexOf(cid) > -1) {
+               /*  if (detectedCollision.indexOf(cid) > -1) {
                     this.macro = '5'//cutless
-                }
+                } */
                 path = outlet.path
                 path = this.parsePath(path)
                 this.sgn.push(`(<Outlet mode="${this.outletOuterInner}" macro="${this.macro}" >)`)
                 this.sgn = [...this.sgn, ...path]
                 this.sgn.push("(<laser_off>)")
-                this.sgn.push(`(</Contour part_id="${this.pNumber}" contour_id="${index}" c_contour_id="${index}" >)`)
+                this.sgn.push(`(</Contour part_id="${this.pNumber}" contour_id="${indexCid}" c_contour_id="${indexCid}" >)`)
             }
         })
         this.sgn.push(this.ncpLines[this.ncpLines.length - 1])
 
-        //TODO remove this
-        this.sgn = this.formatNumbers ( this.sgn )
-        
+        //TODO remove this if necessary
+        this.sgn = this.formatNumbers ( this.sgn )        
         this.sgn.forEach((a,i) => {
-             if ( a ===  this.ncpLines[i] ) {
+            /*  if ( a ===  this.ncpLines[i] ) {
                 console.log (i + ' ' + true)     
             } else {
               //  console.log (a)
                 console.log (i+':  '+ a )
                 console.log (" ".repeat( String(i).length)+':  '+ this.ncpLines[i] )
-            } 
+            }  */
+            console.log (a)
         })
         
         return this.sgn
