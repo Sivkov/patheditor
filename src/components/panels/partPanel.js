@@ -14,7 +14,7 @@ const PartPanel = observer(() => {
 	const [guidesMode, setGuidesMode] =useState(true)
 	const checkCollisions =()=> {
 		console.log (' checkCollisions ')
-		let contours = svgStore.getFiltered('contour')
+		let contours = svgStore.getFiltered(['contour'], ['engraving'])
 		let collision = Part.partDetectCollision( contours )
 		console.log ( 'Colllsion', collision  )
 		collision.forEach((cid)=>{

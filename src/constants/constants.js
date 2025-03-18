@@ -95,10 +95,10 @@ const CONSTANTS = {
 		textPopup: {
 			mini: true,
 			style: {
-				top: 280,
+				top: 360,
 				left: 12,
 				width: 350,
-				height: 120,
+				height: 400,
 			}
 		},
 		jointPopup: {
@@ -113,7 +113,7 @@ const CONSTANTS = {
 		cutPopup: {
 			mini: true,
 			style: {
-				top: 360,
+				top: 280,
 				left: 12,
 				width: 350,
 				height: 120,

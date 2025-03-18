@@ -26,7 +26,7 @@ const NavButtons = observer(() => {
 	}
 
 	const save = () =>{
-		Part.createSgn()
+		Part.savePart()
 	}
 
 	return (
