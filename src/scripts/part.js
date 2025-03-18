@@ -81,7 +81,7 @@ class Part {
             this.ncpLines = ncpCode.code
         } else {
             /////
-            this.ncpLines = CONSTANTS.code2
+            this.ncpLines = CONSTANTS.code1
         }
      
         let currentX, currentY
@@ -514,7 +514,7 @@ class Part {
 		}
 	}
 
-    static async savePart() {
+    static async savePart(action = false) {
         let contours = svgStore.getFiltered('contour')
         this.partDetectCollision( contours )
         this.normalizeIntends()
@@ -530,7 +530,7 @@ class Part {
         var searchParams = new URLSearchParams(url.search);
         var handle = searchParams.get('handle') || 0;
         var partNumber = searchParams.get('part') || 0;
-        let code =JSON.stringify({ "code": this.createSgn() })
+        let code = JSON.stringify({ "code": this.createSgn() })
     
         //console.log(code)
         
@@ -555,11 +555,11 @@ class Part {
               console.log('Part successfully saved!');
             }
         
-            /*if (handle) {
+            if (action) {
               setTimeout(() => {
-                   Part.cleanHandle(handle); 
+                   Part.cleanHandle(action); 
                }, 1500);
-            } */
+            } 
           } catch (error) {
             console.log('Error:', error);
           }
@@ -748,8 +748,21 @@ class Part {
                             if (!arcC) console.log ("NOOOO ARC!!!!");
                         } else {
                             //console.log("radiuses is not equal" + str)
-                            let newArcs = arc.converting ( 'M'+ Part.prevX +' '+ Part.prevY +' '+ str.join(' '))
+                            let degree = str[3]
+                            let cArc = 'M'+ Part.prevX +' '+ Part.prevY +' '+ str.join(' ')
+                            let newArcs;
+                            if (degree === 0 ) {
+                                newArcs = arc.converting ( cArc )
+                            } else {
+                                //console.log ("ROTATION SHIT IS HERE")
+                                let arcC = util.svgArcToCenterParam(Part.prevX, Part.prevY, r1, r2, degree, fA, fS, x, y)                                
+                                let cArc1 = util.applyTransform( cArc, 1, 1, 0, 0,{angle: -degree, x: arcC.cx, y:arcC.cy})
+                                newArcs = arc.converting ( cArc1 )
+                                newArcs = util.applyTransform( newArcs, 1, 1, 0, 0,{angle: degree, x: arcC.cx, y:arcC.cy})
+                            }
+                            
                             newArcs = SVGPathCommander.normalizePath(newArcs)
+                            //console.log ( newArcs.map(a => a.join(' ')).join(' ') )
                             newArcs.forEach((seg)=>{               
                                 let rx, ry,/* x1, y1,*/ x2, y2, flag1, flag2, flag3;                               
                                 if (seg.includes('A')) {
