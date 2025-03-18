@@ -565,27 +565,27 @@ class Part {
           }
     }
 
-    async cleanHandle(action='none') {
+    static async cleanHandle(action=false) {
         switch (action) {
             case 'reload':
               window.location.reload(); 
               break;
             case 'exit':
-              window.location.href = "./main.html";
+              window.location.href = "/main.html";
               break;
             case 'tasks':
-              window.location.href = "./tasks.html?hide_close=0";
+              window.location.href = "/tasks.html?hide_close=0";
               break;
-            case 'planEditor':
+            case 'plan editor':
               const url = new URL(window.location.href);
               const searchParams = url.searchParams;
               let filename = searchParams.get('filename');
               if (filename) {
-                window.location.href = './editor.html?filename=' + encodeURIComponent(filename);
+                window.location.href = '/editor.html?filename=' + encodeURIComponent(filename);
               } else if (sessionStorage.getItem('file')) {
-                window.location.href = './editor.html?filename=' + encodeURIComponent(sessionStorage.getItem('file'));
+                window.location.href = '/editor.html?filename=' + encodeURIComponent(sessionStorage.getItem('file'));
               } else {
-                window.location.href = './editor.html';
+                window.location.href = '/editor.html';
               }
               break;
             default:
@@ -605,7 +605,7 @@ class Part {
 				window.location.href = "./main.html";
 			} else if (action==='tasks') {
 				window.location.href = "./tasks.html?hide_close=0";
-			} else if (action==='planEditor') {       
+			} else if (action==='plan editor') {       
 
                 const url = new URL(location.href);
                 const searchParams = url.searchParams;

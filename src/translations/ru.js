@@ -427,6 +427,10 @@ let ru = {
     "Removed joint":"Перемычка удалена",
     "Cut order was changed":"Порядок резки изменен",
     "Uncut contour":"Kонтур не режем",
+    "Do you want to":"Вы хотите",
+    "Exit without saving":"Выйти без сохранения",
+    "Save and exit":"Сохранить и выйти",
+    "finish part editing and close this page?":"закончить редактирование и выйти?",
 
     }
 

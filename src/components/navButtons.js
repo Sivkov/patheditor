@@ -7,6 +7,7 @@ import { Icon } from '@iconify/react';
 import LanguageSwitcher from './languageSwitcher';
 import { useTranslation } from 'react-i18next';
 import Part from '../scripts/part';
+import ExitModalComponent from  '../components/exitModalComponent'
    
 
 const NavButtons = observer(() => {
@@ -25,8 +26,8 @@ const NavButtons = observer(() => {
 		coordStore.setNeedToFit(true)
 	}
 
-	const save = () =>{
-		Part.savePart()
+	const save = (action=false) =>{
+		Part.savePart(action)
 	}
 
 	return (
@@ -65,20 +66,8 @@ const NavButtons = observer(() => {
 			>
 				{t('Reload')}
 			</a>	
-			<a
-				className="nav-link"
-				href="#"
- 				role="button"
- 			>
-				{t('Tasks')}
-			</a>			
-			<a
-				className="nav-link"
-				href="#"
- 				role="button"
-  			>
-				{t('Plan')} {t('Editor')}
-			</a>
+			<ExitModalComponent action={'tasks'} />		
+			<ExitModalComponent action={'plan editor'} />		
 			<LanguageSwitcher />
 			<div className="nav-item dropdown" id="viewsDropDown">
 				<a
@@ -111,14 +100,7 @@ const NavButtons = observer(() => {
 					</li>
 				</ul>
 			</div>
-			<a
-				className="nav-link"
-				href="#"
-				id="viewsDropdown"
-				role="button"
- 			>
-				{t('Exit')}
-			</a>			
+			<ExitModalComponent action={'exit'} />		
 		</div>
 	</>
 	);
