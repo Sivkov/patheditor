@@ -431,6 +431,8 @@ let ru = {
     "Exit without saving":"Выйти без сохранения",
     "Save and exit":"Сохранить и выйти",
     "finish part editing and close this page?":"закончить редактирование и выйти?",
+    "Plan editor":"Редактор раскроев",
+    "Contour added":"Контур добавлен", 
 
     }
 

@@ -13,6 +13,14 @@ import { addToLog } from '../../scripts/addToLog.js';
 
 const LogPanel = observer(() => {
 	const { t } = useTranslation();
+	const time = (t) => {
+		const date = new Date(t);
+		const hours = date.getHours().toString().padStart(2, "0"); 
+		const minutes = date.getMinutes().toString().padStart(2, "0");
+		const seconds = date.getSeconds().toString().padStart(2, "0");
+	  	return `${hours}:${minutes}:${seconds}`;
+	};
+
 	useEffect(() => {
 		log.initDatabase()
 			.then(() => {
@@ -24,18 +32,17 @@ const LogPanel = observer(() => {
 			});
 	}, []);
 	
-	const time = (t) => {
-		const date = new Date(t);
-		const hours = date.getHours().toString().padStart(2, "0"); 
-		const minutes = date.getMinutes().toString().padStart(2, "0");
-		const seconds = date.getSeconds().toString().padStart(2, "0");
-	  	return `${hours}:${minutes}:${seconds}`;
-	};
 
-	const restore = async (e) => {
-		try {
-			const tpoint = Number(e.currentTarget.getAttribute('data-stamp'));
+
+	useEffect(()=>{
+		console.log ('Useffect' + logStore.currentTimeStamp )
+		restorePoint ( logStore.setCurrentTimeStamp )
+	},[logStore.currentTimeStamp])
+
+	const restorePoint  = async () => {
+		try {			
 			//console.log('Restore from', tpoint);
+			let tpoint = logStore.currentTimeStamp
 			const data = await log.load(tpoint);	
  			console.log('Loaded data:', data);
 			let parsed = JSON.parse(data.svg)
@@ -52,6 +59,15 @@ const LogPanel = observer(() => {
 			}		
 			logStore.makeNoteActive(tpoint)	
 			
+		} catch (error) {
+			console.error('Error during restore:', error);
+		}
+	}
+
+	const restore = async (e) => {
+		try {
+			const tpoint = Number(e.currentTarget.getAttribute('data-stamp'));
+			logStore.setCurrentTimeStamp (tpoint)			 
 		} catch (error) {
 			console.error('Error during restore:', error);
 		}
@@ -77,9 +93,11 @@ const LogPanel = observer(() => {
 									</div>
 								</div>
 								<div className="me-4">
-									<button type="button" className={ element.active ? 
-									'btn btn-sm mt-1 ms-2 btn-secondary btn-log-restore active' : 
-									'btn btn-sm mt-1 ms-2 btn-secondary btn-log-restore'} 
+									<button type="button" className={ 
+										element.time === logStore.currentTimeStamp ? 
+										'btn btn-sm mt-1 ms-2 btn-secondary btn-log-restore active' : 
+										'btn btn-sm mt-1 ms-2 btn-secondary btn-log-restore'
+									} 
 									data-stamp={ element.time } 
 									onMouseDown={restore}>{t('Restore')}</button>
 								</div>                

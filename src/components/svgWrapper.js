@@ -11,6 +11,7 @@ import inlet from './../scripts/inlet.js'
 import svgStore from './stores/svgStore.js';
 import { addToLog } from '../scripts/addToLog.js';
 import jointStore from './stores/jointStore.js';
+import logStore from './stores/logStore.js';
 
 
 var tch = {}
@@ -296,7 +297,6 @@ const  SvgWrapper = observer (() => {
 	}
  
 	useEffect(() => {
-	  if (true) {
 		let rr = Part.getSvgParams()
 		svgStore.setSvgParams( rr )
  		const timeoutId = setTimeout(() => {
@@ -306,8 +306,26 @@ const  SvgWrapper = observer (() => {
 			let attr = calculateRectAttributes()
 			svgStore.setRectParams( attr)
 		}, 500);
-	  		return () => clearTimeout(timeoutId); 
-		}
+	  		
+		const handleKeyDown = (e) => {
+			if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z') { 
+				e.preventDefault();
+				console.log('Ctrl+Z was pressed!');
+				logStore.setNext()
+
+			} else if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+				e.preventDefault();
+				console.log('Ctrl+Z was pressed!');
+				logStore.setPrev()				
+			} 
+		};
+	
+		window.addEventListener('keydown', handleKeyDown);
+		return () => {
+		  window.removeEventListener('keydown', handleKeyDown);
+		  clearTimeout(timeoutId); 
+		};
+
 	}, []); 
 
 	useEffect(() => { 
