@@ -223,7 +223,8 @@ class SvgStore {
 	}
 
 	setNewOuter() {
-		if (typeof this.selectedCid === 'number') {
+		if (typeof this.selectedCid === 'number' && this.selectedCid !==-1 ) {
+			if (this.getSelectedElement().class.includes('outer')) return;
 			this.svgData.code.forEach(element => {
 				if (element.class.includes("outer")) {
 					element.class = element.class.replace("outer", "inner");
@@ -310,12 +311,12 @@ class SvgStore {
 	}
 
 	setsafeMode (mode) {
-		console.log(mode)
+		//console.log(mode)
 		this.safeMode = mode
 	}
 
 	setSvgData(newData) {
-		console.log(newData)
+		//console.log(newData)
 		this.svgData = newData; // Устанавливаем новые данные SVG
 	}
 
@@ -347,7 +348,7 @@ class SvgStore {
 	}
 	
 	removeElementByCidAndClass(cid, className) {
-		console.log ('removeElementByCidAndClass', className, cid)
+		//console.log ('removeElementByCidAndClass', className, cid)
 		this.svgData.code = this.svgData.code.filter(
 			(element) => element.cid !== cid || !element.class.includes(className)
 		);
@@ -378,7 +379,7 @@ class SvgStore {
 				//class: newClass
 			};
 		});	
-		console.log("Adding elements with new cid:", newElements);
+		//console.log("Adding elements with new cid:", newElements);
  		this.svgData.code.push(...newElements);
 	}
 
@@ -463,7 +464,7 @@ class SvgStore {
 	}
 
 	setContourSelected(cid) {
-		console.log('setContourSelected ' + cid)
+		//console.log('setContourSelected ' + cid)
  		this.svgData.code.forEach((el, i, arr)=>{
 			if(el.hasOwnProperty('selected')) {
 				this.updateElementValue (el.cid, 'contour', 'selected', false)		
@@ -510,7 +511,7 @@ class SvgStore {
 
 	printStore() {
 		this.svgData['code'].forEach(element => {
-                 console.log("printStore:", toJS(element));
+        console.log("printStore:", toJS(element));
         });
 	}
 

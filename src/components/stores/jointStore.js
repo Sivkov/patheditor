@@ -75,7 +75,7 @@ class JointStore {
 	}
 
 	get jointsForSelectedCid() {
-		if (!svgStore.selectedCid) return null;		
+		if (!svgStore.selectedCid || svgStore.selectedCid === -1) return null;		
 		return this.joints[svgStore.selectedCid] || null;
 	}
 
