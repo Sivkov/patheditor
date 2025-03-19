@@ -8,6 +8,7 @@ import Navbar from './components/navbar.js';
 import Panels from './components/panels/panels.js';
 import './i18n.js'; 
 import Preloader from './components/preloader.js';
+import { ToastContainer } from 'react-toastify';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
 			<Watches />
 			<Informer />
 			<Panels />
+			<ToastContainer />
 		</div>
  	);
 }
