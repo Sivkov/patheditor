@@ -117,13 +117,13 @@ const ToolsPanel = observer(() => {
 						</button>
 					}					
 					
-				  <button
+					<button
 					type="button"
-					className="btn text-white mt-1 ms-2 btn_copy btn_tool" 
-					onMouseDown={copyContour}
-				  >
-					<i className="fa-solid fa-copy"></i>
-				  </button>
+					className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
+					onMouseDown={roundEdge}
+				  	>
+					<Icon icon="proicons:arc" width="24" height="24" style={{color: 'white'}} />
+				  	</button>
 					{ svgStore.selectedPointOnEdge ?
 
 						<button
@@ -144,10 +144,10 @@ const ToolsPanel = observer(() => {
 					}
 				  <button
 					type="button"
-					className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
-					onMouseDown={roundEdge}
+					className="btn text-white mt-1 ms-2 btn_copy btn_tool" 
+					onMouseDown={copyContour}
 				  >
-					<Icon icon="proicons:arc" width="24" height="24" style={{color: 'white'}} />
+					<i className="fa-solid fa-copy"></i>
 				  </button>
 				  <button
 					type="button"

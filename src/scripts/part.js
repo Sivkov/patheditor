@@ -516,7 +516,7 @@ class Part {
 	}
 
     static async savePart(action = false) {
-        let contours = svgStore.getFiltered('contour')
+        let contours = svgStore.getFiltered(['contour'],['engraving'])
         this.partDetectCollision( contours )
         this.normalizeIntends()
         if (this.collisionDetected) {
