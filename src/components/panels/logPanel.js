@@ -34,40 +34,12 @@ const LogPanel = observer(() => {
 	
 
 
-	useEffect(()=>{
-		console.log ('Useffect' + logStore.currentTimeStamp )
-		restorePoint ( logStore.setCurrentTimeStamp )
-	},[logStore.currentTimeStamp])
-
-	const restorePoint  = async () => {
-		try {			
-			//console.log('Restore from', tpoint);
-			let tpoint = logStore.currentTimeStamp
-			const data = await log.load(tpoint);	
- 			console.log('Loaded data:', data);
-			let parsed = JSON.parse(data.svg)
-			let joints = JSON.parse(data.joints)
-			if (parsed ) {
-				const newSvgData = {
-					width: parsed.width,
-					height: parsed.height,
-					code: parsed.code,
-					params: parsed.params,
-				  };
-				svgStore.setSvgData(newSvgData)
-				jointStore.setData(joints)
-			}		
-			logStore.makeNoteActive(tpoint)	
-			
-		} catch (error) {
-			console.error('Error during restore:', error);
-		}
-	}
-
 	const restore = async (e) => {
 		try {
 			const tpoint = Number(e.currentTarget.getAttribute('data-stamp'));
-			logStore.setCurrentTimeStamp (tpoint)			 
+			if (tpoint)	return;	 
+			logStore.setCurrentTimeStamp (tpoint)	
+			log.restorePoint()
 		} catch (error) {
 			console.error('Error during restore:', error);
 		}

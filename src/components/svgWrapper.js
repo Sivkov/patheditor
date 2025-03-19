@@ -12,6 +12,7 @@ import svgStore from './stores/svgStore.js';
 import { addToLog } from '../scripts/addToLog.js';
 import jointStore from './stores/jointStore.js';
 import logStore from './stores/logStore.js';
+import log from '../scripts/log.js'
 
 
 var tch = {}
@@ -312,11 +313,13 @@ const  SvgWrapper = observer (() => {
 				e.preventDefault();
 				console.log('Ctrl+Z was pressed!');
 				logStore.setNext()
+				log.restorePoint()
 
 			} else if (e.ctrlKey && e.key.toLowerCase() === 'z') {
 				e.preventDefault();
 				console.log('Ctrl+Z was pressed!');
-				logStore.setPrev()				
+				logStore.setPrev()	
+				log.restorePoint()			
 			} 
 		};
 	

@@ -7,6 +7,7 @@ import arc from './arc.js';
 import svgPath from 'svgpath';
 import jointStore from '../components/stores/jointStore.js';
 import inlet from './inlet.js';
+import log from './log.js'
 
 
 class Part {
@@ -566,6 +567,7 @@ class Part {
     }
 
     static async cleanHandle(action=false) {
+        await log.clearBase();	
         switch (action) {
             case 'reload':
               window.location.reload(); 

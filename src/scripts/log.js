@@ -1,3 +1,7 @@
+import logStore from "../components/stores/logStore";
+import jointStore from "../components/stores/jointStore";
+import svgStore from "../components/stores/svgStore";
+
 function openDatabase() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open('parteditor', 1);
@@ -62,7 +66,8 @@ class Log {
     }
 
     async load(tpoint) {
-        return new Promise((resolve, reject) => {
+            if (!tpoint) return;
+            return new Promise((resolve, reject) => {
             if (!tpoint) {
                 reject('Invalid tpoint value');
                 return;
@@ -101,7 +106,7 @@ class Log {
     
 
     // Очистка базы данных
-    clearBase() {
+    async clearBase() {
         if (!this.db) {
             console.error('Database not initialized');
             return;
@@ -128,6 +133,34 @@ class Log {
             this.save(data);
         }, 30000); // Сохранение каждые 30 секунд
     }
+
+    async restorePoint () {
+		try {			
+			//console.log('Restore from', tpoint);
+			let tpoint = logStore.currentTimeStamp
+			if (!tpoint) return
+			const data = await log.load(tpoint);	
+ 			console.log('Loaded data:', data);
+			if (!data) return
+			let parsed = JSON.parse(data.svg)
+			let joints = JSON.parse(data.joints)
+			if (parsed ) {
+				const newSvgData = {
+					width: parsed.width,
+					height: parsed.height,
+					code: parsed.code,
+					params: parsed.params,
+				  };
+				svgStore.setSvgData(newSvgData)
+				jointStore.setData(joints)
+			}		
+			logStore.makeNoteActive(tpoint)	
+			
+		} catch (error) {
+			console.error('Error during restore:', error);
+		}
+	}
+
 }
 
 const log = new Log();
