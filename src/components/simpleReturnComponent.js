@@ -64,7 +64,7 @@ const SimpleReturnComponent = observer(() => {
 				}			
 
 			} else {
-				console.log ('Create text element')
+				//console.log ('Create text element')
 				let coords ={x:e.clientX, y:e.clientY}
 				svgStore.addTextElement ( coords )
 				svgStore.setTextFocus( true )

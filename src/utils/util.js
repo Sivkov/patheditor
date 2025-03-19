@@ -5,7 +5,7 @@ import arc from "../scripts/arc";
 import inside from 'point-in-polygon-hao'
 import ClipperLib from 'clipper-lib'
 import svgStore from "../components/stores/svgStore";
-//import { toJS } from 'mobx'; 
+import { showToast } from "../components/toast";
 
 class Util {
 
@@ -1218,7 +1218,7 @@ class Util {
 			let oldCom = updPath[commandIndex];
 			let newSegment2 = ['A', oldCom[1], oldCom[2],oldCom[3],oldCom[4],oldCom[5],newPoint.x, newPoint.y]
 			if (oldCom[4] === 1) {
-				console.log ('Large arc problem')
+				//console.log ('Large arc problem')
 				let oldArcStart= updPath[commandIndex-1]
 				let oldArcStartX = oldArcStart[oldArcStart.length-2]
 				let oldArcStartY = oldArcStart[oldArcStart.length-1]
@@ -1251,7 +1251,13 @@ class Util {
 		let commandIndex = searchResult.segIndex
 		let commandType = searchResult.currentSeg[0]; // Например, 'L'
 		if( commandType === 'M' ||updPath.length < 4) {
-			console.log ('inappropriate action')
+			//console.log ('inappropriate action')
+			showToast({
+				type: 'warning',
+				message: 'inappropriate action',  
+				autoClose: 5000,
+				theme: 'dark',
+			  });
 			return false
 		}
 
@@ -1344,7 +1350,7 @@ class Util {
         );
  
         if (this.round(k2) > this.round(distance1) || this.round(k2) > this.round(distance2)) {
-            console.log ('El contour deformation, signor!')
+           console.log ('El contour deformation, signor!')
            return false
         }
 
@@ -1409,7 +1415,7 @@ class Util {
 			let res = inlet.getNewInletOutlet( svgStore.selectedPointOnEdge.cid, 'contour', 'path', newPathData, {angle: 0, x:0, y:0} )
 			let success = inlet.applyNewPaths( res )	
 			if (success) {
-				console.log (success+ '  updating POsitions')
+				//console.log (success+ '  updating POsitions')
 				svgStore.setSelectedPointOnEdge({
 					...svgStore.selectedPointOnEdge, 
 					point: { x: coord.x, y: coord.y }
@@ -1460,7 +1466,7 @@ class Util {
 				}
 			}
 		}
-		console.log ( {x:xcoords,y:ycoords,angles:angles})
+		//console.log ( {x:xcoords,y:ycoords,angles:angles})
 		return {x:xcoords,y:ycoords,angles:angles}
 	}
 
@@ -1485,7 +1491,6 @@ class Util {
 					break
 				}
 			}
-
 
 			//console.log ( toJS (svgStore.selectedPointOnEdge))
 

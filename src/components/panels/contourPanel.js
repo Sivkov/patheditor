@@ -10,6 +10,7 @@ import util from '../../utils/util.js';
 import inlet from '../../scripts/inlet.js';
 import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
+import { showToast } from '../toast.js';
 
 
 const ContourPanel = observer(() => {
@@ -158,7 +159,12 @@ const ContourPanel = observer(() => {
 		  setAngle(Number(newValue)); // Convert string to number
 		} else {
 		  // Handle invalid input if necessary
-		  console.warn('Invalid input, please enter a number');	
+		  //console.warn('Invalid input, please enter a number');
+		  showToast({
+			type: 'error',
+			message: 'Invalid input, please enter a number',
+		  });
+		  
 		  if (angle === 0) {
 			setAngle('')
 		  } else {
@@ -236,7 +242,7 @@ const ContourPanel = observer(() => {
 	}
 
 	const alignItems =(direction)=> {
-		console.log (direction)
+		//console.log (direction)
 		let newPath, xDif=0, yDif=0;
 		let path = svgStore.getSelectedElement('path') 
 		let cid =  svgStore.getSelectedElement('cid') 

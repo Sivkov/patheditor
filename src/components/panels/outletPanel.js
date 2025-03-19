@@ -13,6 +13,7 @@ import inlet from '../../scripts/inlet.js';
 import util from '../../utils/util.js';
 import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
+import { showToast } from '../toast.js';
 
 
 const OutletPanel = observer(() => {
@@ -131,8 +132,8 @@ const OutletPanel = observer(() => {
 
 
 	const setNewOutlet = (newType) =>{
-		console.log(newType)
-		if (type === newType) return;
+		//console.log(newType)
+		if (type === newType || selectedCid === -1) return;
 		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
 		let resp = inlet.setOutletType (newType, false, 'set', selectedPath, selectedOutletPath, contourType)
@@ -147,7 +148,14 @@ const OutletPanel = observer(() => {
 	}
 
 	const setOutletForAll = () =>{
-		console.log ('setoutletForAll')
+		//console.log ('setoutletForAll')
+		showToast({
+			type: 'success',
+			message: 'Set new outlet type for all',			
+			autoClose: 5000,
+			theme: 'dark',
+		});		  
+
 		let mode = inlet.detectInletType ( selectedOutletPath )
 		let outlets = svgStore.getFiltered("outlet")
 		if (mode) {

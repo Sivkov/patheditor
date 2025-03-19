@@ -7,16 +7,22 @@ import Util from '../../utils/util';
 import Part from '../../scripts/part';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { showToast } from '../toast';
 
 
 const PartPanel = observer(() => {
 	const { t } = useTranslation();
 	const [guidesMode, setGuidesMode] =useState(true)
 	const checkCollisions =()=> {
-		console.log (' checkCollisions ')
+		//console.log (' checkCollisions ')
 		let contours = svgStore.getFiltered(['contour'], ['engraving'])
 		let collision = Part.partDetectCollision( contours )
-		console.log ( 'Colllsion', collision  )
+		//console.log ( 'Colllsion', collision  )
+		showToast({
+			type: 'error',
+			message: 'In part were detected contour collisions',
+		});
+
 		collision.forEach((cid)=>{
 			let collider  =  svgStore.getElementByCidAndClass( cid, 'contour', 'class')
 			collider += ' collision'

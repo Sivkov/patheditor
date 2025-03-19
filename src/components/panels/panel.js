@@ -129,11 +129,11 @@ const Panel = observer (({ element, index }) => {
 	const handleIncreaseZIndex = () => {
 		const currentMaxZIndex = findHighestZIndex();
 		setZIndex(currentMaxZIndex + 1);
-		console.log ('Set Z')
+		//console.log ('Set Z')
 	};
 
 	const  savePanelPosition =(id)=>{
-		console.log("SavePositions")
+		//console.log("SavePositions")
 		let ppp = localStorage.getItem('ppp')
 		if (!ppp) {
             let ppp = {}

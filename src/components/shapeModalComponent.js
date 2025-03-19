@@ -53,7 +53,7 @@ const ShapeModalComponent =observer(()=> {
 
         if (!d || !d.length) return;
         var transformed = Util.applyTransform(d, scaleX, scaleY, translateX, translateY, {angle: 0, x:0, y:0})
-		console.log (transformed)
+		//console.log (transformed)
 		
 		svgStore.addElementPath( transformed, '', '') 
 		addToLog ('Contour added')

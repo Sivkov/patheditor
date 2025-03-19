@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
 import util from '../../utils/util.js';
 import inlet from '../../scripts/inlet.js';
+import { showToast } from './../toast';
 
 
 const EdgePanel = observer(() => {
@@ -26,8 +27,8 @@ const EdgePanel = observer(() => {
 	const [RY, setRY] = useState('')
 
 	useEffect(() => {
-		console.log('useEffedct selectedEdge')
-		console.log(selectedEdge)
+		//console.log('useEffedct selectedEdge')
+		//console.log(selectedEdge)
 
 		if (!selectedEdge) {
 			setLL('')
@@ -36,7 +37,7 @@ const EdgePanel = observer(() => {
 			return
 		}
 		let normPath = util.normPath(selectedEdgePath)
-		console.log(normPath)
+		//console.log(normPath)
 
 		if (selectedEdgePath.includes('L')) {
 			let dist = util.distance(normPath[0][1], normPath[0][2], normPath[1][1], normPath[1][2])
@@ -56,8 +57,8 @@ const EdgePanel = observer(() => {
 		let updPath = util.normPath(newPath);
 		let segment = selectedEdge.edge.segIndex;
 
-		console.log('segment ' + segment);
-		console.log(updPath);
+		//console.log('segment ' + segment);
+		//console.log(updPath);
 
 		if (segment < 1) {
 			console.error("Невозможно преобразовать в дугу: недостаточно точек");
@@ -103,11 +104,11 @@ const EdgePanel = observer(() => {
 		let updPath = util.normPath(newPath);
 		let segment = selectedEdge.edge.segIndex;
 
-		console.log('segment ' + segment);
-		console.log(updPath);
+		//console.log('segment ' + segment);
+		//console.log(updPath);
 
 		if (!updPath[segment] || updPath[segment][0] !== 'A') {
-			console.error("Выбранный сегмент не является дугой");
+			//console.error("Выбранный сегмент не является дугой");
 			return;
 		}
 
@@ -128,7 +129,7 @@ const EdgePanel = observer(() => {
 		let segment = selectedEdge.edge.segIndex;
 
 		if (!updPath[segment] || updPath[segment][0] !== 'A') {
-			console.error("Выбранный сегмент не является дугой");
+			//console.error("Выбранный сегмент не является дугой");
 			return;
 		}
 
@@ -151,7 +152,7 @@ const EdgePanel = observer(() => {
 		let segment = selectedEdge.edge.segIndex;
 
 		if (!updPath[segment] || updPath[segment][0] !== 'A') {
-			console.error("Выбранный сегмент не является дугой");
+			//console.error("Выбранный сегмент не является дугой");
 			return;
 		}
 
@@ -165,7 +166,14 @@ const EdgePanel = observer(() => {
 
 		let d1 = util.distance(prevX, prevY, currX, currY)*0.5
 		if (d1 > RX && d1 > RY) {
-			console.log("Imp[ossible radius")
+			//console.log("Imp[ossible radius")
+			showToast({
+				type: 'error',
+				message: 'Impossible radius!',
+				position: 'bottom-right',
+				autoClose: 10000,
+				theme: 'dark',
+			});			  
 			return
 		}
 

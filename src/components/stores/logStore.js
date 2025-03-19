@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import { showToast } from "../toast";
 
 class LogStore {
 	log = []
@@ -18,7 +19,13 @@ class LogStore {
 		  let newStamp =  this.log[currentIndex + 1].time;
 		  this.setCurrentTimeStamp (newStamp)
 		} else {
-		  console.log('No next log entry found.');
+		  //console.log('No next log entry found.');
+		  showToast({
+			type: 'warning',
+			message: 'No next log entry found.',			
+			autoClose: 5000,
+			theme: 'dark',
+		});
 		  return null;
 		}
 	}
@@ -29,7 +36,13 @@ class LogStore {
 		  let newStamp =  this.log[currentIndex - 1].time;
 		  this.setCurrentTimeStamp (newStamp)
 		} else {
-		  console.log('No previous log entry found.');
+		  //console.log('No previous log entry found.');
+		  showToast({
+			type: 'warning',
+			message: 'No previous log entry found.',			
+			autoClose: 5000,
+			theme: 'dark',
+		});
 		  return null;
 		}
 	}
@@ -39,7 +52,7 @@ class LogStore {
 	}
 
 	add(newNote) {
-		console.log('note added'+JSON.stringify(newNote))
+		//console.log('note added'+JSON.stringify(newNote))
 		this.setCurrentTimeStamp( newNote.time ) 
 		this.log.push(newNote);
 		this.log.forEach((element, index, arr) => {

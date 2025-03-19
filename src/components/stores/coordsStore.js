@@ -22,7 +22,7 @@ class CoordsStore {
   }
 
   setFittedPosition (val) {
-    console.log (JSON.stringify(val))
+    //console.log (JSON.stringify(val))
     this.fittedPosition = val
   }
 

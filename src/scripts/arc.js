@@ -43,7 +43,7 @@ class ArcConverting {
         // Clean up the temporary SVG elements
         path2.remove();
         path1.remove();
-        console.log(maxDeviation)
+        //console.log(maxDeviation)
 
         return {
             maxDeviation,

@@ -4,6 +4,7 @@ import arc from './arc';
 import CONSTANTS from '../constants/constants';
 import svgStore from '../components/stores/svgStore';
 import { addToLog } from './../scripts/addToLog';
+import { showToast } from '../components/toast';
 
 
 class Inlet {
@@ -89,7 +90,7 @@ class Inlet {
     }
 
     inletTangentR (radius, arcLength, inletPath) {
-        console.log ("inletTangentR")
+        //console.log ("inletTangentR")
         let x1, y1, x2, y2 ,flag1, flag2, flag3, rO; 
         if (radius <= 0 || arcLength <= 0 || 2*Math.PI*radius < arcLength ) {
             //throw Error ("radius it too small")
@@ -156,7 +157,7 @@ class Inlet {
     }
 
     inletTangentL (arcLength, inletPath) {
-        console.log ("inletTangentL"+ arcLength)
+        //console.log ("inletTangentL"+ arcLength)
         let radius, x1, y1, x2, y2 ,flag1, flag2, flag3;
 		let pathArc  = SVGPathCommander.normalizePath (inletPath)
 		if (pathArc.length) {
@@ -242,7 +243,7 @@ class Inlet {
         let oldAxis = util.calculateAngleVector( LX, LY, MX, MY, PX, PY )
 
         if (contour[1][0] === 'A') {
-            console.log('Arc position detected')
+            //console.log('Arc position detected')
             let nearestSegment = contour[1]
             const rx = parseFloat(nearestSegment[1]);
             const ry = parseFloat(nearestSegment[2]);
@@ -254,10 +255,10 @@ class Inlet {
             let C = util.svgArcToCenterParam (LX, LY, rx, ry, flag1, flag2, flag3, EX, EY, true)   
             let OP = util.rotatePoint(  C.x, C.y,  LX, LY,0, 270)
             oldAxis = Math.round(util.calculateAngleVector ( LX, LY, MX, MY, OP.x, OP.y)*100)/100
-            console.log('Arc position detected in degree '+ oldAxis)
+            //console.log('Arc position detected in degree '+ oldAxis)
         }
         let pathDirection = Number(SVGPathCommander.getDrawDirection(contour))
-        console.log (newAxis,oldAxis)
+        //console.log (newAxis,oldAxis)
         if (pathDirection === 1 && outerInner === 'outer'){
              newAxis=180-newAxis
              oldAxis=180-oldAxis
@@ -277,7 +278,7 @@ class Inlet {
     }
 
     inletDirectL(D, inletPath) {
-        console.log (D)
+        //console.log (D)
         let MX, MY, LX, LY;
         let path =  SVGPathCommander.normalizePath(inletPath)
         if (path.length) {
@@ -1293,7 +1294,7 @@ class Inlet {
     }
 
     outletTangentR (radius,  arcLength, path) {
-        console.log ("outletTangentR")
+        //console.log ("outletTangentR")
         let x1, y1, x2, y2 ,flag1, flag2, flag3, rO;
         if (radius <= 0 || arcLength <= 0 || 2*Math.PI*radius < arcLength ) {
             //throw Error ("radius it too small")
@@ -1408,7 +1409,7 @@ class Inlet {
     }
 
     outletHookR ( radius, outletLength, path ) {
-        console.log ('outletHookR   '+radius)
+        //console.log ('outletHookR   '+radius)
         radius = Number(radius)
         let MX, MY, LX, LY, R, EX, EY, flag1, flag2, flag3;
         path =  SVGPathCommander.normalizePath( path)
@@ -1528,7 +1529,7 @@ class Inlet {
     }
 
     outletDirectL(D, path) {
-        console.log (D)
+        //console.log (D)
         let MX, MY, LX, LY;
         path =  SVGPathCommander.normalizePath(path)
         if (path.length) {
@@ -1615,7 +1616,7 @@ class Inlet {
             let C = util.svgArcToCenterParam (MX, MY, rx, ry, flag1, flag2, flag3, EX, EY, true)   
             let OP = util.rotatePoint(  C.x, C.y,  MX, MY,0, 270)
             oldAxis = Math.round(util.calculateAngleVector ( MX, MY, LX, LY, OP.x, OP.y)*100)/100
-            console.log('Arc position detected in degree '+ oldAxis)
+            //console.log('Arc position detected in degree '+ oldAxis)
         }
         let pathDirection = Number(SVGPathCommander.getDrawDirection(contour))
         if (pathDirection === 1 && outerInner === 'outer'){
@@ -1660,6 +1661,7 @@ class Inlet {
             let check = this.checkInletIntend (resp)
             if (!check) {
                 //console.log ('findDangerInletsOutlets InletCheck is...  ' + check)
+                
                 collInl.push(element.cid)
             }
             inlet.contourEdges = ''
@@ -1682,11 +1684,21 @@ class Inlet {
 
 
         if (collOutl.length === 0) {            
-            console.log ("All outlets are Ok!", false, true)
-            //util.messaging ("All inlets are Ok!", false, true)
+            //console.log ("All outlets are Ok!", false, true)
+            showToast({
+                type: 'success',
+                message: 'All outlets are Ok!',  
+                autoClose: 5000,
+                theme: 'dark',
+              });
         } else {
-            console.log ( "Some outlets have danger position!"+ collInl)
-            //util.messaging ( "Some inlets have danger position!", true, false)
+            //console.log ( "Some outlets have danger position!"+ collInl)
+            showToast({
+                type: 'warning',
+                message: 'Some outlets have danger position!',  
+                autoClose: 5000,
+                theme: 'dark',
+              });
             collOutl.forEach((cid)=>{
                 let collider  =  svgStore.getElementByCidAndClass( cid, 'outlet', 'class')
                 collider += ' collisionInlet'
@@ -1704,11 +1716,22 @@ class Inlet {
         } 
 
         if (collInl.length === 0) {            
-            console.log ("All inlets are Ok!", false, true)
-            //util.messaging ("All inlets are Ok!", false, true)
+            //console.log ("All inlets are Ok!", false, true)
+            showToast({
+                type: 'success',
+                message: 'All inlets are Ok!',  
+                autoClose: 5000,
+                theme: 'dark',
+              });
         } else {
-            console.log ( "Some inlets have danger position!"+ collInl)
-            //util.messaging ( "Some inlets have danger position!", true, false)
+            //console.log ( "Some inlets have danger position!"+ collInl)
+            showToast({
+                type: 'warning',
+                message: 'Some inlets have danger position!',  
+                autoClose: 5000,
+                theme: 'dark',
+              });
+            
             collInl.forEach((cid)=>{
                 let collider  =  svgStore.getElementByCidAndClass( cid, 'inlet', 'class')
                 collider += ' collisionInlet'
@@ -2040,7 +2063,7 @@ class Inlet {
                 let point = SVGPathCommander.getPointAtLength( path, i* seg)
                 let fill = util.pointInSvgPath(contour, point.x, point.y) 
                 if ((type === 'inner' && !fill) || (type === 'outer' && fill)) {
-                    console.log ('shit')
+                    //console.log ('shit')
                     return false
                 }
             }
@@ -2050,7 +2073,7 @@ class Inlet {
                 let point = SVGPathCommander.getPointAtLength( path, totalLength-i* seg)
                 let fill = util.pointInSvgPath( contour, point.x, point.y) 
                 if ((type === 'inner' && !fill) || (type === 'outer' && fill)) {
-                    console.log ('shit')
+                    //console.log ('shit')
                     return false
                 }
             }
@@ -2093,7 +2116,7 @@ class Inlet {
 	}
 
     reversePath ()  {
-        console.log ('reverse')
+        //console.log ('reverse')
         const {
              selectedPath,
              selectedCid
@@ -2140,6 +2163,13 @@ class Inlet {
                 //console.log ('outlet check result is...  ' + outletCheck )
             } catch (e) {
                 console.log ('Catch in checkInletPosition')
+                showToast({
+                    type: 'error',
+                    message: 'Catch in checkInletPosition',  
+                    autoClose: 5000,
+                    theme: 'dark',
+                  });
+                
             }
             let inletCheck =  this.checkInletIntend (resp, contour ) 
             if (outletCheck && inletCheck) {

@@ -47,7 +47,7 @@ const CutPanel = observer(() => {
 	  
 		const bbox = util.fakeBox(path);
 		if (!bbox) {
-		  console.error("Failed to calculate bounding box");
+		  //console.error("Failed to calculate bounding box");
 		  return null;
 		}
 	  
@@ -88,8 +88,7 @@ const CutPanel = observer(() => {
 	  
 
 	const resizeCutItem =(event)=> {
-		//
-		console.log ('resizeCutItem')
+		//console.log ('resizeCutItem')
 		let e = event.currentTarget;
 		var newValueX, newValueY, svgX, svgY;
 		if (e.classList.contains('w50')){

@@ -15,6 +15,7 @@ import util from '../../utils/util.js';
 import CONSTANTS from '../../constants/constants.js';
 import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
+import { showToast } from '../toast.js';
 
 
 const InletPanel = observer(() => {
@@ -39,8 +40,8 @@ const InletPanel = observer(() => {
 
 
 	const setNewInlet = (newType) =>{
-		console.log(newType)
-		if (type === newType) return;
+		//console.log(newType)
+		if (type === newType || selectedCid=== -1) return;
 		let classes = svgStore.getElementByCidAndClass ( selectedCid, 'contour', 'class')
 		let contourType = classes.includes('inner') ? 'inner' : 'outer'	
 		let resp = inlet.setInletType (newType, false, 'set', selectedPath, selectedInletPath, contourType)
@@ -61,7 +62,15 @@ const InletPanel = observer(() => {
 	},[safeMode, inletIntend])
 
 	const setInletForAll = () =>{
-		console.log ('setInletForAll')
+		//console.log ('setInletForAll')
+		showToast({
+			type: 'success',
+			message: 'Set inlet for all!',
+			position: 'bottom-right',
+			autoClose: 10000,
+			theme: 'dark',
+		});		
+
 		let inletMode = inlet.detectInletType ( selectedInletPath )
 		let inlets = svgStore.getFiltered("inlet")
 		if (inletMode) {
@@ -265,7 +274,7 @@ const InletPanel = observer(() => {
 		let inletMode = inlet.detectInletType ( selectedInletPath )
 		setInletParams(inletMode)
 		editorStore.setInletMode(mode)
-		console.log ("Set mode" + mode)
+		//console.log ("Set mode" + mode)
 	}, [ selectedCid, mode])
 
 	const panelInfo = [

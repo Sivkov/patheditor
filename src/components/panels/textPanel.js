@@ -66,7 +66,7 @@ const TextPanel = observer(() => {
 	},[ selectedText ])	
 
 	const addCursor =()=>{
-		console.log ('addCursor')
+		//console.log ('addCursor')
 	}
 
 	const onKeyUp =(e)=>{
@@ -222,7 +222,7 @@ const TextPanel = observer(() => {
 	const setTextKerining =(e)=> {
 		let val = Number(e.target.value);
 		if (selectedText && typeof val === "number" && val > 0) {
-			console.log ('setTextKerining')
+			//console.log ('setTextKerining')
 			svgStore.updateElementValues(selectedText.cid, "contour", {"kerning":val, "text":''});
 			textCompare()
 		}
@@ -231,7 +231,7 @@ const TextPanel = observer(() => {
 	const setFontSize =(e)=> {
 		let val = Number(e.target.value);
 		if (selectedText && typeof val === "number" && val > 0) {
-			console.log ('setFontSize')
+			//console.log ('setFontSize')
 			svgStore.updateElementValues(selectedText.cid, "contour", {"fontSize":val, "text":""});
 			textCompare()
 		}

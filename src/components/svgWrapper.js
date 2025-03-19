@@ -64,7 +64,7 @@ const  SvgWrapper = observer (() => {
 	};
 
 	const touchZoom = (event, curDiff, prevDiff) =>{
-		console.log ('** touchZoom **')
+		//console.log ('** touchZoom **')
 		var svg = document.getElementById("svg")
         // Коэффициент масштабирования на основе разницы расстояний
         let scale = curDiff / prevDiff;
@@ -100,12 +100,12 @@ const  SvgWrapper = observer (() => {
  
 	const pointerdown_handler = (ev) => {
 		ev.preventDefault()
- 		console.log ('pointer_down_')
+ 		//console.log ('pointer_down_')
 		tch.evCache.push(ev);
 	}
 
 	const pointermove_handler = (ev) => {
-		console.log('pointer_move_');
+		//console.log('pointer_move_');
 		ev.preventDefault()
 		for (let i = 0; i < tch.evCache.length; i++) {
 			if (ev.pointerId === tch.evCache[i].pointerId) {
@@ -139,7 +139,7 @@ const  SvgWrapper = observer (() => {
 	const remove_event = (ev) => {
 		ev.preventDefault()
 		// ev.stopPropagation()
-		console.log ('remove_event_')
+		//console.log ('remove_event_')
 		for (var i = 0; i <tch.evCache.length; i++) {
 			if (true ||tch.evCache[i].pointerId == ev.pointerId) {
 				tch.evCache.splice(i, 1);
@@ -149,7 +149,7 @@ const  SvgWrapper = observer (() => {
 	}
 
 	const startDrag = (e) =>{
-		console.log ('startDrag' + e.buttons)
+		//console.log ('startDrag' + e.buttons)
 		inMoveRef.current = 1;	
 		if (e.target && (e.buttons === 4  || editorStore.mode== 'drag')) {    
 
@@ -161,14 +161,14 @@ const  SvgWrapper = observer (() => {
 
         } else if (e.button === 0 && editorStore.mode === 'selectPoint') {
 
-			console.log ("editorStore.mode   "+editorStore.mode)
+			//console.log ("editorStore.mode   "+editorStore.mode)
 			let searchResult = util.findNearesPoint(e)
 			svgStore.setSelectedPointOnEdge(searchResult)
 	
 			
 		} else if (e.button === 0 && editorStore.mode === 'addPoint') {
 			
-			console.log ("editorStore.mode   "+editorStore.mode)
+			//console.log ("editorStore.mode   "+editorStore.mode)
 			let contours = svgStore.getFiltered('contour')
 			let coords = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);			
 			let min = Infinity
@@ -190,7 +190,7 @@ const  SvgWrapper = observer (() => {
 
 		} else if (e.button === 0 && editorStore.mode === 'addJoint') {
 
-			console.log ('Adding joint')
+			//console.log ('Adding joint')
 			let contours = svgStore.getFiltered('contour')
 			let coords = util.convertScreenCoordsToSvgCoords(e.clientX, e.clientY);			
 			let min = Infinity
@@ -301,7 +301,7 @@ const  SvgWrapper = observer (() => {
 		let rr = Part.getSvgParams()
 		svgStore.setSvgParams( rr )
  		const timeoutId = setTimeout(() => {
-			console.log ('Delayed message after 2 seconds!');
+			//console.log ('Delayed message after 2 seconds!');
  			fitToPage()
 			coordsStore.setPreloader(false)
 			let attr = calculateRectAttributes()
@@ -311,13 +311,13 @@ const  SvgWrapper = observer (() => {
 		const handleKeyDown = (e) => {
 			if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z') { 
 				e.preventDefault();
-				console.log('Ctrl+Z was pressed!');
+				//console.log('Ctrl+Z was pressed!');
 				logStore.setNext()
 				log.restorePoint()
 
 			} else if (e.ctrlKey && e.key.toLowerCase() === 'z') {
 				e.preventDefault();
-				console.log('Ctrl+Z was pressed!');
+				//console.log('Ctrl+Z was pressed!');
 				logStore.setPrev()	
 				log.restorePoint()			
 			} 
@@ -338,10 +338,10 @@ const  SvgWrapper = observer (() => {
 	}, [coordsStore.needeToFit]); 
 
 	const fitToPage =() => {
-		console.log (coordsStore.fittedPosition)
+		//console.log (coordsStore.fittedPosition)
 
 		if (!coordsStore.fittedPosition) {
-			console.log('calculate without store')
+			//console.log('calculate without store')
 
 			svgStore.setRectParams({x:0, y:0, width: 0, height: 0})
 			svgStore.setMatrix({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
@@ -377,7 +377,7 @@ const  SvgWrapper = observer (() => {
 			coordsStore.setFittedPosition ({matrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }, 'groupMatrix': matrixN , 'rectParams':rectParams})
 
 		} else {
-			console.log('from store')
+			//console.log('from store')
 			svgStore.setMatrix(coordsStore.fittedPosition.matrix)
 			svgStore.setGroupMatrix(coordsStore.fittedPosition.groupMatrix)
 			svgStore.setRectParams(coordsStore.fittedPosition.rectParams)
@@ -387,12 +387,12 @@ const  SvgWrapper = observer (() => {
 			масштаб поучаем из мм1
 			а вот смещение надо рпассчитать как отклонение центра swgWrapper от центра outer при том что это  постоянное 
 			соотношение... от соотношение рахмеров окна и svg
-			console.log ("matrix  " + JSON.stringify(toJS(coordsStore.fittedPosition.matrix)))
-			console.log ( "groupMatrix  " + JSON.stringify(toJS(coordsStore.fittedPosition.groupMatrix)))
+			//console.log ("matrix  " + JSON.stringify(toJS(coordsStore.fittedPosition.matrix)))
+			//console.log ( "groupMatrix  " + JSON.stringify(toJS(coordsStore.fittedPosition.groupMatrix)))
 
 			
 			let mm1 = document.querySelector('#group1').transform.baseVal.consolidate().matrix
-			console.log(mm1)
+			//console.log(mm1)
 			svgStore.setMatrix( { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
 			svgStore.setGroupMatrix(mm1)
 			coordsStore.setNeedToFit(false)		
@@ -430,7 +430,7 @@ const  SvgWrapper = observer (() => {
 	/*useEffect(()=>{
 		// Поменял UseEffect  на изменение в drag and wheelZoom
 		let attr = calculateRectAttributes()
-		console.log ("Rect In UseEffect:  " + JSON.stringify( attr ))
+		//console.log ("Rect In UseEffect:  " + JSON.stringify( attr ))
 		svgStore.setRectParams( attr)
 	},[matrix, groupMatrix, offset])*/
 

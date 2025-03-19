@@ -8,12 +8,20 @@ import inlet from './../../scripts/inlet.js'
 import ShapeModalComponent from '../shapeModalComponent.js';
 import { addToLog } from '../../scripts/addToLog.js';
 import util from '../../utils/util.js';
+import { showToast } from '../toast.js';
 
 
 const ToolsPanel = observer(() => {
 	const deleteContour =()=>{
 		if  (svgStore.getSelectedElement()){
 			svgStore.deleteSelected()
+			showToast({
+				type: 'success',
+				message: 'Contour was deleted!',				
+				autoClose: 5000,
+				theme: 'dark',
+			});
+
 			addToLog('Contour deleted')
 		}
 	}
@@ -29,16 +37,49 @@ const ToolsPanel = observer(() => {
 	}
 
 	const copyContour =()=>{
-		console.log  ( svgStore.selectedCid )
-		if (typeof svgStore.selectedCid === 'number') {
-			svgStore.setCopiedCid ( svgStore.selectedCid )
-		}		
+		//console.log  ( svgStore.selectedCid )
+		if  ( svgStore.selectedCid !== -1){
+			showToast({
+				type: 'success',
+				message: 'Contour was copied to buffer!',			
+				autoClose: 5000,
+				theme: 'dark',
+			});
+	
+			if (typeof svgStore.selectedCid === 'number') {
+				svgStore.setCopiedCid ( svgStore.selectedCid )
+			}		
+		} else {
+
+			showToast({
+				type: 'error',
+				message: 'Contour not selected!',			
+				autoClose: 5000,
+				theme: 'dark',
+			});
+
+		}
 	}
 
 	const pasteContour =()=>{
-		if (typeof svgStore.copiedCid !== 'number') return;
+		if (typeof svgStore.copiedCid !== 'number') {
+			showToast({
+				type: 'warning',
+				message: 'Contour not copied!',
+				
+				autoClose: 5000,
+				theme: 'dark',
+			});
+			return
+		}
 		svgStore.addElementWithCid ( svgStore.copiedCid )
 		svgStore.setCopiedCid ( false )
+		showToast({
+			type: 'success',
+			message: 'Contour was paste from buffer!',			
+			autoClose: 5000,
+			theme: 'dark',
+		});
 		addToLog("Contour pasted")
 	}
 
@@ -62,7 +103,13 @@ const ToolsPanel = observer(() => {
 			svgStore.setSelectedPointOnEdge(false)
 			addToLog('Point deleted from path') 
 		} else {
-			console.log ('No cut signor!')
+			//console.log ('No cut signor!')
+			showToast({
+				type: 'warning',
+				message: 'Point delete from path is impossible',				
+				autoClose: 5000,
+				theme: 'dark',
+			  });
 		}
 	}
 
@@ -73,7 +120,14 @@ const ToolsPanel = observer(() => {
 			svgStore.setSelectedPointOnEdge(false)
 			addToLog('Edge rounded') 
 		} else {
-			console.log ('No cut signor!')
+			//console.log ('No cut signor!')
+			showToast({
+				type: 'warning',
+				message: 'It is impossible to round this edge',
+				
+				autoClose: 5000,
+				theme: 'dark',
+			  });
 		}
 	}
 

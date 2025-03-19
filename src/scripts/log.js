@@ -114,7 +114,6 @@ class Log {
 
         const transaction = this.db.transaction(['save'], 'readwrite');
         const objectStore = transaction.objectStore('save');
-
         const request = objectStore.clear();
 
         request.onsuccess = () => {
@@ -140,7 +139,7 @@ class Log {
 			let tpoint = logStore.currentTimeStamp
 			if (!tpoint) return
 			const data = await log.load(tpoint);	
- 			console.log('Loaded data:', data);
+ 			//console.log('Loaded data:', data);
 			if (!data) return
 			let parsed = JSON.parse(data.svg)
 			let joints = JSON.parse(data.joints)

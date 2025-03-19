@@ -19,7 +19,7 @@ const LaserShow = observer(() => {
 
 	const getCommonPath = () =>{
 		let commonPath =''
-		console.log ('getCommonPathgetCommonPathgetCommonPath')
+		//console.log ('getCommonPathgetCommonPathgetCommonPath')
 		const engs  =  svgStore.getFiltered(["engraving","contour"], ['macro5'])
 		const inners = svgStore.getFiltered(["inner",    "contour"], ['macro5'])
 		const outer  =  svgStore.getFiltered(["outer","contour"], ['macro5'])
@@ -62,7 +62,7 @@ const LaserShow = observer(() => {
 			);
 			i += 1;
 			const speed = (100 - laserShow.speed);
-			console.log (speed)
+			//console.log (speed)
 			if (laserShow.on) {
 				timerID = setTimeout(moveDonor, speed);
 			} else {

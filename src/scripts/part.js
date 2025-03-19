@@ -8,6 +8,7 @@ import svgPath from 'svgpath';
 import jointStore from '../components/stores/jointStore.js';
 import inlet from './inlet.js';
 import log from './log.js'
+import { showToast } from '../components/toast.js';
 
 
 class Part {
@@ -77,7 +78,7 @@ class Part {
     static ncpToSvg(ncpCode, number) {
         let svg = []
         let joints = []
-        console.log ('ncp to svg') 
+        //console.log ('ncp to svg') 
         if ( window.location.href.includes('parteditor')) {   
             this.ncpLines = ncpCode.code
         } else {
@@ -355,9 +356,9 @@ class Part {
     
     static partDetectCollision ( data ) {
         var start = performance.now()
-        console.log ('partDetectCollision')
+        //console.log ('partDetectCollision')
         let inners = data 
-        console.log (data)
+        //console.log (data)
 
         let polygons = {}
         Part.collisionDetected = false
@@ -522,7 +523,13 @@ class Part {
         if (this.collisionDetected) {
             const ignoreColissions = document.getElementById('ignoreColissions').checked;
             if (!ignoreColissions) {
-                console.log ("Столкновения не дают сохраниться")
+                //console.log ("Столкновения не дают сохраниться")
+                showToast({
+                    type: 'warning',
+                    message: 'Saving was cancelled cause contour collision',  
+                    autoClose: 5000,
+                    theme: 'dark',
+                  });
                 return
             }
         } 
@@ -549,11 +556,21 @@ class Part {
             const data = response.data;
         
             if (data?.status === 'exception') {
-              console.log('Saving was failed by remote server!');
+                showToast({
+                    type: 'error',
+                    message: 'Saving was failed by remote server!',
+                    position: 'bottom-right',
+                    autoClose: 5000,
+                    theme: 'dark',
+                });
             }
         
             if (data?.status === 'success') {
-              console.log('Part successfully saved!');
+              //console.log('Part successfully saved!');
+              showToast({
+                type: 'success',
+                message: 'Part successfully saved!',
+              });
             }
         
             if (action) {
@@ -562,7 +579,11 @@ class Part {
                }, 1500);
             } 
           } catch (error) {
-            console.log('Error:', error);
+            //console.log('Error:', error);
+            showToast({
+                type: 'error',
+                message: 'Saving was failed by remote server!',
+            });
           }
     }
 
