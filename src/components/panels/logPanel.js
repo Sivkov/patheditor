@@ -37,7 +37,7 @@ const LogPanel = observer(() => {
 	const restore = async (e) => {
 		try {
 			const tpoint = Number(e.currentTarget.getAttribute('data-stamp'));
-			if (tpoint)	return;	 
+			if (!tpoint) return;	 
 			logStore.setCurrentTimeStamp (tpoint)	
 			log.restorePoint()
 		} catch (error) {

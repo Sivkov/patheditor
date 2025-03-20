@@ -56,10 +56,14 @@ const InletPanel = observer(() => {
 	}
 
 	useEffect(()=>{
-		svgStore.setsafeMode({mode:safeMode, intend: inletIntend})
-		inlet.findDangerInletsOutlets() 
+		if (safeMode) inlet.findDangerInletsOutlets();
+	},[safeMode])
 
-	},[safeMode, inletIntend])
+	useEffect(() => {
+		if (inletIntend !== CONSTANTS.defaultInletIntend) {
+		  inlet.findDangerInletsOutlets();
+		}
+	  }, [inletIntend]);
 
 	const setInletForAll = () =>{
 		//console.log ('setInletForAll')
@@ -318,7 +322,11 @@ const InletPanel = observer(() => {
 												value={inletIntend} 
 												onChange={(e) => {
 													const value = Number(e.target.value);
-													setInletIntend(Math.min(5, Math.max(1, value)));
+													const newVal=(Math.min(5, Math.max(1, value)));
+													setInletIntend((prev) => {
+														if (prev === newVal) return prev; 
+														return newVal;
+													  });
 												}}
 											/>
 											<div>{t('mm')}</div>
