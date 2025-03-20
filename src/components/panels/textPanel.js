@@ -16,14 +16,25 @@ const TextPanel = observer(() => {
 	const { t } = useTranslation();
 	const {	textFocus, selectedText } = svgStore;
 	const textareaRef = useRef(null);
-	const {positions, maxZindex} = panelStore
+	const { positions } = panelStore
+
+	const findHighestZIndex = () => {
+		let inx = [...Object.values(panelStore.positions).map(popup => popup.style.zIndex)]
+		let maxZIndex = Math.max( ...inx  );	
+		return maxZIndex+1;
+	};
+
+	const handleIncreaseZIndex = () => {
+		const currentMaxZIndex = findHighestZIndex();
+		panelStore.setMaxZindex ( currentMaxZIndex )
+	};
 
 	useEffect(() => {
 		if (textareaRef.current) {
 		  	if (textFocus) {
 			
 				//console.log("Handle focus", textFocus);
-				miniTextPanel(false)
+				//miniTextPanel(false)
 				//TODO при смене значения textFocus в сторе не успевает уйти фокус и курсор не ставиться. Так что пока так.
 				setTimeout(()=>{
 
@@ -37,30 +48,44 @@ const TextPanel = observer(() => {
 			
 			} else {
 				textareaRef.current.value = ''
-				miniTextPanel(true)				
 			}
 		}
 	}, [textFocus]); 
 
-	const miniTextPanel =(val)=> {
-		let id = 'textPopup'
-		if (positions[id].mini !== val) {
+/* 	const miniTextPanel =(val)=> {
+		console.log ('miniTextPanel')
+		if ( true ) {
+			let id = 'textPopup'
+			handleIncreaseZIndex ()
 			let position = {
 				style:{
 					width: positions[id].style.width,
 					height:positions[id].style.height,
 					top:   positions[id].style.top,
 					left:  positions[id].style.left,	
-					zIndex: maxZindex+1			
+					zIndex: findHighestZIndex()			
 				}
 			}
-			position.mini = val
+			position.mini = false
 			panelStore.setPosition(id, position)
 		}
-	}
+	} */
 
 	useEffect(()=>{
 		if (selectedText) {
+			let id = 'textPopup'
+			handleIncreaseZIndex ()
+			let position = {
+				style:{
+					width: positions[id].style.width,
+					height:positions[id].style.height,
+					top:   positions[id].style.top,
+					left:  positions[id].style.left,	
+					zIndex: findHighestZIndex()			
+				}
+			}
+			position.mini = false
+			panelStore.setPosition(id, position)
 			textareaRef.current.value = selectedText.text
 		}
 	},[ selectedText ])	
