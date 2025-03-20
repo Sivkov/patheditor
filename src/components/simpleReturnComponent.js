@@ -2,8 +2,9 @@ import { observer } from "mobx-react-lite";
 import svgStore from "./stores/svgStore.js";
 import editorStore from "./stores/editorStore.js";
 import Part from "./../scripts/part";
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import jointStore from "./stores/jointStore.js";
+import axios from "axios";
 
 const SimpleReturnComponent = observer(() => {
 
@@ -11,6 +12,7 @@ const SimpleReturnComponent = observer(() => {
 	var searchParams = new URLSearchParams(url.search);
 	var handle = searchParams.get('handle') || 0;
 	var partNumber = searchParams.get('part') || 0;
+	const pollingTimeoutRef = useRef(null);
 
 	const {
 		selectedCid,
@@ -29,6 +31,7 @@ const SimpleReturnComponent = observer(() => {
 			jointStore.loadJoints (svg.joints)			
 		};
 		fetchData();
+		setPrimaryPollingTimeout()
 
 	}, []);
 
@@ -77,6 +80,26 @@ const SimpleReturnComponent = observer(() => {
 			editorStore.setInletMode('move')
 		} 
 	} 
+
+	const primaryPolling = () => {
+		
+		axios.get(`/editor/poll?handle=${handle}`)
+			.then(response => {
+				//console.log('Polling response:', response.data);
+				setPrimaryPollingTimeout();
+			})
+			.catch(error => {
+				//console.error('Polling error:', error);
+				setPrimaryPollingTimeout();
+			});
+	};
+	
+	const setPrimaryPollingTimeout = () => {
+		clearTimeout(pollingTimeoutRef.current);
+		pollingTimeoutRef.current = setTimeout(() => {
+			primaryPolling();
+		}, 2000);
+	};
 
 	return (
 		<>

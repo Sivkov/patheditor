@@ -371,8 +371,11 @@ const  SvgWrapper = observer (() => {
 			let matrixN = { a: scale, b: 0, c: 0, d: scale, e: coords1.x - coords1.x * scale-xdif, f: coords1.y - coords1.y * scale-ydif }
 			//TODO ЗДЕСЬ в некоторых случаях вылезает ошибка и матрица  получает неверные значения
 			////TODOTODO//TDOD  потестить где баг есть!!!
-			//svgStore.setGroupMatrix (matrixN)
-
+			let allNumbersAreValid = Object.values(matrixN).every(value => Number.isFinite(value));
+			if ( allNumbersAreValid ) {
+				svgStore.setGroupMatrix (matrixN)
+			}		
+			
  			coordsStore.setNeedToFit(false)
 			coordsStore.setFittedPosition ({matrix: { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }, 'groupMatrix': matrixN , 'rectParams':rectParams})
 
