@@ -50,6 +50,9 @@
   --gridColorFill:#333333;
 }
 
+.text-color {
+  color: var(--color);
+}
 /* @-moz-document url-prefix() {
   #grid rect{
     fill:var(--mainBg1);

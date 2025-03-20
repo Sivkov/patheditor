@@ -12,12 +12,11 @@ import GOST from '../../constants/gost.js';
 import CONSTANTS from '../../constants/constants.js';
 
 
-
 const TextPanel = observer(() => {
 	const { t } = useTranslation();
 	const {	textFocus, selectedText } = svgStore;
 	const textareaRef = useRef(null);
-	const {positions} = panelStore
+	const {positions, maxZindex} = panelStore
 
 	useEffect(() => {
 		if (textareaRef.current) {
@@ -51,7 +50,8 @@ const TextPanel = observer(() => {
 					width: positions[id].style.width,
 					height:positions[id].style.height,
 					top:   positions[id].style.top,
-					left:  positions[id].style.left				
+					left:  positions[id].style.left,	
+					zIndex: maxZindex+1			
 				}
 			}
 			position.mini = val

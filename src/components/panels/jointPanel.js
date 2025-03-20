@@ -74,7 +74,7 @@ const JointPanel = observer(() => {
 	const panelInfo = 
 		  {
 			id: 'jointPopup',
-			fa: (<><i className="fa-solid fa-xmark me-2" /><div>{t('Joint')}</div></>),
+			fa: (<><i className="fa-solid fa-xmark me-2 text-white" /><div>{t('Joint')}</div></>),
 			content:  (
 	<div className="d-flex flex-column">
 		<table className="table">

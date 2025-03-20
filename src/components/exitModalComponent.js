@@ -26,7 +26,7 @@ const ExitModalComponent = ({action})=> {
 		<>
 			<Button variant="" onClick={handleShow} className=''>
 				<div
-					className="text-white btn_shapes btn_tool"
+					className="text-color btn_shapes btn_tool"
 				>
 					{t( capitalized )}
 				</div>

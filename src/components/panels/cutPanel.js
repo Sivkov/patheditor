@@ -139,7 +139,7 @@ const CutPanel = observer(() => {
 	const panelInfo =
 	{
 		id: 'cutPopup',
-		fa: (<><i className="fa-solid fa-route me-2" /><div>{t('Cutting order')}</div></>),
+		fa: (<><i className="fa-solid fa-route me-2 text-white" /><div>{t('Cutting order')}</div></>),
 		content: (
 			<div className="d-flex flex-column">
 				<table className="table">

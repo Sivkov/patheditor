@@ -13,10 +13,7 @@ const Navbar = () => {
 					<NavButtons />
 				</div>
 				<div className='d-flex align-items-center'>
-					<ThemeSwitcher />
-					<a href="https://github.com/Sivkov/arcConverter" className="github-button" target="_blank">
-						<img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Icon" className="github-icon" width="20" height="20" />
-					</a>
+					<ThemeSwitcher />					
 				</div>
 			</div>
 		</nav>);

@@ -49,7 +49,7 @@ const PartPanel = observer(() => {
 	const panelInfo = [
 		{
 			id: 'partPopup',
-			fa: (<><i className="fa-solid fa-gear me-2"></i><div>{t('Part data')}</div></>),
+			fa: (<><i className="fa-solid fa-gear me-2 text-white"></i><div>{t('Part data')}</div></>),
 			content: (
 				<div className="d-flex">
 					<table className="table">
