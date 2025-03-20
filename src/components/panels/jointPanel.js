@@ -263,7 +263,7 @@ const JointPanel = observer(() => {
 	
 return (
 	<>
-		<Panel key={'panel' + 13} element={panelInfo} index={13} />
+		<Panel key={'panel' + 13} element={panelInfo}/>
 	</>
 	);
 })

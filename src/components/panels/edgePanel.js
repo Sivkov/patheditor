@@ -331,7 +331,7 @@ const EdgePanel = observer(() => {
 return (
 	<>
 		{selectedEdge && panelInfo.map((element, index) => (
-			<Panel key={'panel' + index + 11} element={element} index={index + 11} />
+			<Panel key={'panel' + index + 11} element={element} />
 		))}
 	</>
 );

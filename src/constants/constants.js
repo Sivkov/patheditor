@@ -18,6 +18,7 @@ const CONSTANTS = {
 				left: 12,
 				width: 350,
 				height: 300,
+				zIndex:1
 			}
 		},
 		toolsPopup: {
@@ -27,6 +28,17 @@ const CONSTANTS = {
 				left: 300,
 				width: 125,
 				height: 380,
+				zIndex: 2
+			}
+		},		
+		contourPopup: {
+			mini: true,
+			style: {
+				top: 120,
+				left: 12,
+				width: 350,
+				height: 600,
+				zIndex: 3
 			}
 		},
 		contourModesPopup: {
@@ -36,15 +48,7 @@ const CONSTANTS = {
 				left: 12,
 				width: 350,
 				height: 300,
-			}
-		},
-		contourPopup: {
-			mini: true,
-			style: {
-				top: 120,
-				left: 12,
-				width: 350,
-				height: 600,
+				zIndex: 4
 			}
 		},
 		partPopup: {
@@ -54,15 +58,7 @@ const CONSTANTS = {
 				left: 12,
 				width: 350,
 				height: 300,
-			}
-		},
-		outletPopup: {
-			mini: true,
-			style: {
-				top: 200,
-				left: 12,
-				width: 350,
-				height: 360,
+				zIndex: 5
 			}
 		},
 		inletPopup: {
@@ -72,26 +68,19 @@ const CONSTANTS = {
 				left: 12,
 				width: 350,
 				height: 400,
+				zIndex:6
 			}
 		},
-		pointPopup: {
+		outletPopup: {
 			mini: true,
 			style: {
 				top: 200,
-				left: 500,
-				width: 400,
-				height: 120,
-			}
-		},
-		edgePopup: {
-			mini: true,
-			style: {
-				top: 100,
-				left: 500,
+				left: 12,
 				width: 350,
-				height: 120,
+				height: 360,
+				zIndex:7
 			}
-		},
+		},		
 		textPopup: {
 			mini: true,
 			style: {
@@ -99,6 +88,7 @@ const CONSTANTS = {
 				left: 12,
 				width: 350,
 				height: 400,
+				zIndex: 8
 			}
 		},
 		jointPopup: {
@@ -108,6 +98,7 @@ const CONSTANTS = {
 				left: 12,
 				width: 350,
 				height: 360,
+				zIndex: 9
 			}
 		},
 		cutPopup: {
@@ -117,6 +108,27 @@ const CONSTANTS = {
 				left: 12,
 				width: 350,
 				height: 360,
+				zIndex: 10 
+			}
+		},
+		pointPopup: {
+			mini: true,
+			style: {
+				top: 200,
+				left: 500,
+				width: 400,
+				height: 120,
+				zIndex: 11
+			}
+		},
+		edgePopup: {
+			mini: true,
+			style: {
+				top: 100,
+				left: 500,
+				width: 350,
+				height: 120,
+				zIndex: 12
 			}
 		},
     },

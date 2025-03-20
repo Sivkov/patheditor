@@ -307,7 +307,7 @@ const TextPanel = observer(() => {
 	
 return (
 	<>
-		<Panel key={'panel' + 12} element={panelInfo} index={12} />
+		<Panel key={'panel' + 12} element={panelInfo} />
 	</>
 	);
 })

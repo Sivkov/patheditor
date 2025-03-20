@@ -1,18 +1,15 @@
 import { observer } from "mobx-react-lite";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import panelStore from "../stores/panelStore";
-//import { toJS } from "mobx";
 
 
-const Panel = observer (({ element, index }) => {
+const Panel = observer (({ element }) => {
 	const id =element.id
 
 	useEffect(()=>{
 		panelStore.getInitialPositions()
 	},[])
-	
-	
-	const [zIndex, setZIndex] = useState(index+1);
+
 	const panelRef = useRef(null);
 	const startPos = useRef({ x: 0, y: 0 });
 	const startWidth = useRef(0);
@@ -22,12 +19,14 @@ const Panel = observer (({ element, index }) => {
 	const move = useRef(0);
 
  	const toggleMinified = () => {
+		handleIncreaseZIndex()
 		let positions = {
 			style:{
 				width: panelStore.positions[id].style.width,
 				height:panelStore.positions[id].style.height,
 				top:   panelStore.positions[id].style.top,
-				left:  panelStore.positions[id].style.left				
+				left:  panelStore.positions[id].style.left,	
+				zIndex:panelStore.maxZindex
 			}
 		}
 		positions.mini = Boolean(!Number( panelStore.positions[id].mini ))
@@ -45,6 +44,18 @@ const Panel = observer (({ element, index }) => {
 		};
 
 		move.current = 'move'
+
+		let positions = {
+			style:{
+				width: panelStore.positions[id].style.width,
+				height:panelStore.positions[id].style.height,
+				top:   panelStore.positions[id].style.top,
+				left:  panelStore.positions[id].style.left,	
+				zIndex:panelStore.maxZindex
+			}
+		}
+		positions.mini = panelStore.positions[id].mini
+		panelStore.setPosition(id, positions)
 
 		document.addEventListener("mousemove", handleMouseMove);
 		document.addEventListener("mouseup", handleMouseUp);
@@ -64,19 +75,17 @@ const Panel = observer (({ element, index }) => {
 	}
 	
 	const handleMouseMove = (e) => {
+
 		if (move.current === 'move') {
 			const newLeft = e.clientX - startPos.current.x;
 			const newTop = e.clientY - startPos.current.y;
-			/* setPosition({
-				top: newTop,
-				left: newLeft,
-			}); */
 			let positions = {
 				style:{
-					top:newTop,
-					left:newLeft,
-					width:panelStore.positions[id].style.width,
+					top:   newTop,
+					left:  newLeft,
+					width: panelStore.positions[id].style.width,
 					height:panelStore.positions[id].style.height,
+					zIndex:panelStore.maxZindex
 				}
 			}
 			positions.mini = panelStore.positions[id].mini
@@ -86,17 +95,13 @@ const Panel = observer (({ element, index }) => {
 		} else {
 			let w = startWidth.current + e.clientX - startX.current ;
 			let h = startHeight.current + e.clientY - startY.current;
-			/* setSize ({
-				width:w,
-				height:h
-			}) */
-			
-            let positions = {
+			let positions = {
 				style:{
-					top:panelStore.positions[id].style.top,
+					top: panelStore.positions[id].style.top,
 					left:panelStore.positions[id].style.left,
 					width:w,
 					height:h,
+					zIndex:panelStore.maxZindex
 				}
 			}
 			positions.mini = panelStore.positions[id].mini
@@ -113,27 +118,17 @@ const Panel = observer (({ element, index }) => {
 	};
 
 	const findHighestZIndex = () => {
-		let currentMaxZIndex = 0;
-		const popups = document.querySelectorAll('.window.popup');
-		popups.forEach((popup) => {
-			const zIndex = getComputedStyle(popup).getPropertyValue('z-index');
-			const parsedZIndex = parseInt(zIndex, 10);
-
-			if (!isNaN(parsedZIndex) && parsedZIndex > currentMaxZIndex) {
-				currentMaxZIndex = parsedZIndex;
-			}
-		});
-		return currentMaxZIndex;
+		let inx = [...Object.values(panelStore.positions).map(popup => popup.style.zIndex)]
+		let maxZIndex = Math.max( ...inx  );		
+		return maxZIndex+1;
 	};
 
 	const handleIncreaseZIndex = () => {
 		const currentMaxZIndex = findHighestZIndex();
-		setZIndex(currentMaxZIndex + 1);
-		//console.log ('Set Z')
+		panelStore.setMaxZindex ( currentMaxZIndex )
 	};
 
 	const  savePanelPosition =(id)=>{
-		//console.log("SavePositions")
 		let ppp = localStorage.getItem('ppp')
 		if (!ppp) {
             let ppp = {}
@@ -144,14 +139,13 @@ const Panel = observer (({ element, index }) => {
         }
 	}   
 
-
 	return (
 		<div
 			ref={panelRef}
 			id={element.id}
 			className={`window popup ${panelStore.positions[id].mini ? " mini h45" : ""}`}
 			style={{
-				zIndex: zIndex,
+				zIndex: `${panelStore.positions[id].style.zIndex}`,
 				top: `${panelStore.positions[id].style.top}px`,
 				left: `${panelStore.positions[id].style.left}px`,
 				width: `${panelStore.positions[id].style.width}px`,

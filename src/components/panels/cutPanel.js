@@ -308,7 +308,7 @@ const CutPanel = observer(() => {
 
 	return (
 		<>
-			<Panel key={'panel' + 14} element={panelInfo} index={14} />
+			<Panel key={'panel' + 14} element={panelInfo} />
 		</>
 	);
 })

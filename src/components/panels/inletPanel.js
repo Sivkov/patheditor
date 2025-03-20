@@ -621,7 +621,7 @@ const InletPanel = observer(() => {
 	return (
 		<>
 			{panelInfo.map((element) => (
-				<Panel key={'panel' + 2} element={element} index={2} />
+				<Panel key={'panel' + 2} element={element} />
 			))}
 		</>
 	);

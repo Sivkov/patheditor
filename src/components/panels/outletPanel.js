@@ -579,7 +579,7 @@ const OutletPanel = observer(() => {
 return (
 	<>
 		{panelInfo.map((element) => (
-			<Panel key={'panel' + 5} element={element} index={5} />
+			<Panel key={'panel' + 5} element={element} />
 		))}
 	</>
 	);
