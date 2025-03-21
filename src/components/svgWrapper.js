@@ -311,13 +311,13 @@ const  SvgWrapper = observer (() => {
 		const handleKeyDown = (e) => {
 			if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z') { 
 				e.preventDefault();
-				//console.log('Ctrl+Z was pressed!');
+				console.log('Ctrl+Z was pressed!');
 				logStore.setNext()
 				log.restorePoint()
 
 			} else if (e.ctrlKey && e.key.toLowerCase() === 'z') {
 				e.preventDefault();
-				//console.log('Ctrl+Z was pressed!');
+				console.log('Ctrl+Z was pressed!');
 				logStore.setPrev()	
 				log.restorePoint()			
 			} 

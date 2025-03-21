@@ -551,12 +551,13 @@ const ContourPanel = observer(() => {
 				  <td />
 				  <td />
 				</tr>
-				<tr>
+				<tr className="d-none">
 				  <td>
 					<i className="fa-solid fa-rectangles-mixed" />
 				  </td>
 				  <td colSpan={4}>
-					<input id="transformAll" type="checkbox" defaultChecked="" />{t('outer&inner')}</td>
+					<input  id="transformAll" type="checkbox" defaultChecked="" />{t('outer&inner')}
+					</td>
 				</tr>
 			  </tbody>
 			</table>

@@ -78,14 +78,34 @@ const Selector = observer(() => {
 				};
 				break;
 	
-			case 'selectorGrip_resize_nw':
+			/*case 'selectorGrip_resize_nw':
 				newCoords = {
 					x: part.current.x,
 					y: part.current.y,
 					width: selectorCoords.x + selectorCoords.width - part.current.x,
 					height: selectorCoords.y - part.current.y + selectorCoords.height,
 				};
+				break; */
+			case 'selectorGrip_resize_nw':
+				let width_nw = selectorCoords.x + selectorCoords.width - part.current.x;
+				let height_nw = selectorCoords.y - part.current.y + selectorCoords.height;
+				let currentAspectRatio_nw = part.initialWidth / part.initialHeight;
+				let newAspectRatio_nw = width_nw / height_nw;
+			
+				if (newAspectRatio_nw > currentAspectRatio_nw) {
+ 					width_nw = height_nw * currentAspectRatio_nw;
+				} else {
+ 					height_nw = width_nw / currentAspectRatio_nw;
+				}
+			
+				newCoords = {
+					x: selectorCoords.x + selectorCoords.width - width_nw,
+					y: selectorCoords.y + selectorCoords.height - height_nw,
+					width: width_nw,
+					height: height_nw
+				};
 				break;
+				
 	
 			case 'selectorGrip_resize_w':
 				newCoords = {
@@ -96,14 +116,34 @@ const Selector = observer(() => {
 				};
 				break;
 	
-			case 'selectorGrip_resize_sw':
+			/*case 'selectorGrip_resize_sw':
 				newCoords = {
 					x: part.current.x,
 					y: selectorCoords.y,
 					width: selectorCoords.x + selectorCoords.width - part.current.x,
 					height: part.current.y - selectorCoords.y,
 				};
+				break; */
+			case 'selectorGrip_resize_sw':
+				let width_sw = selectorCoords.x + selectorCoords.width - part.current.x;
+				let height_sw = part.current.y - selectorCoords.y;
+				let currentAspectRatio_sw = part.initialWidth / part.initialHeight;
+				let newAspectRatio_sw = width_sw / height_sw;
+			
+				if (newAspectRatio_sw > currentAspectRatio_sw) {
+ 					width_sw = height_sw * currentAspectRatio_sw;
+				} else {
+ 					height_sw = width_sw / currentAspectRatio_sw;
+				}
+			
+				newCoords = {
+					x: selectorCoords.x + selectorCoords.width - width_sw,
+					y: selectorCoords.y,
+					width: width_sw,
+					height: height_sw
+				};
 				break;
+				
 	
 			case 'selectorGrip_resize_s':
 				newCoords = {
@@ -114,14 +154,34 @@ const Selector = observer(() => {
 				};
 				break;
 	
-			case 'selectorGrip_resize_se':
+			/*case 'selectorGrip_resize_se':
 				newCoords = {
 					x: selectorCoords.x,
 					y: selectorCoords.y,
 					width: part.current.x - selectorCoords.x,
 					height: part.current.y - selectorCoords.y,
 				};
+				break;*/
+			case 'selectorGrip_resize_se':
+				let width_se = part.current.x - selectorCoords.x;
+				let height_se = part.current.y - selectorCoords.y;
+				let currentAspectRatio_se = part.initialWidth / part.initialHeight;
+				let newAspectRatio_se = width_se / height_se;
+			
+				if (newAspectRatio_se > currentAspectRatio_se) {
+ 					width_se = height_se * currentAspectRatio_se;
+				} else {
+ 					height_se = width_se / currentAspectRatio_se;
+				}
+			
+				newCoords = {
+					x: selectorCoords.x,
+					y: selectorCoords.y,
+					width: width_se,
+					height: height_se
+				};
 				break;
+				
 	
 			case 'selectorGrip_resize_e':
 				newCoords = {
@@ -132,14 +192,35 @@ const Selector = observer(() => {
 				};
 				break;
 	
-			case 'selectorGrip_resize_ne':
+
+			/*case 'selectorGrip_resize_ne':
 				newCoords = {
 					x: selectorCoords.x,
 					y: part.current.y,
 					width: part.current.x - selectorCoords.x,
 					height: selectorCoords.y - part.current.y + selectorCoords.height,
 				};
+				break;*/
+			case 'selectorGrip_resize_ne':
+				let width_ne = part.current.x - selectorCoords.x;
+				let height_ne = selectorCoords.y - part.current.y + selectorCoords.height;
+				let currentAspectRatio_ne = part.initialWidth / part.initialHeight;
+				let newAspectRatio_ne = width_ne / height_ne;
+			
+				if (newAspectRatio_ne > currentAspectRatio_ne) {
+					height_ne = width_ne / currentAspectRatio_ne;
+				} else {
+					width_ne = height_ne * currentAspectRatio_ne;
+				}
+			
+				newCoords = {
+					x: selectorCoords.x,
+					y: selectorCoords.y + selectorCoords.height - height_ne,
+					width: width_ne,
+					height: height_ne
+				};
 				break;
+				
 	
 			case 'selectorGrip_central':
 				newCoords = {
