@@ -129,7 +129,7 @@ const JointPanel = observer(() => {
 													type="number" 
 													min={10}
 													step={1} 
-													defaultValue={50} 
+													/*defaultValue={50}  */
 													value={ jointsForSelectedCid && jointsForSelectedCid.distance ? jointsForSelectedCid.distance : 50}
 													onChange={ setNewJointDistance }
 													ref={jointDistance}
@@ -161,8 +161,8 @@ const JointPanel = observer(() => {
 													type="number" 
 													min={1} 
 													step={1}
-													defaultValue={1} 
-													onChange={ setNewJointQuantity }
+/* 													defaultValue={1} 
+ */													onChange={ setNewJointQuantity }
 													ref={jointQuantity}
 													value={ jointsForSelectedCid &&  jointsForSelectedCid.quantity ? jointsForSelectedCid.quantity : 1}
 												/>
@@ -238,7 +238,7 @@ const JointPanel = observer(() => {
 												type="number" 
 												name="jointSize" 
 												id="jointSize"
-												defaultValue={CONSTANTS.defaultJointSize} 
+												/* defaultValue={CONSTANTS.defaultJointSize}  */
 												min={0.1} 
 												max={5} 
 												step="0.1" 	

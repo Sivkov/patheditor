@@ -6,6 +6,7 @@ import CONSTANTS from "../../constants/constants";
 import Util from "../../utils/util";
 
 class SvgStore {
+	tooltips = false;
 	laserShow =  {};
 	highLighted= false;
 	svgParams = { width: 0, height: 0 };
@@ -186,6 +187,10 @@ class SvgStore {
 		}
 	}
 
+	setTooltips (val) {
+		this.tooltips = val
+	}
+
 	reorderItems(newOrder, oldOrder) {
 		// Создаём копию оригинального массива
 		const originalArray = [...this.svgData.code];
@@ -213,7 +218,7 @@ class SvgStore {
 		this.textFocus = val
 		if (!val) {
 			this.svgData.code.forEach(element => {
-				element.class = element.class.replace(/\bselectedText\b/, "").trim();
+				element.class = element.class.replace(/\bselectedText\b/, " ").trim();
 			});
 		}
 	}	

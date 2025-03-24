@@ -1,5 +1,6 @@
 import React from 'react';
 import ThemeSwitcher from './themeSwitcher';
+import TooltipSwitcher from './tooltipSwitcher';
 import Intro from './intro';
 import NavButtons from './navButtons';
 
@@ -13,6 +14,7 @@ const Navbar = () => {
 					<NavButtons />
 				</div>
 				<div className='d-flex align-items-center'>
+					<TooltipSwitcher />					
 					<ThemeSwitcher />					
 				</div>
 			</div>

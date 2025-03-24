@@ -32,7 +32,7 @@ function ThemeSwitcher() {
   };
 
   return (
-    <div className="form-check form-switch themeSwitcher d-flex align-items-center mx-4" style={{}}>
+    <div className="form-check form-switch themeSwitcher d-flex align-items-center p-2">
       <label htmlFor="themeSwitcher" className="form-check-label" style={{ marginRight: '0px', fontSize:'16px' }}>{t('Dark')}</label>
       <input
         className="form-check-input"
