@@ -9,9 +9,12 @@ import ShapeModalComponent from '../shapeModalComponent.js';
 import { addToLog } from '../../scripts/addToLog.js';
 import util from '../../utils/util.js';
 import { showToast } from '../toast.js';
+import TooltipCreator from './tooltipCreator.js';
+import { useTranslation } from 'react-i18next';
 
 
 const ToolsPanel = observer(() => {
+	const { t } = useTranslation();
 	const deleteContour =()=>{
 		if  (svgStore.getSelectedElement()){
 			svgStore.deleteSelected()
@@ -137,106 +140,231 @@ const ToolsPanel = observer(() => {
 			fa: (<Icon icon="heroicons:wrench-screwdriver-20-solid" />),
  			content: (
 				<div className="d-flex align-items-center btn_block flex-wrap">
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_tool btn_resize_mode"
-					onMouseDown={()=> setMode('resize')}
-				  >
-					<i className="fa-solid fa-arrow-pointer"></i>
-				  </button>
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_tool btn_drag_mode"
-					onMouseDown={()=> setMode('drag')}
-				  >
-					<i className="fa-solid fa-hand"></i>
-				  </button>
+				  	<TooltipCreator
+						element={{
+							id: 'resizeMode',
+							info: (
+								<button
+									id="btn_resize_mode"
+									type="button"
+									className="btn text-white mt-1 ms-2 btn_tool d-flex align-items-center"
+									onMouseDown={() => setMode('resize')}
+									aria-label={t('Resize Mode')} // Улучшаем доступность
+								>
+									<i className="fa-solid fa-arrow-pointer" style={{ marginRight: '5px' }}></i>
+								</button>
+							)
+						}}
+					/>
+					<TooltipCreator
+						element={{
+							id: 'dragMode',
+							info: (
+								<button
+									type="button"
+									id="dragMode"
+									className="btn text-white mt-1 ms-2 btn_tool d-flex align-items-center"
+									onMouseDown={() => setMode('drag')}
+									aria-label={t('Drag Mode')} // Улучшаем доступность
+								>
+									<i className="fa-solid fa-hand" style={{ marginRight: '5px' }}></i>
+								</button>
+							)
+						}}
+					/>
 				 
 					{svgStore.selectedPointOnPath ? 
-						<button
-							type="button"
-							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
-							onMouseDown={addPointToPath}>
-							<Icon icon="gridicons:add" width="24" height="24" />
-						</button>
+						<TooltipCreator
+						element={{
+							id: 'addPointToPath',
+							info: (
+								<button
+									id="addPointToPath"
+									type="button"
+									className="btn text-white mt-1 ms-2 btn_mode d-flex align-items-center btn_tool btn_add_point"
+									onMouseDown={addPointToPath}
+									aria-label={t('Add Point to Path')} 
+								>
+									<Icon icon="gridicons:add" width="24" height="24" style={{ marginRight: '5px' }} />
+ 								</button>
+							)
+						}}
+					/>
 						:
-						<button
-							type="button"
-							className="btn text-white mt-1 ms-2 btn_mode btn_tool btn_add_point"
-							onMouseDown={()=> setMode('addPoint')}							>
-							<div className="d-flex flex-row align-items-center justify-content-center">
-							<i className="fa-solid fa-arrow-pointer"></i>
-							<div style={{ marginTop: 11 }}>+</div>
-							</div>
-						</button>
+
+						<TooltipCreator
+							element={{
+								id: 'addPoint',
+								info: (
+									<button
+										id="addPoint"
+										type="button"
+										className="btn text-white mt-1 ms-2 btn_mode d-flex btn_tool btn_add_point"
+										onMouseDown={() => setMode('addPoint')}
+										aria-label={t('Add Point')}>
+										<div className="d-flex flex-row align-items-center justify-content-center">
+											<i className="fa-solid fa-arrow-pointer" style={{ marginRight: '5px' }}></i>
+											<div style={{ marginTop: 11 }}>+</div>
+										</div>
+									</button>
+								)
+							}}
+						/>						
 					}					
 					
-					<button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
-					onMouseDown={roundEdge}
-				  	>
-					<Icon icon="proicons:arc" width="24" height="24" style={{color: 'white'}} />
-				  	</button>
+					<TooltipCreator
+						element={{
+							id: 'rounding',
+							info: (
+								<button
+									id='rounding'
+									type="button"
+									className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
+									onMouseDown={roundEdge}
+									aria-label="Округление углов" // Добавляем атрибут для доступности
+								>
+									<Icon icon="proicons:arc" width="24" height="24" style={{ color: 'white' }} />
+									{/* Можно добавить текстовое обозначение, если это улучшит понимание функции */}
+								</button>
+							),
+						}}
+					/>
 					{ svgStore.selectedPointOnEdge ?
 
-						<button
-							type="button"
-							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
-							onMouseDown={ deletePoint }
-						>
-						<Icon icon="gridicons:cross-circle" width="24" height="24" />
-						</button>						
+						<TooltipCreator
+							element={{
+								id: 'deletePoint',
+								info: (
+									<button
+										type="button"
+										className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+										onMouseDown={deletePoint}
+										aria-label="Удалить точку" // Улучшаем доступность
+									>
+										<Icon icon="gridicons:cross-circle" width="24" height="24" />
+ 									</button>
+								),
+							}}
+						/>				
 						:
-						<button
-							type="button"
-							className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
-							onMouseDown={()=> setMode('selectPoint')}
-						>
-							<Icon icon="mage:mouse-pointer" width="24" height="24" style={{color: 'white'}}/>
-						</button>
+						<TooltipCreator
+							element={{
+								id: 'selectPoint',
+								info: (
+									<button
+										type="button"
+										id="selectPoint"
+										className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+										onMouseDown={() => setMode('selectPoint')}
+										aria-label="Выбор точки" // Улучшаем доступность
+									>
+										<Icon icon="mage:mouse-pointer" width="24" height="24" style={{ color: 'white' }} />
+ 									</button>
+								),
+							}}
+						/>
 					}
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_copy btn_tool" 
-					onMouseDown={copyContour}
-				  >
-					<i className="fa-solid fa-copy"></i>
-				  </button>
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_paste btn_tool" 
-					onMouseDown={pasteContour}
-				  >
-					<i className="fa-solid fa-file-import"></i>
-				  </button>
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_reverse_path btn_tool"
-					onMouseDown={reverse}
-				  >
-					<i className="fa-solid fa-rotate"></i>
-				  </button>
-  				 <ShapeModalComponent />
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_text btn_tool"
-					onMouseDown={()=> setMode('text')}
-				  >
-					<Icon icon="tabler:text-size" width="24" height="24" />
-				  </button>
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_new_outer btn_tool"
-					onClick={() => svgStore.setNewOuter()}
-				  >
-					<Icon icon="material-symbols:settings-applications-outline" width="24" height="24"  style={{color: 'white'}} />				  </button>
-				  <button
-					type="button"
-					className="btn text-white mt-1 ms-2 btn_delete btn_tool" onMouseDown={deleteContour}
-				  >
-					<i className="fa-solid fa-trash"></i>
-				  </button>
+					<TooltipCreator
+						element={{
+							id: 'btn_copy',
+							info: (
+								<button
+									type="button"
+									id="btn_copy"
+									className="btn text-white mt-1 ms-2 btn_copy btn_tool" 
+									onMouseDown={copyContour}
+									aria-label="Копировать контур" // Делаем кнопку более доступной
+								>
+									<i className="fa-solid fa-copy"></i>
+ 								</button>
+							),
+						}}
+					/>
+					<TooltipCreator
+						element={{
+							id: 'btn_paste',
+							info: (
+								<button
+									id='pasteContour'
+									type="button"
+									className="btn text-white mt-1 ms-2 btn_paste btn_tool" 
+									onMouseDown={pasteContour}
+									aria-label="Вставить контур" // Улучшаем доступность с aria-label
+								>
+									<i className="fa-solid fa-file-import"></i>
+ 								</button>
+							),
+						}}
+					/>
+					<TooltipCreator
+						element={{
+							id: 'btn_reverse',
+							info: (
+								<button
+									id="reverse"
+									type="button"
+									className="btn text-white mt-1 ms-2 btn_reverse_path btn_tool"
+									onMouseDown={reverse}
+									aria-label="Обратить путь" // Атрибут для доступности
+								>
+									<i className="fa-solid fa-rotate"></i>
+								</button>
+							),
+						}}
+					/>
+  					<ShapeModalComponent />
+				   <TooltipCreator
+						element={{
+							id: 'btn_text',
+							info: (
+								<button
+									type="button"
+									className="btn text-white mt-1 ms-2 btn_text btn_tool"
+									onMouseDown={() => setMode('text')}
+									aria-label="Выбрать текстовый режим" // Атрибут для доступности
+								>
+									<Icon icon="tabler:text-size" width="24" height="24" />
+									{/* Если хотите добавить текст рядом с иконкой, может выглядеть так: */}
+									{/* Текст */}
+								</button>
+							),
+						}}
+					/>
+				<TooltipCreator
+					element={{
+						id: 'btn_new_outer',
+						info: (
+							<button
+								id="btn_new_outer"
+								type="button"
+								className="btn text-white mt-1 ms-2 btn_new_outer btn_tool"
+								onClick={() => svgStore.setNewOuter()}
+								aria-label="Создать новый внешний элемент" // Атрибут для доступности
+							>
+								<Icon icon="material-symbols:settings-applications-outline" width="24" height="24" style={{ color: 'white' }} />
+								{/* Можно добавлять текст рядом с иконкой, если это необходимо */}
+								{/* Создать новый */}
+							</button>
+						),
+					}}
+				/>
+				<TooltipCreator
+					element={{
+						id: 'btn_delete',
+						info: (
+							<button
+								type="button"
+								id="btn_delete"
+								className="btn text-white mt-1 ms-2 btn_delete btn_tool" 
+								onMouseDown={deleteContour}
+								aria-label="Удалить контур" // Улучшаем доступность с aria-label
+							>
+								<i className="fa-solid fa-trash"></i>
+								{/* Опционально можно добавить текстовое обозначение, если это необходимо */}
+							</button>
+						),
+					}}
+				/>
 				</div>
 			  ),
 		  },   

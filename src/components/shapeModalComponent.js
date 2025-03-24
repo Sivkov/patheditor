@@ -9,6 +9,7 @@ import svgStore from './stores/svgStore';
 import Util from '../utils/util';
 import SVGPathCommander from 'svg-path-commander';
 import { useTranslation } from 'react-i18next';
+import TooltipCreator from './panels/tooltipCreator';
 
 
 const ShapeModalComponent =observer(()=> {
@@ -62,11 +63,19 @@ const ShapeModalComponent =observer(()=> {
 	return (
 		<>
 			<Button variant="" onClick={handleShow} className='mt-1 ms-2'>
-				<div
-					className="text-white btn_shapes btn_tool"
-				>
-					<i className="fa-solid fa-shapes"></i>
-				</div>
+				<TooltipCreator
+					element={{
+						id:"btn_shapes",
+						info: (
+							<div
+								className="text-white btn_shapes btn_tool"
+								role="button" 
+							>
+								<i className="fa-solid fa-shapes"></i>
+							</div>
+						),
+					}}
+/>
 			</Button>
 
 			<Modal variant="" show={show} onHide={handleClose}>

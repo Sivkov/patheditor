@@ -50,12 +50,22 @@ const TooltipCreator = observer (({ element }) => {
 			text: '',
 			placement: 'bottom'
 		},
-		btn_drag_mode: {
+		resizeMode: {
+			title: t("Resize mode"),
+			text: '',
+			placement: 'bottom'
+		},
+		dragMode: {
 			title: t("Drag mode"),
 			text: '',
 			placement: 'bottom'
 		},
-		btn_add_point: {
+		addPoint: {
+			title: t("Add point"),
+			text: '',
+			placement: 'bottom'
+		},
+		addPointToPath: {
 			title: t("Add point"),
 			text: '',
 			placement: 'bottom'
@@ -65,12 +75,12 @@ const TooltipCreator = observer (({ element }) => {
 			text: '',
 			placement: 'bottom'
 		},
-		btn_selectPoint_mode: {
+		selectPoint: {
 			title: t("Select point mode"),
 			text: '',
 			placement: 'bottom'
 		},
-		btn_rounding: {
+		rounding: {
 			title: t("Round edges at selected point"),
 			text: '',
 			placement: 'bottom'
@@ -80,7 +90,7 @@ const TooltipCreator = observer (({ element }) => {
 			text: '',
 			placement: 'bottom'
 		},
-		btn_reverse_path: {
+		btn_reverse: {
 			title: t("Revert contour path"),
 			text: '',
 			placement: 'bottom'
@@ -115,11 +125,11 @@ const TooltipCreator = observer (({ element }) => {
 			text: '',
 			placement: 'bottom'
 		},
-		toolTipsSwitcher: {
+		/* toolTipsSwitcher: {
 			title: t("Enables and disables hints"),
 			text: '',
 			placement: 'bottom'
-		}
+		} */
 	}
 
 

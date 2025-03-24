@@ -11,6 +11,7 @@ import inlet from '../../scripts/inlet.js';
 import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
 import { showToast } from '../toast.js';
+import TooltipCreator from './tooltipCreator.js';
 
 
 const ContourPanel = observer(() => {
@@ -507,7 +508,18 @@ const ContourPanel = observer(() => {
 					</div>
 				  </td>
 				  <td>
-					<input id="proportion" type="checkbox" />
+					<TooltipCreator
+						element={{
+							id: 'proportion',
+							info: (
+								<input
+									id="proportion"
+									type="checkbox"
+									className="form-check-input"
+								/>
+							)
+						}}
+					/>
 				  </td>
 				  <td>
 					<div className="d-flex align-items-center">
@@ -556,8 +568,25 @@ const ContourPanel = observer(() => {
 					<i className="fa-solid fa-rectangles-mixed" />
 				  </td>
 				  <td colSpan={4}>
-					<input  id="transformAll" type="checkbox" defaultChecked="" />{t('outer&inner')}
-					</td>
+					<TooltipCreator
+						element={{
+							id: 'transformAll',
+							info: (
+								<div>
+									<input
+										id="transformAll"
+										type="checkbox"
+										defaultChecked
+										className="form-check-input"
+									/>
+									<label htmlFor="transformAll" className="ms-2">
+										{t('outer&inner')}
+									</label>
+								</div>
+							)
+						}}
+					/>
+				</td>
 				</tr>
 			  </tbody>
 			</table>

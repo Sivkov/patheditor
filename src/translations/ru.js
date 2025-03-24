@@ -450,6 +450,7 @@ let ru = {
     "No previous log entry found.":"Дальше никак",
     "Saving was cancelled cause contour collision":"Сохранение отмененено из-за столкновения контуров",
     "Indexed DB cleared!":"База данных обновлена!",
+    "Resize mode":"Режим контура"
 
     }
 

@@ -10,6 +10,7 @@ import { addToLog } from './../../scripts/addToLog.js';
 import { useTranslation } from 'react-i18next';
 import GOST from '../../constants/gost.js';
 import CONSTANTS from '../../constants/constants.js';
+import TooltipCreator from './tooltipCreator.js';
 
 
 const TextPanel = observer(() => {
@@ -274,36 +275,64 @@ const TextPanel = observer(() => {
 								<td className="mx-2">
 									<div className="d-flex align-items-center justify-content-center">
 										<div className="d-flex align-items-center ">
-										<div>
-											<Icon icon="fluent:text-font-16-regular" width="20" height="20"  style={{color:'white'}} />
-										</div>
-										<input
-											className="mx-2 text-center"
-											id="fontSize"
-											type="number"
-											min={1}
-											max={100}
-											step={0.5}
-											onChange={ setFontSize }
-											value={selectedText ? selectedText.fontSize : CONSTANTS.fontSize}
-										/>
-										<div>{t('mm')}</div>
+											<TooltipCreator
+												element={{
+													id: 'textSize',
+													info: (
+														<div className="d-flex align-items-center">
+															<div>
+																<Icon
+																	icon="fluent:text-font-16-regular"
+																	width="20"
+																	height="20"
+																	style={{ color: 'white' }}
+																/>
+															</div>
+															<input
+																className="mx-2 text-center"
+																id="textSize"
+																type="number"
+																min={1}
+																max={100}
+																step={0.5}
+																onChange={setFontSize}
+																value={selectedText ? selectedText.fontSize : CONSTANTS.fontSize}
+															/>
+															<div>{t('mm')}</div>
+														</div>
+													)
+												}}
+											/>
 										</div>
 										<div className="d-flex align-items-center ms-4">
-										<div htmlFor="kerning">
-											<Icon icon="carbon:text-kerning" width="24" height="24"  style={{color: 'white'}} />
-										</div>
-										<input
-											className="mx-2 text-center"
-											id="kerning"
-											type="number"
- 											min={0.1}
-											max={100}
-											step={0.1}
-											onChange={ setTextKerining }
-											value={selectedText ? selectedText.kerning : CONSTANTS.kerning}
+										<TooltipCreator
+											element={{
+												id: 'textKerning',
+												info: (
+													<div className="d-flex align-items-center">
+														<label htmlFor="textKerning" className="d-flex align-items-center">
+															<Icon
+																icon="carbon:text-kerning"
+																width="24"
+																height="24"
+																style={{ color: 'white' }}
+															/>
+														</label>
+														<input
+															className="mx-2 text-center"
+															id="textKerning"
+															type="number"
+															min={0.1}
+															max={100}
+															step={0.1}
+															onChange={setTextKerining}
+															value={selectedText ? selectedText.kerning : CONSTANTS.kerning}
+														/>
+														<div>{t('mm')}</div>
+													</div>
+												)
+											}}
 										/>
-										<div>{t('mm')}</div>
 										</div>
 									</div>
 								</td>

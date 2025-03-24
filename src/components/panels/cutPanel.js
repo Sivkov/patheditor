@@ -7,6 +7,7 @@ import { addToLog } from '../../scripts/addToLog.js';
 import svgStore from '../stores/svgStore.js';
 import { Icon } from '@iconify/react';
 import { ReactSortable } from "react-sortablejs";
+import TooltipCreator from './tooltipCreator.js';
 
 
 
@@ -147,58 +148,103 @@ const CutPanel = observer(() => {
 						<tr>
 							<td>
 								<div className="d-flex align-items-center justify-content-evenly">
-									<div className="ms-2 w-25">
-										<input
-										type="range"
-										className="form-range"
-										id="speedPartShow"
-										step={1}
-										min={1}
-										max={100}
-										value={speed}
-										onChange={ setShowSpeed }
+								<TooltipCreator
+									element={{
+										id: 'speedPartShow',
+										info: (
+											<div className="ms-2 w-25">
+												<input
+													type="range"
+													className="form-range"
+													id="speedPartShow"
+													step={1}
+													min={1}
+													max={100}
+													value={speed}
+													onChange={setShowSpeed}
+												/>
+											</div>
+										)
+									}}
+								/>
+									<div className="ms-2">
+										<TooltipCreator 
+											element ={ 
+											{ 
+												id : 'playCutPartOrder',
+												info :
+													(<button
+														type="button"
+														className="btn btn-sm btn-info"
+														id="playCutPartOrder"
+														onMouseDown={runCutQue}
+													>
+														<Icon icon="material-symbols:play-arrow-rounded" width="24" height="24" style={{ color: "white" }} />
+													</button>)
+											}
+										}										
 										/>
+										<TooltipCreator
+												element={{
+													id: 'stopCutQue',
+													info: (
+														<button
+															type="button"
+															className="btn btn-sm btn-danger ms-1"
+															id="stopCutQue"
+															onMouseDown={stopCutQue}
+														>
+															<Icon icon="material-symbols:stop-rounded" width="24" height="24" style={{ color: "white" }} />
+														</button>
+													)
+												}}
+											/>
+										
+				
 									</div>
 									<div className="ms-2">
-										<button
-											type="button"
-											className="btn btn-sm btn-info"
-											id="playCutPartOrder"
-											onMouseDown={runCutQue}
-										>
-											<Icon icon="material-symbols:play-arrow-rounded" width="24" height="24" style={{ color: "white" }} />
-										</button>
-										<button
-											type="button"
-											className="btn btn-sm btn-danger ms-1"
-											id="stopCutQue"
-											onMouseDown={stopCutQue}
-										>
-											<Icon icon="material-symbols:stop-rounded" width="24" height="24" style={{ color: "white" }} />
-										</button>
-									</div>
-									<div className="ms-2">
-										<button
-											type="button"
-											className="btn btn-sm btn-primary w50 resizeCutItem"
-											onMouseDown={resizeCutItem}
-										>
-											<Icon icon="material-symbols:grid-on-sharp" width="24" height="24" style={{ color: "white" }} />
-										</button>
-										<button
-											type="button"
-											className="btn btn-sm btn-primary w100 resizeCutItem"
-											onMouseDown={resizeCutItem}
-										>
-											<Icon icon="material-symbols-light:grid-view" width="24" height="24" style={{ color: "white" }} />
-										</button>
-										<button
-											type="button"
-											className="btn btn-sm btn-primary resizeCutItem"
-											onMouseDown={resizeCutItem}
-										>
-											<Icon icon="material-symbols-light:format-list-bulleted-rounded" width="24" height="24" />
-										</button>
+										<TooltipCreator
+											element={{
+												id: 'resizeCutItem',
+												info: (
+													<button
+														type="button"
+														className="btn btn-sm btn-primary w50 resizeCutItem"
+														onMouseDown={resizeCutItem}
+													>
+														<Icon icon="material-symbols:grid-on-sharp" width="24" height="24" style={{ color: "white" }} />
+													</button>
+												)
+											}}
+										/>
+										<TooltipCreator
+											element={{
+												id: 'resizeCutItem',
+												info: (
+													<button
+														type="button"
+														className="btn btn-sm btn-primary w100 resizeCutItem"
+														onMouseDown={resizeCutItem}
+													>
+													<Icon icon="material-symbols-light:grid-view" width="24" height="24" style={{ color: "white" }} />
+													</button>
+												)
+											}}
+										/>
+										<TooltipCreator
+											element={{
+												id: 'resizeCutItem',
+												info: (
+													<button
+														type="button"
+														className="btn btn-sm btn-primary resizeCutItem"
+														onMouseDown={resizeCutItem}
+													>
+													<Icon icon="material-symbols-light:format-list-bulleted-rounded" width="24" height="24" />
+													</button>
+												)
+											}}
+										/>
 									</div>
 								</div>
 							</td>

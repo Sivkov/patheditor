@@ -19,6 +19,7 @@ const JointPanel = observer(() => {
 	const { selectedCid } = svgStore
 	const jointQuantity = useRef(null);
 	const jointDistance = useRef(null);
+	const { jointSize } = jointStore
 
 	const setJointQuantity =(e)=> {
 		if (jointsForSelectedCid) {
@@ -238,7 +239,7 @@ const JointPanel = observer(() => {
 												type="number" 
 												name="jointSize" 
 												id="jointSize"
-												/* defaultValue={CONSTANTS.defaultJointSize}  */
+												value={jointSize ? jointSize : CONSTANTS.defaultJointSize}  
 												min={0.1} 
 												max={5} 
 												step="0.1" 	
