@@ -29,6 +29,7 @@ const  SvgWrapper = observer (() => {
         rectParams,
         gridState,
         svgParams, 
+		selectedText
 
 	} =  svgStore
 
@@ -309,19 +310,29 @@ const  SvgWrapper = observer (() => {
 		}, 500);
 	  		
 		const handleKeyDown = (e) => {
-			if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z') { 
-				e.preventDefault();
-				console.log('Ctrl+Z was pressed!');
-				logStore.setNext()
-				log.restorePoint()
-
-			} else if (e.ctrlKey && e.key.toLowerCase() === 'z') {
-				e.preventDefault();
-				console.log('Ctrl+Z was pressed!');
-				logStore.setPrev()	
-				log.restorePoint()			
-			} 
-		};
+				if (!selectedText && e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z') { 
+					e.preventDefault();
+					console.log('Ctrl+Z was pressed!');
+					logStore.setNext()
+					log.restorePoint()
+	
+				} else if (!selectedText && e.ctrlKey && e.key.toLowerCase() === 'z') {
+					e.preventDefault();
+					console.log('Ctrl+Z was pressed!');
+					logStore.setPrev()	
+					log.restorePoint()			
+				} else if (!selectedText && e.key === 'Delete') {
+					e.preventDefault();
+					console.log('Delete was pressed!');	
+				} /* else if (!selectedText && e.key === ' ') {
+					e.preventDefault();
+					console.log('Space was pressed!');
+				}  else if (!selectedText && e.ctrlKey && e.key.toLowerCase() === 'c') {
+					e.preventDefault();
+				} else if (!selectedText && e.ctrlKey && e.key.toLowerCase() === 'v') {
+					e.preventDefault();
+				}  */
+			}
 	
 		window.addEventListener('keydown', handleKeyDown);
 		return () => {

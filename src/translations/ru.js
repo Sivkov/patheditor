@@ -344,8 +344,8 @@ let ru = {
     "Download":"Скачать ",
     "Getting NCP failed":"Получение NCP не удалось ",
     "Unfinished":"Незаконченный ",
-    "To Line":"В линию ",
-    "To Arc":"В дугу ",
+    "To line":"В линию ",
+    "To arc":"В дугу ",
     "Saving was failed by remote server!":"Сохранение не удалось выполнить на удаленном сервере! ",
     "Joint":"Перемычка ",
     "Avto":"Авто ",
@@ -450,7 +450,8 @@ let ru = {
     "No previous log entry found.":"Дальше никак",
     "Saving was cancelled cause contour collision":"Сохранение отмененено из-за столкновения контуров",
     "Indexed DB cleared!":"База данных обновлена!",
-    "Resize mode":"Режим контура"
+    "Resize mode":"Режим контура",
+    "Delete selected point":"Удалить выбранную точку",
 
     }
 

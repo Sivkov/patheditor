@@ -29,7 +29,7 @@ const Selector = observer(() => {
 
 
 	let circleSize =  (selectorCoords.width + selectorCoords.height) / 40;
-	circleSize = circleSize > 2 ? 2 : (circleSize < 0.25 ? 0.25 : circleSize)
+	circleSize = circleSize > 3 ? 3 : (circleSize < 0.5 ? 0.5 : circleSize)
 	let part = {};
 	part.svg = document.getElementById("svg")
 

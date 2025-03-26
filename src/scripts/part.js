@@ -83,7 +83,7 @@ class Part {
             this.ncpLines = ncpCode.code
         } else {
             /////
-            this.ncpLines = CONSTANTS.code1
+            this.ncpLines = CONSTANTS.code6
         }
      
         let currentX, currentY
@@ -588,7 +588,11 @@ class Part {
     }
 
     static async cleanHandle(action=false) {
-        await log.clearBase();	
+        showToast({
+            type: 'success',
+            message: 'Update DB',
+        });
+        let data = await log.clearBase();	
         switch (action) {
             case 'reload':
               window.location.reload(); 

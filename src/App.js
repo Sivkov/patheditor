@@ -9,6 +9,7 @@ import Panels from './components/panels/panels.js';
 import './i18n.js'; 
 import Preloader from './components/preloader.js';
 import { ToastContainer } from 'react-toastify';
+//import Example from './components/example.js'
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
 			<Informer />
 			<Panels />
 			<ToastContainer />
+			{/* <Example /> */}
 		</div>
  	);
 }

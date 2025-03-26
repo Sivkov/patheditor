@@ -80,6 +80,11 @@ const TooltipCreator = observer (({ element }) => {
 			text: '',
 			placement: 'bottom'
 		},
+		deletePoint: {
+			title: t("Delete selected point"),
+			text: '',
+			placement: 'bottom'
+		},
 		rounding: {
 			title: t("Round edges at selected point"),
 			text: '',
