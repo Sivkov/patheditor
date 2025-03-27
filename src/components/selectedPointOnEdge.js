@@ -33,6 +33,8 @@ const SelectedPointOnEdge = observer(() => {
 			cy={selectedPointOnEdge.point.y}
 			onMouseDown = { onMouseDown }
 			onMouseUp ={ onMouseUp }
+			onTouchStart={ onMouseDown }
+			onTouchEnd={ onMouseUp }
 		/>
 	);
 });

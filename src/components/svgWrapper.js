@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite'; 
-//import { toJS } from 'mobx'; 
 import coordsStore from './stores/coordsStore.js'; 
 import editorStore from './stores/editorStore.js'; 
 import SvgComponent from './svg';
@@ -23,7 +22,8 @@ const  SvgWrapper = observer (() => {
         rectParams,
         gridState,
         svgParams, 
-		selectedText
+		selectedText,
+		pointInMove
 	} =  svgStore
 
 	const { jointPositions } = jointStore
@@ -58,18 +58,15 @@ const  SvgWrapper = observer (() => {
 	};
 
 	const touchZoom = (event, curDiff, prevDiff) =>{
-		console.log ('** touchZoom **')
+		//console.log ('** touchZoom **')
 		var svg = document.getElementById("svg")
-        // Коэффициент масштабирования на основе разницы расстояний
         let scale = curDiff / prevDiff;
 		var group = document.getElementById("group").transform.baseVal.consolidate().matrix
 
-        // Вычисление координат центра между двумя точками касания
         let x = (evCache[0].clientX + evCache[1].clientX) / 2;
         let y = (evCache[0].clientY + evCache[1].clientY) / 2;
         let coords = util.convertScreenCoordsToSvgCoords(x, y);
     
-        // Применение трансформации
 		var gTransform = svg.createSVGMatrix()
         gTransform = gTransform.translate(coords.x, coords.y);
         gTransform = gTransform.scale(scale, scale);
@@ -114,8 +111,7 @@ const  SvgWrapper = observer (() => {
     // Обработчик движения пальцев
     const handleTouchMove =(event)=> {
         //console.log ('handleTouchMove')
-		if ( editorStore.mode == 'drag' || editorStore.mode == 'dragging') {
-			//console.log ('handleTouchMove')
+		if ( editorStore.mode == 'drag' || editorStore.mode == 'dragging' || pointInMove) {
 			let ee = event.touches[0]	
 			drag ( ee , true)
 		} else {
@@ -127,7 +123,7 @@ const  SvgWrapper = observer (() => {
 				let curDiff = getDistance(evCache[0], evCache[1]);
 		
 				if (prevDiff > 0) {
-					touchZoom(event, curDiff, prevDiff); // Вызов функции масштабирования
+					touchZoom(event, curDiff, prevDiff);
 				}
 				prevDiff = curDiff;
 			}
@@ -136,9 +132,8 @@ const  SvgWrapper = observer (() => {
     
     // Обработчик окончания касания
     const handleTouchEnd =(event) =>{
-        //event.preventDefault()
         //console.log ('handleTouchEnd')
-		if ( editorStore.mode== 'dragging' ) {
+		if ( editorStore.mode== 'dragging'|| pointInMove) {
 			endDrag( e )
 		} else {
 			for (let i = 0; i < event.changedTouches.length; i++) {
@@ -250,7 +245,7 @@ const  SvgWrapper = observer (() => {
 
 	const endDrag =(e) =>{
 		inMoveRef.current = 0;	
-		if (svgStore.pointInMove) {
+		if ( pointInMove ) {
 			util.setGuidesPositionForPoint (e)
 			addToLog("Contour was changed")
 		}
@@ -305,7 +300,10 @@ const  SvgWrapper = observer (() => {
 			editorStore.setMode('dragging')
 		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
 			inlet.getNewPathsInMove (coords)				
-		} else if (e.button === 0 && svgStore.pointInMove) {
+		} else if (
+				( e.button === 0 && pointInMove ) ||
+				( force && pointInMove )
+			) {
 			util.pointMoving(e, coords)			
 		}		
 	}
