@@ -480,10 +480,10 @@ class SvgStore {
 
 	getSelectedElement(val = '') {	
 		const selectedElement = this.svgData.code.find(element => element.selected);
-		if (!selectedElement) {
+		if (!selectedElement || selectedElement.cid === -1 ) {
 			return null;
 		}
-		return val ? selectedElement[val] || null : selectedElement;
+		return val ? selectedElement[val] /* || null : */: selectedElement;
 	}
 
 	getOuterElement(val = '') {	

@@ -26,6 +26,7 @@
   --sizePlanX:50;   
   --sizePlanY:50;  
 }
+/*  TODO REMOVE  start*/
 
 .example {
   position: absolute;
@@ -55,11 +56,20 @@
   margin-bottom: 8px;
 }
  
- 
 .draggableItem {
   touch-action: manipulation !important;
 }
 
+/*  TODO REMOVE  END*/
+
+
+html, body, #partEditor {
+  touch-action: none !important;
+}
+
+#wrapper_svg {
+  touch-action: manipulation;
+}
 
  .theme_light {
   --color: #02feff;        

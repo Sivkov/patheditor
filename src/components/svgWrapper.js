@@ -15,9 +15,6 @@ import logStore from './stores/logStore.js';
 import log from '../scripts/log.js'
 
 
-var tch = {}
-tch.evCache = new Array();
-var prevDiff = -1;
   
 
 const  SvgWrapper = observer (() => {
@@ -30,7 +27,6 @@ const  SvgWrapper = observer (() => {
         gridState,
         svgParams, 
 		selectedText
-
 	} =  svgStore
 
 	const { jointPositions } = jointStore
@@ -65,15 +61,15 @@ const  SvgWrapper = observer (() => {
 	};
 
 	const touchZoom = (event, curDiff, prevDiff) =>{
-		//console.log ('** touchZoom **')
+		console.log ('** touchZoom **')
 		var svg = document.getElementById("svg")
         // Коэффициент масштабирования на основе разницы расстояний
         let scale = curDiff / prevDiff;
 		var group = document.getElementById("group").transform.baseVal.consolidate().matrix
 
         // Вычисление координат центра между двумя точками касания
-        let x = (tch.evCache[0].clientX + tch.evCache[1].clientX) / 2;
-        let y = (tch.evCache[0].clientY + tch.evCache[1].clientY) / 2;
+        let x = (evCache[0].clientX + evCache[1].clientX) / 2;
+        let y = (evCache[0].clientY + evCache[1].clientY) / 2;
         let coords = util.convertScreenCoordsToSvgCoords(x, y);
     
         // Применение трансформации
@@ -91,6 +87,9 @@ const  SvgWrapper = observer (() => {
 			e: comboMatrix.e,
 			f: comboMatrix.f
 		});
+
+        let attr = calculateRectAttributes()
+		svgStore.setRectParams( attr)
     
      	/*Применение трансформации к элементу SVG
         let transform = part.svg.createSVGTransform();
@@ -98,56 +97,57 @@ const  SvgWrapper = observer (() => {
         part.group.transform.baseVal.initialize(transform);
         */
     }
- 
-	const pointerdown_handler = (ev) => {
-		ev.preventDefault()
- 		//console.log ('pointer_down_')
-		tch.evCache.push(ev);
-	}
 
-	const pointermove_handler = (ev) => {
-		//console.log('pointer_move_');
-		ev.preventDefault()
-		for (let i = 0; i < tch.evCache.length; i++) {
-			if (ev.pointerId === tch.evCache[i].pointerId) {
-				tch.evCache[i] = ev;
-				break;
-			}
-		}
-	
-		if (tch.evCache.length === 2) {
-			let curDiff = Math.sqrt(
-				Math.pow(tch.evCache[1].clientX - tch.evCache[0].clientX, 2) +
-				Math.pow(tch.evCache[1].clientY - tch.evCache[0].clientY, 2)
-			);
-	
-			if (prevDiff > 0) {
-				if (curDiff !== prevDiff) {
-					touchZoom(ev, curDiff, prevDiff);
-				}
-			}
-			prevDiff = curDiff;
-		} 
-	}
+    let evCache = []; // Список активных касаний
+    let prevDiff = -1; // Предыдущее расстояние между пальцами
+    
+    // Обработчик начала касания
+    const handleTouchStart =(event)=> {
+        console.log ('handleTouchStart')
+        evCache = []; 
+        prevDiff = -1; 
+        evCache.push(event);
+    }
+    
+    // Обработчик движения пальцев
+    const handleTouchMove =(event)=> {
+        //console.log ('handleTouchMove')
 
-	const pointerup_handler = (ev) => {
-		ev.preventDefault()
- 		//console.log ('pointer_up_')
-		remove_event(ev);
-		if (tch.evCache.length < 2) prevDiff = -1;
-	}
+        for (let i = 0; i < event.touches.length; i++) {
+            evCache[i] = event.touches[i];
+        }
+    
+        if (evCache.length === 2) {
+            let curDiff = getDistance(evCache[0], evCache[1]);
+    
+            if (prevDiff > 0) {
+                touchZoom(event, curDiff, prevDiff); // Вызов функции масштабирования
+            }
+            prevDiff = curDiff;
+        }
+    }
+    
+    // Обработчик окончания касания
+    const handleTouchEnd =(event) =>{
+        //event.preventDefault()
+        console.log ('handleTouchEnd')
 
-	const remove_event = (ev) => {
-		ev.preventDefault()
-		// ev.stopPropagation()
-		//console.log ('remove_event_')
-		for (var i = 0; i <tch.evCache.length; i++) {
-			if (true ||tch.evCache[i].pointerId == ev.pointerId) {
-				tch.evCache.splice(i, 1);
-				break;
-			}
-		}
-	}
+        for (let i = 0; i < event.changedTouches.length; i++) {
+            let index = evCache.findIndex(t => t.identifier === event.changedTouches[i].identifier);
+            if (index > -1) evCache.splice(index, 1);
+        }
+    
+        // Если осталось одно или ноль касаний, сбрасываем prevDiff
+        if (evCache.length < 2) {
+            prevDiff = -1;
+        }
+    }
+    
+    const getDistance = (touch1, touch2)=> {
+        let dx = touch1.clientX - touch2.clientX;
+        let dy = touch1.clientY - touch2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
 
 	const startDrag = (e) =>{
 		//console.log ('startDrag' + e.buttons)
@@ -310,6 +310,7 @@ const  SvgWrapper = observer (() => {
 		}, 500);
 	  		
 		const handleKeyDown = (e) => {
+				console.log ('handleKeyDown')
 				if (!selectedText && e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z') { 
 					e.preventDefault();
 					console.log('Ctrl+Z was pressed!');
@@ -441,13 +442,6 @@ const  SvgWrapper = observer (() => {
 		svgStore.setGridState(updatedState);
 	}, [a, b, c , d, e, f]);
 
-	/*useEffect(()=>{
-		// Поменял UseEffect  на изменение в drag and wheelZoom
-		let attr = calculateRectAttributes()
-		//console.log ("Rect In UseEffect:  " + JSON.stringify( attr ))
-		svgStore.setRectParams( attr)
-	},[matrix, groupMatrix, offset])*/
-
 	useEffect(()=>{
 		console.log (editorStore.mode)
 		if (editorStore.mode === 'resize') {
@@ -498,20 +492,20 @@ const  SvgWrapper = observer (() => {
 			<div className="row  align-items-center h-100">
 				<div className="w-100 h-100">
 					<div className="d-flex" id="editor_main_wrapper">
-						<div id="wrapper_svg" ref={wrapperSVG}
+						<div id="wrapper_svg" 
+							ref={wrapperSVG}
+							className={ wrapperClass }		 
 		 					onWheel = {handleMouseWheel} 
 							onMouseDown = {startDrag}
 							onMouseMove = {drag} 
 							onMouseUp = {endDrag}
 							onMouseLeave = {leave}
-							className={ wrapperClass }		 
-							/* TODO RESIZING using touches onPointerDown = {pointerdown_handler}
-							onPointerMove = {pointermove_handler}
-							onPointerUp = {pointerup_handler}
-							onPointerCancel = {pointerup_handler}
-							onPointerOut = {pointerup_handler}
-							onPointerLeave = {pointerup_handler}*/> 
-								<SvgComponent />
+							onTouchStart = {handleTouchStart}
+                			onTouchMove = {handleTouchMove}
+                			onTouchEnd = {handleTouchEnd}
+                			onTouchCancel = {handleTouchEnd}
+							>	 
+							<SvgComponent />
 						</div>
 					</div>
 				</div>	
