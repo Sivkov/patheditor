@@ -35,6 +35,26 @@ const SimpleReturnComponent = observer(() => {
 
 	}, []);
 
+	const setSelectedTouch = (e) => {
+		//console.log ("setSelectedTouch    ")
+		if ( editorStore.mode === 'resize') {
+			let cid = Number(e.currentTarget.getAttribute('data-cid'));
+			if (typeof cid === 'number') {
+				if (cid !== selectedCid) {
+					svgStore.setContourSelected(cid)
+				} else {
+					//console.log (e)
+					let inlet = e.currentTarget.classList.contains('inlet')
+					let outlet = e.currentTarget.classList.contains('outlet')				
+					if ( (inlet || outlet) && editorStore.inletMode === 'move' ) {
+						editorStore.setInletMode('inletInMoving')
+						//console.log ('setSelected and start in mode  ****')						
+					}				
+				}
+			}
+		} 
+	}
+
 	const setSelected = (e) => {
 		//console.log ("Button number   "+e.button)
 		if (e.button === 0 && editorStore.mode === 'resize') {
@@ -46,9 +66,9 @@ const SimpleReturnComponent = observer(() => {
 					//console.log (e)
 					let inlet = e.currentTarget.classList.contains('inlet')
 					let outlet = e.currentTarget.classList.contains('outlet')				
-					if ( (inlet || outlet) && editorStore.inletMode === 'move') {
+					if ( (inlet || outlet) && editorStore.inletMode === 'move' ) {
 						editorStore.setInletMode('inletInMoving')
-						//console.log ('setSelected and start in mode  ' + editorStore.inlrtMode)						
+						//console.log ('setSelected and start in mode  @@@')						
 					}				
 				}
 			}
@@ -110,6 +130,8 @@ const SimpleReturnComponent = observer(() => {
 					className={element.class}
 					onMouseDown={setSelected}
 					onMouseUp={detectCanMove}
+ 					onTouchStart={setSelectedTouch} 
+					onTouchEnd={detectCanMove}
 					fill={element.class.includes("inner") ? "url(#grid)" : ""}
 				>
 					<path d={element.path}></path>

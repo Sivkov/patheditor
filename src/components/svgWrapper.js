@@ -114,6 +114,9 @@ const  SvgWrapper = observer (() => {
 		if ( editorStore.mode == 'drag' || editorStore.mode == 'dragging' || pointInMove) {
 			let ee = event.touches[0]	
 			drag ( ee , true)
+		} else if ( editorStore.inletMode === 'inletInMoving' ){
+			let ee = event.touches[0]	
+			drag ( ee , true)
 		} else {
 			for (let i = 0; i < event.touches.length; i++) {
 				evCache[i] = event.touches[i];
@@ -298,7 +301,10 @@ const  SvgWrapper = observer (() => {
 				svgStore.setRectParams( attr)
 			}
 			editorStore.setMode('dragging')
-		} else if ( e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') {
+		} else if ( 
+			(e.buttons === 1  &&   editorStore.inletMode === 'inletInMoving') ||
+			(force  &&   editorStore.inletMode === 'inletInMoving') 
+		) {
 			inlet.getNewPathsInMove (coords)				
 		} else if (
 				( e.button === 0 && pointInMove ) ||
