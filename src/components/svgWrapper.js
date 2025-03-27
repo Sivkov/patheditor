@@ -6,16 +6,13 @@ import editorStore from './stores/editorStore.js';
 import SvgComponent from './svg';
 import util from './../utils/util';
 import Part from '../scripts/part.js';
-//import tch from './../scripts/touches'
 import inlet from './../scripts/inlet.js'
 import svgStore from './stores/svgStore.js';
 import { addToLog } from '../scripts/addToLog.js';
 import jointStore from './stores/jointStore.js';
 import logStore from './stores/logStore.js';
 import log from '../scripts/log.js'
-
-
-  
+ 
 
 const  SvgWrapper = observer (() => {
 
@@ -103,44 +100,57 @@ const  SvgWrapper = observer (() => {
     
     // Обработчик начала касания
     const handleTouchStart =(event)=> {
-        console.log ('handleTouchStart')
-        evCache = []; 
-        prevDiff = -1; 
-        evCache.push(event);
+		//console.log ('handleTouchStart')
+		if ( editorStore.mode== 'drag') {
+			let ee = event.touches[0]	
+ 			startDrag( ee )
+		} else {
+			evCache = []; 
+        	prevDiff = -1; 
+        	evCache.push(event);
+		}        
     }
     
     // Обработчик движения пальцев
     const handleTouchMove =(event)=> {
         //console.log ('handleTouchMove')
-
-        for (let i = 0; i < event.touches.length; i++) {
-            evCache[i] = event.touches[i];
-        }
-    
-        if (evCache.length === 2) {
-            let curDiff = getDistance(evCache[0], evCache[1]);
-    
-            if (prevDiff > 0) {
-                touchZoom(event, curDiff, prevDiff); // Вызов функции масштабирования
-            }
-            prevDiff = curDiff;
-        }
+		if ( editorStore.mode == 'drag' || editorStore.mode == 'dragging') {
+			//console.log ('handleTouchMove')
+			let ee = event.touches[0]	
+			drag ( ee , true)
+		} else {
+			for (let i = 0; i < event.touches.length; i++) {
+				evCache[i] = event.touches[i];
+			}
+		
+			if (evCache.length === 2) {
+				let curDiff = getDistance(evCache[0], evCache[1]);
+		
+				if (prevDiff > 0) {
+					touchZoom(event, curDiff, prevDiff); // Вызов функции масштабирования
+				}
+				prevDiff = curDiff;
+			}
+		}
     }
     
     // Обработчик окончания касания
     const handleTouchEnd =(event) =>{
         //event.preventDefault()
-        console.log ('handleTouchEnd')
-
-        for (let i = 0; i < event.changedTouches.length; i++) {
-            let index = evCache.findIndex(t => t.identifier === event.changedTouches[i].identifier);
-            if (index > -1) evCache.splice(index, 1);
-        }
-    
-        // Если осталось одно или ноль касаний, сбрасываем prevDiff
-        if (evCache.length < 2) {
-            prevDiff = -1;
-        }
+        //console.log ('handleTouchEnd')
+		if ( editorStore.mode== 'dragging' ) {
+			endDrag( e )
+		} else {
+			for (let i = 0; i < event.changedTouches.length; i++) {
+				let index = evCache.findIndex(t => t.identifier === event.changedTouches[i].identifier);
+				if (index > -1) evCache.splice(index, 1);
+			}
+		
+			// Если осталось одно или ноль касаний, сбрасываем prevDiff
+			if (evCache.length < 2) {
+				prevDiff = -1;
+			}
+		}
     }
     
     const getDistance = (touch1, touch2)=> {
@@ -150,7 +160,7 @@ const  SvgWrapper = observer (() => {
     }
 
 	const startDrag = (e) =>{
-		//console.log ('startDrag' + e.buttons)
+		//console.log ('startDrag' )
 		inMoveRef.current = 1;	
 		if (e.target && (e.buttons === 4  || editorStore.mode== 'drag')) {    
 
@@ -261,7 +271,7 @@ const  SvgWrapper = observer (() => {
 		coordsStore.setCoords({ x:0,y:0});
 	}
 
-	const drag =(e) =>{
+	const drag =(e, force=false ) =>{
 
  		let coords= util.convertScreenCoordsToSvgCoords (e.clientX, e.clientY)
 		coordsStore.setCoords({ x: Math.round( coords.x*100) / 100, y: Math.round( coords.y*100) / 100 });
@@ -269,13 +279,15 @@ const  SvgWrapper = observer (() => {
 				(
 					(e.buttons === 4)  || 
 					(editorStore.mode== 'drag' && e.buttons === 1) || 
-					(editorStore.mode== 'dragging' && e.buttons === 1)
+					(editorStore.mode== 'drag' && force) || 
+					(editorStore.mode== 'dragging' && e.buttons === 1) ||
+					(editorStore.mode== 'dragging' && force)
 				)
 			) 
 		{
 			if (!inMoveRef.current) return;
 			var coord = util.getMousePosition(e);
-			if (e.target && (e.buttons === 4 || e.buttons === 1)){
+			if (e.target && (e.buttons === 4 || e.buttons === 1 || force)){
 				let e = (coord.x - offset.x)
 				let f = (coord.y - offset.y) 
 				svgStore.setGroupMatrix({
