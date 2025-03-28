@@ -26,42 +26,10 @@
   --sizePlanX:50;   
   --sizePlanY:50;  
 }
-/*  TODO REMOVE  start*/
 
-.example {
-  position: absolute;
-  top: 0;
-  left:0;
-  z-index: 500;
-  width: 500px;
-  height: 500px;
+.btn_tool.activeMode {
+ color: orangered !important;
 }
-
-
-.draggableItem {
-  padding: 10px 15px;
-  max-width: 180px;
-  margin: auto;
-  background: rgb(71, 119, 214);
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  touch-action: auto !important;
-  user-select: auto !important;
-  pointer-events: auto !important;
-  
-}
-
-.draggableItem:not(:last-child) {
-  margin-bottom: 8px;
-}
- 
-.draggableItem {
-  touch-action: manipulation !important;
-}
-
-/*  TODO REMOVE  END*/
-
 
 html, body, #partEditor {
   touch-action: none !important;

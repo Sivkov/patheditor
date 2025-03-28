@@ -37,6 +37,7 @@ const ToolsPanel = observer(() => {
 		svgStore.setSelectedEdge(false)
 		svgStore.setTextFocus(false)
 		svgStore.setLaserShow ({on:false, speed:svgStore.laserShow.speed})
+		svgStore.setCopiedCid(false)
 	}
 
 	const copyContour =()=>{
@@ -147,7 +148,7 @@ const ToolsPanel = observer(() => {
 								<button
 									id="btn_resize_mode"
 									type="button"
-									className="btn text-white mt-1 ms-2 btn_tool d-flex align-items-center"
+									className={"btn text-white mt-1 ms-2 btn_tool d-flex align-items-center" + (editorStore.mode === 'resize'? ' activeMode ':'') }
 									onMouseDown={() => setMode('resize')}
 									aria-label={t('Resize Mode')} // Улучшаем доступность
 								>
@@ -163,7 +164,7 @@ const ToolsPanel = observer(() => {
 								<button
 									type="button"
 									id="dragMode"
-									className="btn text-white mt-1 ms-2 btn_tool d-flex align-items-center"
+									className={"btn text-white mt-1 ms-2 btn_tool d-flex align-items-center" + (editorStore.mode.startsWith('drag') ? ' activeMode ':'')}
 									onMouseDown={() => setMode('drag')}
 									aria-label={t('Drag Mode')} // Улучшаем доступность
 								>
@@ -181,7 +182,7 @@ const ToolsPanel = observer(() => {
 								<button
 									id="addPointToPath"
 									type="button"
-									className="btn text-white mt-1 ms-2 btn_mode d-flex align-items-center btn_tool btn_add_point"
+									className={"btn  text-white mt-1 ms-2 btn_mode d-flex align-items-center btn_tool btn_add_point" + (editorStore.mode === 'addPoint'? ' activeMode ':'') }
 									onMouseDown={addPointToPath}
 									aria-label={t('Add Point to Path')} 
 								>
@@ -199,7 +200,7 @@ const ToolsPanel = observer(() => {
 									<button
 										id="addPoint"
 										type="button"
-										className="btn text-white mt-1 ms-2 btn_mode d-flex btn_tool btn_add_point"
+										className={"btn  text-white mt-1 ms-2 btn_mode d-flex btn_tool btn_add_point" + (editorStore.mode === 'addPoint'? ' activeMode ':'') }
 										onMouseDown={() => setMode('addPoint')}
 										aria-label={t('Add Point')}>
 										<div className="d-flex flex-row align-items-center justify-content-center">
@@ -219,12 +220,11 @@ const ToolsPanel = observer(() => {
 								<button
 									id='rounding'
 									type="button"
-									className="btn text-white mt-1 ms-2 btn_rounding btn_tool"
+									className="btn  text-white mt-1 ms-2 btn_rounding btn_tool"
 									onMouseDown={roundEdge}
 									aria-label="Округление углов" // Добавляем атрибут для доступности
 								>
 									<Icon icon="proicons:arc" width="24" height="24" style={{ color: 'white' }} />
-									{/* Можно добавить текстовое обозначение, если это улучшит понимание функции */}
 								</button>
 							),
 						}}
@@ -237,7 +237,7 @@ const ToolsPanel = observer(() => {
 								info: (
 									<button
 										type="button"
-										className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+										className={"btn  text-white mt-1 ms-2 btn_tool btn_selectPoint_mode" + (editorStore.mode === 'selectPoint'? ' activeMode ':'') }
 										onMouseDown={deletePoint}
 										aria-label="Удалить точку" // Улучшаем доступность
 									>
@@ -254,11 +254,11 @@ const ToolsPanel = observer(() => {
 									<button
 										type="button"
 										id="selectPoint"
-										className="btn text-white mt-1 ms-2 btn_tool btn_selectPoint_mode"
+										className={"btn  text-white mt-1 ms-2 btn_tool btn_selectPoint_mode" + (editorStore.mode === 'selectPoint'? ' activeMode ':'') }
 										onMouseDown={() => setMode('selectPoint')}
 										aria-label="Выбор точки" // Улучшаем доступность
 									>
-										<Icon icon="mage:mouse-pointer" width="24" height="24" style={{ color: 'white' }} />
+										<Icon icon="mage:mouse-pointer" width="24" height="24" />
  									</button>
 								),
 							}}
@@ -271,7 +271,7 @@ const ToolsPanel = observer(() => {
 								<button
 									type="button"
 									id="btn_copy"
-									className="btn text-white mt-1 ms-2 btn_copy btn_tool" 
+									className="btn  text-white mt-1 ms-2 btn_copy btn_tool"
 									onMouseDown={copyContour}
 									aria-label="Копировать контур" // Делаем кнопку более доступной
 								>
@@ -287,7 +287,7 @@ const ToolsPanel = observer(() => {
 								<button
 									id='pasteContour'
 									type="button"
-									className="btn text-white mt-1 ms-2 btn_paste btn_tool" 
+									className={"btn  text-white mt-1 ms-2 btn_paste btn_tool"  + (typeof svgStore.copiedCid === 'number'? ' activeMode ':'') }
 									onMouseDown={pasteContour}
 									aria-label="Вставить контур" // Улучшаем доступность с aria-label
 								>
@@ -303,7 +303,7 @@ const ToolsPanel = observer(() => {
 								<button
 									id="reverse"
 									type="button"
-									className="btn text-white mt-1 ms-2 btn_reverse_path btn_tool"
+									className="btn  text-white mt-1 ms-2 btn_reverse_path btn_tool"
 									onMouseDown={reverse}
 									aria-label="Обратить путь" // Атрибут для доступности
 								>
@@ -319,13 +319,11 @@ const ToolsPanel = observer(() => {
 							info: (
 								<button
 									type="button"
-									className="btn text-white mt-1 ms-2 btn_text btn_tool"
+									className={"btn  text-white mt-1 ms-2 btn_text btn_tool" + (editorStore.mode === 'text'? ' activeMode ':'') }
 									onMouseDown={() => setMode('text')}
 									aria-label="Выбрать текстовый режим" // Атрибут для доступности
 								>
 									<Icon icon="tabler:text-size" width="24" height="24" />
-									{/* Если хотите добавить текст рядом с иконкой, может выглядеть так: */}
-									{/* Текст */}
 								</button>
 							),
 						}}
@@ -337,13 +335,11 @@ const ToolsPanel = observer(() => {
 							<button
 								id="btn_new_outer"
 								type="button"
-								className="btn text-white mt-1 ms-2 btn_new_outer btn_tool"
+								className="btn  text-white mt-1 ms-2 btn_new_outer btn_tool"
 								onClick={() => svgStore.setNewOuter()}
 								aria-label="Создать новый внешний элемент" // Атрибут для доступности
 							>
 								<Icon icon="material-symbols:settings-applications-outline" width="24" height="24" style={{ color: 'white' }} />
-								{/* Можно добавлять текст рядом с иконкой, если это необходимо */}
-								{/* Создать новый */}
 							</button>
 						),
 					}}
@@ -355,12 +351,11 @@ const ToolsPanel = observer(() => {
 							<button
 								type="button"
 								id="btn_delete"
-								className="btn text-white mt-1 ms-2 btn_delete btn_tool" 
+								className="btn  text-white mt-1 ms-2 btn_delete btn_tool"
 								onMouseDown={deleteContour}
-								aria-label="Удалить контур" // Улучшаем доступность с aria-label
+								aria-label="Удалить контур" 
 							>
 								<i className="fa-solid fa-trash"></i>
-								{/* Опционально можно добавить текстовое обозначение, если это необходимо */}
 							</button>
 						),
 					}}
