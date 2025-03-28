@@ -14,25 +14,33 @@ const SimpleReturnComponent = observer(() => {
 	var partNumber = searchParams.get('part') || 0;
 	const pollingTimeoutRef = useRef(null);
 
+	
 	const {
 		selectedCid,
 	} = svgStore;
+	
+
+	 
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const svg = await Part.getPartCode(handle, partNumber); // Получаем данные
-			const newSvgData = {
-				width: svg.width,
-				height: svg.height,
-				code: svg.code,
-				params: svg.params
-			};
-			svgStore.setSvgData(newSvgData);
-			jointStore.loadJoints (svg.joints)			
-		};
-		fetchData();
-		setPrimaryPollingTimeout()
+		
+		if (partNumber !== 'part_new') {
 
+			const fetchData = async () => {
+				const svg = await Part.getPartCode(handle, partNumber); // Получаем данные
+				const newSvgData = {
+					width: svg.width,
+					height: svg.height,
+					code: svg.code,
+					params: svg.params
+				};
+				svgStore.setSvgData(newSvgData);
+				jointStore.loadJoints (svg.joints)			
+			};
+			fetchData();
+			setPrimaryPollingTimeout()
+
+		}
 	}, []);
 
 	const setSelectedTouch = (e) => {
