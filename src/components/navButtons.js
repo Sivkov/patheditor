@@ -30,6 +30,15 @@ const NavButtons = observer(() => {
 		Part.savePart(action)
 	}
 
+
+	const saveAs = (action=false) =>{
+		
+	}
+
+	const newPart =()=>{
+
+	}
+
 	return (
 	<>
 		<div className="d-flex">
@@ -52,6 +61,26 @@ const NavButtons = observer(() => {
 						>
 						<Icon icon="fluent:save-16-filled" className='me-2' width="18" height="18"/>
 						{t('Save')}
+					</a>
+				</li>
+				<li>
+					<a className="dropdown-item" 
+						href="#" 
+						id="fit_to_page"
+						onClick={ saveAs }					
+						>
+						<Icon icon="fluent:save-16-filled" className='me-2' width="18" height="18"/>
+						{t('Save as')}
+					</a>
+				</li>
+				<li>
+					<a className="dropdown-item" 
+						href="#" 
+						id="fit_to_page"
+						onClick={ newPart }					
+						>
+						<i class="fa-solid fa-file me-2"></i>
+						{t('New part')}
 					</a>
 				</li>
 			</ul>

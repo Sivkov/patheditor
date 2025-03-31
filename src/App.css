@@ -35,6 +35,9 @@ html, body, #partEditor {
   touch-action: none !important;
 }
 
+
+
+
 #wrapper_svg {
   touch-action: manipulation;
 }
@@ -69,6 +72,10 @@ html, body, #partEditor {
     fill:var(--mainBg1);
   }
 }  */
+
+.Toastify__toast-theme--dark {
+  background: var(--mainBg); 
+}
 
 * {
   user-select: none;
