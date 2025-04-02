@@ -239,6 +239,7 @@ const ContourPanel = observer(() => {
 					angle: angle,					
 				});		
 			}
+			addToLog("Contour was changed")   
 		}	
 	}
 
@@ -280,6 +281,7 @@ const ContourPanel = observer(() => {
 			}
 			svgStore.updateElementValue(cid, 'contour', 'coords', newStart)			
 		}
+		addToLog("Contour was changed")   
 	} 
 
 	const panelInfo = [
@@ -383,7 +385,7 @@ const ContourPanel = observer(() => {
 			  </thead>
 			  <tbody>
 				<tr>
-				  <td className="w-25" rowSpan={3}>
+				  <td className="col-4" rowSpan={3}>
 					<div
 					  style={{
 						width: "initial",
@@ -451,17 +453,18 @@ const ContourPanel = observer(() => {
 					  </div>
 					</div>
 				  </td>
-				  <td>X:</td>
-				  <td id="contourPointXvalue" 
-				  className="editable" 
+				  <td className="col-2">X</td>
+				  <td 
+				  id="contourPointXvalue" 
+				  className="col-2 editable" 
 				  contentEditable=""
 				  onKeyDown={onKeyDown}		
 				  >
 					{activeCooord.x}
 				  </td>
-				  <td>Y:</td>
+				  <td className='col-2'>Y</td>
 				  <td id="contourPointYvalue" 
-				  className="editable" 
+				  className="col-2 editable" 
 				  contentEditable=""
 				  onKeyDown={onKeyDown}		
 				  >
@@ -469,7 +472,7 @@ const ContourPanel = observer(() => {
 				  </td>
 				</tr>
 				<tr>
-				  <td>__:</td>
+				  <td>W</td>
 				  <td id="contourWidthValue" 
 				  className="editable" 
 				  contentEditable=""
@@ -477,7 +480,7 @@ const ContourPanel = observer(() => {
 				  >
 					{wh.w}
 				  </td>
-				  <td>|:</td>
+				  <td>H</td>
 				  <td id="contourHeightValue" 
 				  	className="editable" 
 					contentEditable=""
@@ -486,7 +489,7 @@ const ContourPanel = observer(() => {
 					{wh.h}
 				  </td>
 				</tr>
-				<tr>
+				{/* <tr className='d-none'>
 				  <td>
 					<i className="fa-solid fa-link" />
 				  </td>
@@ -538,10 +541,9 @@ const ContourPanel = observer(() => {
 					  <div>%</div>
 					</div>
 				  </td>
-				</tr>
+				</tr> */}
 				<tr>
-				  <td className="w-25" rowSpan={3}></td>
-				  <td>
+				  <td colSpan={2}>
 					<div className="d-flex flex-row align-items-top justify-content-center">
 					<Icon icon="tabler:angle" width="24" height="24" /><div
 						style={{ fontFamily: '"Font Awesome 6 Pro"', marginTop: "-7px" }}
@@ -557,13 +559,12 @@ const ContourPanel = observer(() => {
 					contentEditable=""
 					onKeyDown={onKeyDown}	
 					onInput={captureInput} 
+					colSpan={2}
 					>
 					{ angle }
 				  </td>
-				  <td />
-				  <td />
-				</tr>
-				<tr className="d-none">
+ 				</tr>
+{/* 				<tr className="d-none">
 				  <td>
 					<i className="fa-solid fa-rectangles-mixed" />
 				  </td>
@@ -587,7 +588,7 @@ const ContourPanel = observer(() => {
 						}}
 					/>
 				</td>
-				</tr>
+				</tr> */}
 			  </tbody>
 			</table>
 			<table className="table">
