@@ -17,8 +17,8 @@ class Part {
     }
 
     static #params = {
-        width: 189,
-        height:200
+        width: window.screen.width,
+        height:window.screen.height
     };
 
     static setSvgParams(newParams) {

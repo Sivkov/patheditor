@@ -79,7 +79,7 @@ const NavButtons = observer(() => {
 						id="fit_to_page"
 						onClick={ newPart }					
 						>
-						<i class="fa-solid fa-file me-2"></i>
+						<i className="fa-solid fa-file me-2"></i>
 						{t('New part')}
 					</a>
 				</li>
